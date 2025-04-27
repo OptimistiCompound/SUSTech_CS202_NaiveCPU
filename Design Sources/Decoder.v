@@ -31,19 +31,23 @@ module Decoder(
     output [31:0] imm32
     );
 
-wire [6:0] opcode;
-wire sign;
-wire [4:0] raddr1;
-wire [4:0] raddr2;
-wire [4:0] waddr;
-
-// wire Branch;
-// wire MemRead;
-// wire MemtoReg;
-// wire [1:0] ALUOp;
-// wire MemWrite;
-// wire ALUSrc;
-// wire regWrite;
+wire sign = inst[31];
+assign opcode = inst[6:0];
+parameter R = 7'b0110011,
+        I = 7'b0010011,
+        L = 7'b0000011,
+        S = 7'b0100011,
+        B = 7'b1100011,
+        LUI = 7'b0110111,
+        AUIPC = 7'b0010111,
+        JAL = 7'b1101111,
+        JALR = 7'b1100111;
+wire rs1 = opcode == R || opcode == I || opcode == L || opcode == JALR ||
+            opcode == S || opcode == B;
+wire rs2 = opcode == R || opcode == S || opcode == B;
+wire [4:0] raddr1 = (rs1) ? inst[19:15] : 0;
+wire [4:0] raddr2 = (rs2) ? inst[24:20] : 0;
+wire [4:0] waddr = (regWrite) ? inst[11:7] : 0;
 
 RegisterFile uRegisterFile(
     .clk(clk),
@@ -62,9 +66,5 @@ ImmGen uImmGen(
     .imm32(imm32)
 );
 
-assign sign = inst[31];
-assign waddr = inst[11:7];
-assign raddr1 = inst[19:15];
-assign raddr2 = inst[24:20];
 
 endmodule

@@ -22,7 +22,7 @@
 
 module RegisterFile(
     input clk,
-    input rst,
+    input rstn,
     input [4:0] raddr1,
     input [4:0] raddr2,
     input [4:0] waddr,
@@ -31,14 +31,20 @@ module RegisterFile(
     output [31:0] rdata1,
     output [31:0] rdata2
     );
-reg [31:0] registers [4:0];
+reg [31:0] registers [31:0];
 
 assign rdata1 = registers[raddr1];
 assign rdata2 = registers[raddr2];
 
-always @(*) begin
-    if (regWrite)
+integer i;
+always @(posedge clk or negedge rstn) begin
+    registers[0] = 0;
+    if (~rstn) begin
+        for (i = 0; i < 32; i = i + 1) begin
+            registers[i] <= 32'b0;
+        end
+    end
+    else if (regWrite && waddr != 5'b0)
         registers[waddr] <= wdata;
 end
-
 endmodule
