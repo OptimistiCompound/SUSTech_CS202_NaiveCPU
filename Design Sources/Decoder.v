@@ -30,8 +30,6 @@ module Decoder(
     output [31:0] rdata2,
     output [31:0] imm32
     );
-
-wire sign = inst[31];
 assign opcode = inst[6:0];
 parameter R = 7'b0110011,
         I = 7'b0010011,
@@ -42,12 +40,9 @@ parameter R = 7'b0110011,
         AUIPC = 7'b0010111,
         JAL = 7'b1101111,
         JALR = 7'b1100111;
-wire rs1 = opcode == R || opcode == I || opcode == L || opcode == JALR ||
-            opcode == S || opcode == B;
-wire rs2 = opcode == R || opcode == S || opcode == B;
-wire [4:0] raddr1 = (rs1) ? inst[19:15] : 0;
-wire [4:0] raddr2 = (rs2) ? inst[24:20] : 0;
-wire [4:0] waddr = (regWrite) ? inst[11:7] : 0;
+wire [4:0] raddr1 = inst[19:15];
+wire [4:0] raddr2 = inst[24:20];
+wire [4:0] waddr = inst[11:7];
 
 RegisterFile uRegisterFile(
     .clk(clk),
