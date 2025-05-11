@@ -21,59 +21,100 @@
 
 
 module ALU(
-    input [31:0] ReadData1,
-    input [31:0] ReadData2,
-    input [31:0] imm32,
-    input ALUSrc,
-    input [1:0] ALUOp,
-    input [2:0] funct3,
-    input [6:0] funct7,
-    output reg [31:0] ALUResult,
-    output zero
-    );
+    // Inputs
+    input [31:0] ReadData1,         // data from rs1
+    input [31:0] ReadData2,         // data from rs2
+    input [31:0] imm32,             // immediate
+    input ALUSrc,                   // MUX control, operand2 = (ALU == 1) ? rs2 : imm
+    input [1:0] ALUOp,              // 2bits control
+    input [2:0] funct3,             // from instruction
+    input [6:0] funct7,             // from instruction
+    // input [31:0] pc4_i,             // from IFetch, PC + 4
 
+    // Outputs
+    output reg [31:0] ALUResult,    // result of ALU
+    output [31:0] ALU_addr_out,     // address of PC
+    output zero                     // for B-type, from ALU to IFetch
+    );
+//-------------------------------------------------------------
+// Includes
+//-------------------------------------------------------------
+`include "riscv_defs.v"
+
+//-------------------------------------------------------------
+// Decode ALUOp and funct to ALUControl
+//-------------------------------------------------------------
 reg [3:0] ALUControl;
 wire [31:0] operand1 = ReadData1;
 wire [31:0] operand2 = (ALUSrc==1) ? imm32 : ReadData2;
-
-wire ADD = (funct7 == 7'b0000000) && (funct3 == 3'b000);
-wire SUB = (funct7 == 7'b0100000) && (funct3 == 3'b000);
-wire AND = (funct7 == 7'b0000000) && (funct3 == 3'b111);
-wire OR  = (funct7 == 7'b0000000) && (funct3 == 3'b110);
-
+wire [9:0] com_funct = {funct3, funct7};
 assign zero = (ALUResult==0) ? 1'b1 : 1'b0;
-
 always @(*) begin
     case(ALUOp)
-        2'b00:begin // load or store
-            ALUControl = {ALUOp, 2'b10};
+        2'b00:begin // load-type, S-type
+            ALUControl = `ALU_ADD;
         end
         2'b01:begin // B-type
-            ALUControl = {ALUOp, 2'b10};
+            ALUControl = `ALU_SUB;
         end
         2'b10:begin // R-type
-            if (ADD)
-                ALUControl = {4'b0010};
-            else if (SUB)
-                ALUControl = {4'b0110};
-            else if (AND)
-                ALUControl = {4'b0000};
-            else if (OR)
-                ALUControl = {4'b0001};
+            if (com_funct == `INST_ADD)
+                ALUControl = `ALU_ADD;
+            else if (com_funct == `INST_SUB)
+                ALUControl = `ALU_SUB;
+            else if (com_funct == `INST_XOR)
+                ALUControl = `ALU_XOR;
+            else if (com_funct == `INST_OR)
+                ALUControl = `ALU_OR;
+            else if (com_funct == `INST_AND)
+                ALUControl = `ALU_AND;
+            else if (com_funct == `INST_SLL)
+                ALUControl = `ALU_SHIFTL;
+            else if (com_funct == `INST_SRL)
+                ALUControl = `ALU_SHIFTR;
+            else if (com_funct == `INST_SRA)
+                ALUControl = `ALU_SHIFTR_ARITH;
+            else if (com_funct == `INST_SLT)
+                ALUControl = `ALU_LESS_THAN_SIGNED;
+            else if (com_funct == `INST_SLTU)
+                ALUControl = `ALU_LESS_THAN;
         end 
-        2'b11: ALUControl = {ALUOp, 2'b00};
-        default: ALUControl = {4'b1111};
+        2'b11:begin // I-type
+            if (funct3 == `INST_ADDI)
+                ALUControl = `ALU_ADD;
+            else if (funct3 == `INST_XORI)
+                ALUControl = `ALU_XOR;
+            else if (funct3 == `INST_ORI)
+                ALUControl = `ALU_OR;
+            else if (funct3 == `INST_ANDI)
+                ALUControl = `ALU_AND;
+            else if (funct3 == `INST_SLLI)
+                ALUControl = `ALU_SHIFTL;
+            else if (funct3 == `INST_SRLI)
+                ALUControl = `ALU_SHIFTR;
+            else if (funct3 == `INST_SRAI)
+                ALUControl = `ALU_SHIFTR_ARITH;
+            else if (funct3 == `INST_SLTUI)
+                ALUControl = `ALU_LESS_THAN;
+        end
     endcase
 end
 
 always @(*) begin
     case (ALUControl)
-        4'b0000: ALUResult = operand1 & operand2;
-        4'b0001: ALUResult = operand1 | operand2;
-        4'b0010: ALUResult = operand1 + operand2;
-        4'b0110: ALUResult = operand1 - operand2;
+        `ALU_NONE:              ALUResult = 0;
+        `ALU_SHIFTL:            ALUResult = operand1 << operand2;
+        `ALU_SHIFTR:            ALUResult = operand1 >> operand2;
+        `ALU_SHIFTR_ARITH:      ALUResult = operand1 >>> operand2;
+        `ALU_ADD:               ALUResult = operand1 + operand2;
+        `ALU_SUB:               ALUResult = operand1 - operand2;
+        `ALU_AND:               ALUResult = operand1 & operand2;
+        `ALU_OR:                ALUResult = operand1 | operand2;
+        `ALU_XOR:               ALUResult = operand1 ^ operand2;
+        `ALU_LESS_THAN:         ALUResult = $unsigned(operand1) < $unsigned(operand2);
+        `ALU_LESS_THAN_SIGNED:  ALUResult = operand1 < operand2;
         default: 
-            ALUResult = 32'b0;
+            ALUResult = 0;
     endcase
 end
 
