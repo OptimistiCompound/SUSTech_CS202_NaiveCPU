@@ -3,9 +3,9 @@
 // Company: 
 // Engineer: 
 // 
-// Create Date: 2025/04/26 23:37:15
+// Create Date: 2025/04/26 22:38:53
 // Design Name: 
-// Module Name: ALU
+// Module Name: Controller
 // Project Name: 
 // Target Devices: 
 // Tool Versions: 
@@ -20,61 +20,39 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module ALU(
-    input [31:0] ReadData1,
-    input [31:0] ReadData2,
-    input [31:0] imm32,
-    input ALUSrc,
-    input [1:0] ALUOp,
-    input [2:0] funct3,
-    input [6:0] funct7,
-    output reg [31:0] ALUResult,
-    output zero
+module Controller(
+    input [31:0] inst,
+    output Branch,
+    output Jump,
+    output [1:0] ALUOp,
+    output ALUSrc,
+    output MemRead,
+    output MemWrite,
+    output MemtoReg,
+    output RegWrite
     );
+//-------------------------------------------------------------
+// Includes
+//-------------------------------------------------------------
+`include "riscv_defs.v"
 
-reg [3:0] ALUControl;
-wire [31:0] operand1 = ReadData1;
-wire [31:0] operand2 = (ALUSrc==1) ? imm32 : ReadData2;
-
-wire ADD = !(funct7 ^ 7'b0000000) && !(funct3 ^ 3'b000);
-wire SUB = !(funct7 ^ 7'b0100000) && !(funct3 ^ 3'b000);
-wire AND = !(funct7 ^ 7'b0000000) && !(funct3 ^ 3'b111);
-wire OR = !(funct7 ^ 7'b0000000) && !(funct3 ^ 3'b110);
-
-assign zero = (ALUResult==0) ? 1'b1 : 1'b0;
-
-always @(*) begin
-    case(ALUOp)
-        2'b00:begin // load or store
-            ALUControl = {ALUOp, 2'b10};
-        end
-        2'b01:begin // B-type
-            ALUControl = {ALUOp, 2'b10};
-        end
-        2'b10:begin // R-type
-            if (ADD)
-                ALUControl = {4'b0010};
-            else if (SUB)
-                ALUControl = {4'b0110};
-            else if (AND)
-                ALUControl = {4'b0000};
-            else if (OR)
-                ALUControl = {4'b0001};
-        end 
-        2'b11: ALUControl = {ALUOp, 2'b00};
-        default: ALUControl = {4'b1111};
-    endcase
-end
-
-always @(*) begin
-    case (ALUControl)
-        4'b0000: ALUResult = operand1 & operand2;
-        4'b0001: ALUResult = operand1 | operand2;
-        4'b0010: ALUResult = operand1 + operand2;
-        4'b0110: ALUResult = operand1 - operand2;
-        default: 
-            ALUResult = 32'b0;
-    endcase
-end
+//-------------------------------------------------------------
+// Control signals
+//-------------------------------------------------------------
+wire [6:0] opcode;
+assign opcode = inst[6:0];
+assign Branch = (opcode == `OPCODE_B);
+assign Jump = (opcode == `OPCODE_JAL);
+assign ALUOp = {
+            {(opcode != `OPCODE_L) && (opcode != `OPCODE_S) && (opcode != `OPCODE_B)}, 
+            {(opcode != `OPCODE_L) && (opcode != `OPCODE_S) && (opcode != `OPCODE_R)}
+        };
+assign ALUSrc = (opcode == `OPCODE_I) || (opcode == `OPCODE_L) || (opcode == `OPCODE_S) || (opcode == `OPCODE_LUI) ||
+            (opcode == `OPCODE_AUIPC);
+assign MemRead = opcode == `OPCODE_L;
+assign MemWrite = (opcode == `OPCODE_S);
+assign MemtoReg = (opcode == `OPCODE_L);
+assign RegWrite = (opcode == `OPCODE_R) || (opcode == `OPCODE_I) || (opcode == `OPCODE_L) || (opcode == `OPCODE_LUI) ||
+            (opcode == `OPCODE_AUIPC) || (opcode == `OPCODE_JAL) || (opcode == `OPCODE_JALR);
 
 endmodule

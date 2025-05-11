@@ -24,28 +24,27 @@ module ImmGen(
     input [31:0] inst,
     output reg[31:0] imm32
     );
+//-------------------------------------------------------------
+// Includes
+//-------------------------------------------------------------
+`include "riscv_defs.v"
+
+//-------------------------------------------------------------
+// Generate immediate
+//-------------------------------------------------------------
 wire [6:0] opcode;
 wire sign;
 assign opcode = inst[6:0];
 assign sign = inst[31];
-parameter R = 7'b0110011,
-        I = 7'b0010011,
-        L = 7'b0000011,
-        S = 7'b0100011,
-        B = 7'b1100011,
-        LUI = 7'b0110111,
-        AUIPC = 7'b0010111,
-        JAL = 7'b1101111,
-        JALR = 7'b1101111;
 
 always @(*) begin
     case (opcode)
-        R: imm32 = {32'b0};
-        I, L, JALR: imm32 = {{20{sign}},inst[31:20]};
-        S: imm32 = {{20{sign}}, inst[31:25], inst[11:7]};
-        B: imm32 = {{19{sign}}, inst[31], inst[7], inst[30:25], inst[11:8], 1'b0};
-        LUI, AUIPC: imm32 = {inst[31:12], 12'b0};
-        JAL: imm32 = {{12{sign}}, inst[31], inst[19:12], inst[20], inst[30:21], 1'b0};
+        `OPCODE_R: imm32 = {32'b0};
+        `OPCODE_I, `OPCODE_L, `OPCODE_JALR: imm32 = {{20{sign}},inst[31:20]};
+        `OPCODE_S: imm32 = {{20{sign}}, inst[31:25], inst[11:7]};
+        `OPCODE_B: imm32 = {{19{sign}}, inst[31], inst[7], inst[30:25], inst[11:8], 1'b0};
+        `OPCODE_LUI, `OPCODE_AUIPC: imm32 = {inst[31:12], 12'b0};
+        `OPCODE_JAL: imm32 = {{12{sign}}, inst[31], inst[19:12], inst[20], inst[30:21], 1'b0};
         default:
             imm32 = 0;
     endcase

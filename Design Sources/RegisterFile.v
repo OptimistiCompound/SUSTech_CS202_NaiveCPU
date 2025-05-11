@@ -21,6 +21,7 @@
 
 
 module RegisterFile(
+    // Inputs
     input clk,
     input rstn,
     input [4:0] raddr1,
@@ -28,6 +29,8 @@ module RegisterFile(
     input [4:0] waddr,
     input [31:0] wdata,
     input regWrite,
+
+    // Outputs
     output [31:0] rdata1,
     output [31:0] rdata2
     );
