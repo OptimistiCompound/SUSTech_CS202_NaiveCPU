@@ -21,29 +21,51 @@
 
 
 module Decoder(
+    // Inputs
     input clk,
     input rstn,
-    input [31:0] wdata,
+    input [31:0] ALUResult,
+    input [31:0] MemData,
+    input [31:0] pc4_i,
     input regWrite,
+    input MemtoReg,
     input [31:0] inst,
+
+    // Outputs
     output [31:0] rdata1,
     output [31:0] rdata2,
     output [31:0] imm32
     );
+//-------------------------------------------------------------
+// Includes
+//-------------------------------------------------------------
+`include "riscv_defs.v"
+
 assign opcode = inst[6:0];
-parameter R = 7'b0110011,
-        I = 7'b0010011,
-        L = 7'b0000011,
-        S = 7'b0100011,
-        B = 7'b1100011,
-        LUI = 7'b0110111,
-        AUIPC = 7'b0010111,
-        JAL = 7'b1101111,
-        JALR = 7'b1100111;
 wire [4:0] raddr1 = inst[19:15];
 wire [4:0] raddr2 = inst[24:20];
-wire [4:0] waddr = inst[11:7];
+wire [4:0] rd_v = inst[11:7];
 
+//-------------------------------------------------------------
+// Write data selection
+//-------------------------------------------------------------
+reg [31:0] wdata;
+always @(*) begin
+    if (opcode == `OPCODE_JAL)
+        wdata = rd_v;
+    else if (opcode == `OPCODE_LUI)
+        wdata = imm32;
+    else if (opcode == `OPCODE_AUIPC)
+        wdata = pc4_i + imm32;
+    else if (MemtoReg == 1)
+        wdata = MemData;
+    else 
+        wdata = ALUResult;
+end
+
+//-------------------------------------------------------------
+// Submodules
+//-------------------------------------------------------------
 RegisterFile uRegisterFile(
     .clk(clk),
     .rstn(rstn),

@@ -21,18 +21,23 @@
 
 
 module IFetch(
+    // Inputs
     input clk,
     input rst,
     input [31:0] imm32,
     input branch,
+    input jump,
     input zero,
+    input ALU_addr_out, 
+
+    // Outputs
     output [31:0] inst
     );
 reg [31:0] PC;
 always @(negedge clk or negedge rst) begin
     if (~rst)
     PC <= 32'h0000_0000;
-    else if (branch && zero)
+    else if (branch && zero || jump)
         PC <= PC + imm32;
     else begin
         PC <= PC + 32'h4;
