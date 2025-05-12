@@ -33,7 +33,6 @@ module ALU(
 
     // Outputs
     output reg [31:0] ALUResult,    // result of ALU
-    output [31:0] ALU_addr_out,     // address of PC
     output zero                     // for B-type, from ALU to IFetch
     );
 //-------------------------------------------------------------
@@ -55,7 +54,10 @@ always @(*) begin
             ALUControl = `ALU_ADD;
         end
         2'b01:begin // B-type
-            ALUControl = `ALU_SUB;
+            if (funct3 == `INST_BLTU || funct3 == `INST_BGEU)
+                ALUControl = `ALU_SUB_UNSIGNED;
+            else
+                ALUControl = `ALU_SUB;
         end
         2'b10:begin // R-type
             if (com_funct == `INST_ADD)
@@ -113,6 +115,7 @@ always @(*) begin
         `ALU_XOR:               ALUResult = operand1 ^ operand2;
         `ALU_LESS_THAN:         ALUResult = $unsigned(operand1) < $unsigned(operand2);
         `ALU_LESS_THAN_SIGNED:  ALUResult = operand1 < operand2;
+        `ALU_SUB_UNSIGNED:      ALUResult = $unsigned(operand1) - $unsigned(operand2);
         default: 
             ALUResult = 0;
     endcase

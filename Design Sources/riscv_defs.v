@@ -43,7 +43,9 @@
 `define ALU_XOR                                 4'b1001
 `define ALU_LESS_THAN                           4'b1010
 `define ALU_LESS_THAN_SIGNED                    4'b1011
+`define ALU_SUB_UNSIGNED                        4'b1100
 
+// instruction funct for R-type
 `define INST_ADD                                10'h0_00
 `define INST_SUB                                10'h0_20
 `define INST_XOR                                10'h4_00
@@ -55,6 +57,7 @@
 `define INST_SLT                                10'h2_20
 `define INST_SLTU                               10'h3_00
 
+// instruction funct for I-type
 `define INST_ADDI                               3'h0
 `define INST_XORI                               3'h4
 `define INST_ORI                                3'h6
@@ -64,16 +67,10 @@
 `define INST_SRAI                               3'h5
 `define INST_SLTUI                              3'h3
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+// instruction funct for B-type
+`define INST_BEQ                                3'h0
+`define INST_BNE                                3'h1
+`define INST_BLT                                3'h4
+`define INST_BGE                                3'h5
+`define INST_BLTU                               3'h6
+`define INST_BGEU                               3'h7
