@@ -25,27 +25,18 @@ module IFetch(
     input clk,
     input rst,
     input [31:0] imm32,
-    input [31:0] ALUResult,
-
-    input zero,
     input Branch,
-    input nBranch,
-    input Jump,
-    input Branch_lt,
-    input Branch_ge,
 
     // Outputs
     output [31:0] inst
     );
 reg [31:0] PC;
+wire [31:0] next_PC = (rst==0) ? 0 : (Branch) ? PC + imm32 : PC + 32'h4;
 always @(negedge clk or negedge rst) begin
     if (~rst)
         PC <= 0;
-    else if (Branch && zero || Jump || nBranch && !zero || Branch_lt && ALUResult < 0 || Branch_ge && ALUResult >= 0)
-        PC <= PC + imm32;
-    else begin
-        PC <= PC + 32'h4;
-    end
+    else
+        PC <= next_PC;
 end
 
 prgrom urom (

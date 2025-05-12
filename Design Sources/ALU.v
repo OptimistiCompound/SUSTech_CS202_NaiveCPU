@@ -29,11 +29,10 @@ module ALU(
     input [1:0] ALUOp,              // 2bits control
     input [2:0] funct3,             // from instruction
     input [6:0] funct7,             // from instruction
-    // input [31:0] pc4_i,             // from IFetch, PC + 4
 
     // Outputs
     output reg [31:0] ALUResult,    // result of ALU
-    output zero                     // for B-type, from ALU to IFetch
+    output reg zero                     // for B-type, from ALU to IFetch
     );
 //-------------------------------------------------------------
 // Includes
@@ -47,7 +46,6 @@ reg [3:0] ALUControl;
 wire [31:0] operand1 = ReadData1;
 wire [31:0] operand2 = (ALUSrc==1) ? imm32 : ReadData2;
 wire [9:0] com_funct = {funct3, funct7};
-assign zero = (ALUResult==0) ? 1'b1 : 1'b0;
 always @(*) begin
     case(ALUOp)
         2'b00:begin // load-type, S-type
@@ -108,17 +106,33 @@ always @(*) begin
         `ALU_SHIFTL:            ALUResult = operand1 << operand2;
         `ALU_SHIFTR:            ALUResult = operand1 >> operand2;
         `ALU_SHIFTR_ARITH:      ALUResult = operand1 >>> operand2;
-        `ALU_ADD:               ALUResult = operand1 + operand2;
-        `ALU_SUB:               ALUResult = operand1 - operand2;
+        `ALU_ADD:               ALUResult = $signed(operand1) + $signed(operand2);
+        `ALU_SUB:               ALUResult = $signed(operand1) - $signed(operand2);
         `ALU_AND:               ALUResult = operand1 & operand2;
         `ALU_OR:                ALUResult = operand1 | operand2;
         `ALU_XOR:               ALUResult = operand1 ^ operand2;
         `ALU_LESS_THAN:         ALUResult = $unsigned(operand1) < $unsigned(operand2);
-        `ALU_LESS_THAN_SIGNED:  ALUResult = operand1 < operand2;
+        `ALU_LESS_THAN_SIGNED:  ALUResult = $signed(operand1) < $signed(operand2);
         `ALU_SUB_UNSIGNED:      ALUResult = $unsigned(operand1) - $unsigned(operand2);
         default: 
             ALUResult = 0;
     endcase
+end
+
+//-------------------------------------------------------------
+// Branch handling
+//-------------------------------------------------------------
+always @(*) begin
+    if (ALUOp == 2'b01) begin
+        case (funct3)
+            `INST_BEQ: zero = (ALUResult == 0);
+            `INST_BNE: zero = (ALUResult != 0);
+            `INST_BLT, `INST_BLTU: zero = (ALUResult < 0);
+            `INST_BLT, `INST_BGEU: zero = (ALUResult >= 0);
+            default: 
+                zero = 0;
+        endcase
+    end
 end
 
 endmodule
