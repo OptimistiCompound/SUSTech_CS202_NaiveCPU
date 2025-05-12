@@ -23,6 +23,9 @@
 module Controller(
     input [31:0] inst,
     output Branch,
+    output nBranch,
+    output Branch_lt,
+    output Branch_ge,
     output Jump,
     output [1:0] ALUOp,
     output ALUSrc,
@@ -39,9 +42,12 @@ module Controller(
 //-------------------------------------------------------------
 // Control signals
 //-------------------------------------------------------------
-wire [6:0] opcode;
-assign opcode = inst[6:0];
-assign Branch = (opcode == `OPCODE_B);
+wire [6:0] opcode = inst[6:0];
+wire [2:0] funct3 = inst[14:12];
+assign Branch = (opcode == `OPCODE_B) && (funct3 == `INST_BEQ);
+assign nBranch = (opcode == `OPCODE_B) && (funct3 == `INST_BNE);
+assign Branch_lt = (opcode == `OPCODE_B) && (funct3 == `INST_BLT || funct3 == `INST_BLTU);
+assign Branch_ge = (opcode == `OPCODE_B) && (funct3 == `INST_BGE || funct3 == `INST_BGEU);
 assign Jump = (opcode == `OPCODE_JAL);
 assign ALUOp = {
             {(opcode != `OPCODE_L) && (opcode != `OPCODE_S) && (opcode != `OPCODE_B)}, 
