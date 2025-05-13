@@ -39,7 +39,7 @@ module Decoder(
 //-------------------------------------------------------------
 // Includes
 //-------------------------------------------------------------
-`include "riscv_defs.v"
+`include "../Header_Files/riscv_defs.v"
 
 assign opcode = inst[6:0];
 wire [4:0] raddr1 = inst[19:15];
