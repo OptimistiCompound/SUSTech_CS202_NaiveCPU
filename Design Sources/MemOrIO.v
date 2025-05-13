@@ -1,0 +1,52 @@
+module MemOrIO( 
+    input mRead,        // 读内存控制信号
+    input mWrite,       // 写内存控制信号
+    input ioRead,       // 读IO控制信号
+    input ioWrite,      // 写IO控制信号
+    input [31:0] addr_in,  // 来自ALU的地址
+    output [31:0] addr_out, // 输出到数据存储器的地址
+    input [31:0] m_rdata,   // 从数据存储器读取的数据
+    input [15:0] switch_data, // 从开关读取的数据(16位)
+    input [11:0] key_data,   // 从键盘读取的数据(11位)
+    output [31:0] r_wdata,  // 输出到寄存器堆的数据
+    input [31:0] r_rdata,   // 从寄存器堆读取的数据
+    output reg [31:0] write_data, // 输出到存储器或IO的数据
+    output LEDCtrl,         // LED片选信号
+    output SwitchCtrl,      // 开关片选信号
+    output KeyCtrl          // 键盘片选信号
+);
+
+    // 地址映射定义
+    parameter LED_BASE_ADDR = 32'hFFFFFC60;     // LED基地址
+    parameter SWITCH_BASE_ADDR = 32'hFFFFFC64;  // 开关基地址
+    parameter KEY_BASE_ADDR = 32'hFFFFFC68;     // 键盘基地址
+    
+    // 判断地址类型
+    wire isLEDAddr = (addr_in == LED_BASE_ADDR);
+    wire isSwitchAddr = (addr_in == SWITCH_BASE_ADDR);
+    wire isKeyAddr = (addr_in == KEY_BASE_ADDR);
+    wire isIOAddr = isLEDAddr || isSwitchAddr || isKeyAddr;
+    
+    // 输出地址直接连接输入地址
+    assign addr_out = addr_in;
+    
+    // 从存储器或IO读取的数据到寄存器堆
+    assign r_wdata = (mRead && !isIOAddr) ? m_rdata :      // 内存读取
+                     (ioRead && isSwitchAddr) ? {16'h0, switch_data} :  // 开关读取
+                     (ioRead && isKeyAddr) ? {21'h0, key_data} :        // 键盘读取(扩展到32位)
+                     32'h0;  // 默认值
+    
+    // 片选信号（高电平有效）
+    assign LEDCtrl = ioWrite && isLEDAddr;      // 写LED时有效
+    assign SwitchCtrl = ioRead && isSwitchAddr; // 读开关时有效
+    assign KeyCtrl = ioRead && isKeyAddr;       // 读键盘时有效
+    
+    // 写入数据选择
+    always @* begin
+        if (mWrite || (ioWrite && isLEDAddr))  // 写内存或LED时
+            write_data = r_rdata;  // 数据来自寄存器堆
+        else
+            write_data = 32'hZZZZZZZZ;  // 否则为高阻态
+    end
+
+endmodule
