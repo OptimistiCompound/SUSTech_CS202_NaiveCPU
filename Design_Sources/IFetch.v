@@ -28,7 +28,8 @@ module IFetch(
     input Branch,
 
     // Outputs
-    output [31:0] inst
+    output [31:0] inst,
+    output [31:0] pc4_i
     );
 reg [31:0] PC;
 wire [31:0] next_PC = (rst==0) ? 0 : (Branch) ? PC + imm32 : PC + 32'h4;
@@ -38,6 +39,8 @@ always @(negedge clk or negedge rst) begin
     else
         PC <= next_PC;
 end
+
+assign pc4_i = PC + 32'h4;
 
 prgrom urom (
     .clka(clk),
