@@ -67,6 +67,7 @@ module CPU(
 
     Controller controller(
         .inst(inst),
+        .ALUResult(ALUResult),
         .zero(zero),
         .Branch(Branch),
         .ALUOp(ALUOp),
@@ -74,7 +75,8 @@ module CPU(
         .MemRead(MemRead),
         .MemWrite(MemWrite),
         .MemtoReg(MemtoReg),
-        .RegWrite(RegWrite)
+        .RegWrite(RegWrite),
+
     );
 
     ALU alu(
@@ -105,7 +107,52 @@ module CPU(
 
     // need to test and complicate
 
+    MemOrIO memorio(
+        .mRead(MemRead),        // read from Mem
+        .mWrite(MemWrite),      // write to Mem
+        .ioRead(io_read),       // read from IO
+        .ioWrite(io_write),     // write to IO
+        .addr_in(ALUResult),    // address from ALU
+        .addr_out(),            
+        .m_rdata(MemData),
+        .switch_data(16'h0),
+        .key_data(12'h0),
+        .r_wdata(),
+        .r_rdata(ReadData2),
+        .write_data(),
+        .LEDCtrl(),
+        .SwitchCtrl(),
+        .KeyCtrl(),
+        .seg_ctrl(),
+        .seg_data()
+    );
     
+    LED_con led(
+        .clk(cpu_clk),
+        .rstn(rstn),
+        .io_write(io_write),
+        .reg_LED(),
+        .reg_seg(),
+        .write_data(write_data),
+        .LEDCtrl(LEDCtrl),
+        .seg_ctrl(seg_ctrl),
+    );
+
+    debounce conf_btn_deb(
+        .clk(cpu_clk),
+        .rstn(rstn),
+        .key_in(conf_btn),
+        .key_out(conf_btn_out)
+    );
+
+    Switch_con switch_con(
+        .clk(cpu_clk),
+        .rstn(rstn),
+        .io_read(io_read),
+        .conf_btn_out(conf_btn_out),
+        .read_data(read_data)
+    );
+
 
 //-------------------------------------------------------------
 // direct connections

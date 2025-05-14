@@ -23,6 +23,7 @@
 module Controller(
     // Inputs
     input [31:0] inst,
+    input [31:0] ALUResult,
     input zero,
 
     // Outputs
@@ -32,7 +33,10 @@ module Controller(
     output MemRead,
     output MemWrite,
     output MemtoReg,
-    output RegWrite
+    output RegWrite,
+    output mem_io_reg,
+    output io_read,
+    output io_write
     );
 //-------------------------------------------------------------
 // Includes
@@ -56,5 +60,9 @@ assign MemWrite = (opcode == `OPCODE_S);
 assign MemtoReg = (opcode == `OPCODE_L);
 assign RegWrite = (opcode == `OPCODE_R) || (opcode == `OPCODE_I) || (opcode == `OPCODE_L) || (opcode == `OPCODE_LUI) ||
             (opcode == `OPCODE_AUIPC) || (opcode == `OPCODE_JAL) || (opcode == `OPCODE_JALR);
+
+assign mem_io_reg = io_read || io_write;
+assign io_read = (opcode == `OPCODE_L) && ALUResult[31:8] == 24'hFFFFFC;
+assign io_write = (opcode == `OPCODE_S ) && ALUResult[31:8] == 24'hFFFFFC;
 
 endmodule
