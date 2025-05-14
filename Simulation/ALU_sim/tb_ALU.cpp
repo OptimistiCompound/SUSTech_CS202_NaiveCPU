@@ -15,6 +15,9 @@ int main(int argc, char** argv) {
     dut->trace(tfp, 5); // 跟踪5层信号
     tfp->open("waveform.vcd");
 
+    int ans = 0;
+    int ans_zero = 0;
+
 //-------------------------------------------------------------
 // R-type Test
 //-------------------------------------------------------------
@@ -213,7 +216,7 @@ int main(int argc, char** argv) {
     dut->funct3 = (INST_ANDI);      // funct3=7 (111b)
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == (dut->ReadData1 & imm32) && dut->zero == 1) {
+    if (dut->ALUResult == (dut->ReadData1 & dut->imm32) && dut->zero == 1) {
         printf("test14 passed!\n");
     } else {
         printf("test14 failed: ANDI 0x%08X 0x%08X: Result=0x%08X, zero=%d\n",
@@ -280,6 +283,92 @@ int main(int argc, char** argv) {
             2. 完成剩余命令的测试
             3. 将所有zero的赋值改为按照结果是否为0赋值
     */
+//-------------------------------------------------------------
+// B-type Test
+//-------------------------------------------------------------
+    printf("\n=== B-type Test ===\n\n");
+    // test19: BEQ
+    dut->ReadData1 = 0x0000000A;
+    dut->ReadData2 = 0x0000000A;
+    dut->ALUOp = ALUOP_B;
+    dut->funct3 = (INST_BEQ);
+    dut->ALUSrc = 0;
+    dut->eval();
+    tfp->dump(main_time++);
+    ans = dut->ReadData1 - dut->ReadData2;
+    ans_zero = ans == 0;
+    if (dut->ALUResult == ans && dut->zero == ans_zero) {
+        printf("test19 passed!\n");
+    } else {
+        printf("test19 failed: BEQ 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n", 
+            dut->ReadData1, dut->ReadData2, dut->ALUResult, dut->zero);
+        printf("\tans=0x%08X\n", ans);
+    }
+
+    // test20: BNE
+    dut->ReadData1 = 0xDEADBEEF;
+    dut->ReadData2 = 0xCAFEBABE;
+    dut->funct3 = (INST_BNE);
+    dut->eval();
+    tfp->dump(main_time++);
+    ans = dut->ReadData1 - dut->ReadData2;
+    ans_zero = ans != 0;
+    if (dut->ALUResult == ans && dut->zero == ans_zero) {
+        printf("test20 passed!\n");
+    } else {
+        printf("test20 failed: BNE 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n",
+            dut->ReadData1, dut->ReadData2, dut->ALUResult, dut->zero);
+        printf("\tans=0x%08X\n", ans);
+    }
+
+    // test21: BLT
+    dut->ReadData1 = 0xFFFFFFFE;
+    dut->ReadData2 = 0x00000001;
+    dut->funct3 = (INST_BLT);
+    dut->eval();
+    tfp->dump(main_time++);
+    ans = dut->ReadData1 - dut->ReadData2;
+    ans_zero = ans < 0;
+    if (dut->ALUResult == ans && dut->zero == ans_zero) {
+        printf("test21 passed!\n");
+    } else {
+        printf("test21 failed: BLT 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n",
+            dut->ReadData1, dut->ReadData2, dut->ALUResult, dut->zero);
+        printf("\tans=0x%08X\n", ans);
+    }
+
+    // test22: BGEU
+    dut->ReadData1 = 0xFFFFFFFF;
+    dut->ReadData2 = 0x00000001;
+    dut->funct3 = (INST_BGEU);
+    dut->eval();
+    tfp->dump(main_time++);
+    ans = (uint32_t)dut->ReadData1 - (uint32_t)dut->ReadData2;
+    ans_zero = (uint32_t)ans >= 0;
+    if (dut->ALUResult == ans && dut->zero == ans_zero) {
+        printf("test22 passed!\n");
+    } else {
+        printf("test22 failed: BGEU 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n",
+            dut->ReadData1, dut->ReadData2, dut->ALUResult, dut->zero);
+        printf("\tans=0x%08X\n", ans);
+    }
+
+    // test23: BLTU
+    dut->ReadData1 = 0x00000001;
+    dut->ReadData2 = 0xF0000000;
+    dut->funct3 = (INST_BLTU);
+    dut->eval();
+    tfp->dump(main_time++);
+    ans = (uint32_t)dut->ReadData1 - (uint32_t)dut->ReadData2;
+    ans_zero = (uint32_t)ans < 0;
+    if (dut->ALUResult == ans && dut->zero == ans_zero) {
+        printf("test23 passed!\n");
+    } else {
+        printf("test23 failed: BLTU 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n",
+            dut->ReadData1, dut->ReadData2, dut->ALUResult, dut->zero);
+        printf("\tans=0x%08X\n", ans);
+    }
+
 
     // 清理资源
     tfp->close();

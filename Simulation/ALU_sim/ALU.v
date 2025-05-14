@@ -109,7 +109,8 @@ always @(*) begin
         `ALU_NONE:              ALUResult = 0;
         `ALU_SHIFTL:            ALUResult = operand1 << operand2[4:0];
         `ALU_SHIFTR:            ALUResult = operand1 >> operand2[4:0];
-        `ALU_SHIFTR_ARITH:      ALUResult = $signed(operand1) >>> operand2[4:0];
+        // `ALU_SHIFTR_ARITH:      ALUResult = $signed(operand1) >>> operand2[4:0];
+        `ALU_SHIFTR_ARITH:      ALUResult = shifted_ext_operand1[31:0];
         `ALU_ADD:               ALUResult = $signed(operand1) + $signed(operand2);
         `ALU_SUB:               ALUResult = $signed(operand1) - $signed(operand2);
         `ALU_AND:               ALUResult = operand1 & operand2;
@@ -123,16 +124,21 @@ always @(*) begin
     endcase
 end
 
+wire [63:0] signed_ext_operand1 = { {32{operand1[31]}}, operand1 };
+wire [63:0] shifted_ext_operand1 = signed_ext_operand1 >> operand2;
+
 //-------------------------------------------------------------
 // Branch handling
 //-------------------------------------------------------------
 always @(*) begin
     if (ALUOp == 2'b01) begin
         case (funct3)
-            `INST_BEQ: zero = (ALUResult == 0);
-            `INST_BNE: zero = (ALUResult != 0);
-            `INST_BLT, `INST_BLTU: zero = ($signed(ALUResult) < 0);
-            `INST_BGE, `INST_BGEU: zero = ($signed(ALUResult) >= 0);
+            `INST_BEQ:          zero = (ALUResult == 0);
+            `INST_BNE:          zero = (ALUResult != 0);
+            `INST_BLT:          zero = ($signed(ALUResult) < 0);
+            `INST_BGE:          zero = ($signed(ALUResult) >= 0);
+            `INST_BLTU:         zero = ($unsigned(ALUResult) < 0);
+            `INST_BGEU:         zero = ($unsigned(ALUResult) >= 0);
             default: 
                 zero = (ALUResult == 0);
         endcase
