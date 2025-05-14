@@ -31,6 +31,12 @@
 `define OPCODE_JAL                              7'b1101111
 `define OPCODE_JALR                             7'b1100111
 
+// ALUOp
+`define ALUOP_L_S                               2'b00
+`define ALUOP_B                                 2'b01
+`define ALUOP_R                                 2'b10
+`define ALUOP_I                                 2'b11
+
 // ALU Operations
 `define ALU_NONE                                4'b0000
 `define ALU_SHIFTL                              4'b0001
@@ -41,21 +47,21 @@
 `define ALU_AND                                 4'b0111
 `define ALU_OR                                  4'b1000
 `define ALU_XOR                                 4'b1001
-`define ALU_LESS_THAN                           4'b1010
+`define ALU_LESS_THAN_UNSIGNED                  4'b1010
 `define ALU_LESS_THAN_SIGNED                    4'b1011
 `define ALU_SUB_UNSIGNED                        4'b1100
 
 // instruction funct for R-type
-`define INST_ADD                                10'h0_00
-`define INST_SUB                                10'h0_20
-`define INST_XOR                                10'h4_00
-`define INST_OR                                 10'h6_00
-`define INST_AND                                10'h7_00
-`define INST_SLL                                10'h1_00
-`define INST_SRL                                10'h5_00
-`define INST_SRA                                10'h5_00
-`define INST_SLT                                10'h2_20
-`define INST_SLTU                               10'h3_00
+`define INST_ADD                                12'h0_00
+`define INST_SUB                                12'h0_20
+`define INST_XOR                                12'h4_00
+`define INST_OR                                 12'h6_00
+`define INST_AND                                12'h7_00
+`define INST_SLL                                12'h1_00
+`define INST_SRL                                12'h5_00
+`define INST_SRA                                12'h5_00
+`define INST_SLT                                12'h2_20
+`define INST_SLTU                               12'h3_00
 
 // instruction funct for I-type
 `define INST_ADDI                               3'h0
