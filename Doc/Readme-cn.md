@@ -83,13 +83,8 @@ IFetch
 | `input clk`              | 时钟信号                     |
 | `input rst`              | 低电平有效复位信号                |
 | `input [31:0] imm32`     | 扩展32位立即数                 |
-| `input [31:0] ALUResult` | 来自ALU的32位计算结果，可能用于间接跳转地址 |
-| `input zero`             | 零标志位输入，用于条件分支判断          |
+| `input zero`             | 标志位输入，用于条件分支判断          |
 | `input Branch`           | beq分支控制                  |
-| `input nBranch`          | bne分支控制                  |
-| `input Jump`             | 无条件跳转使能信号（j/jal指令有效）     |
-| `input Branch_lt`        | 有符号小于分支使能（blt等指令有效）      |
-| `input Branch_ge`        | 有符号大于等于分支使能（bge等指令有效）    |
 | `output [31:0] inst`     | 32位指令输出，送往译码阶段           |
 
 Decoder

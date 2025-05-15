@@ -21,8 +21,6 @@ module MemOrIO(
     output Segctrl      // 七段数码管控制信�? 
 );
 
-
-    
     // 判断地址类型
     wire isLEDAddr = (addr_in == `LED_BASE_ADDR);
     wire isSwitchAddr = (addr_in == `SWITCH_BASE_ADDR);
