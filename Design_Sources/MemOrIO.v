@@ -43,6 +43,7 @@ module MemOrIO(
     // 片�?�信号（高电平有效）
     assign LEDCtrl = ioWrite && isLEDAddr;      // 写LED时有�?
     assign SwitchCtrl = ioRead && isSwitchAddr; // 读开关时有效
+    assign conf_btn_out = ioRead && isBtnAddr; // 读按键时有效
     assign KeyCtrl = ioRead && isKeyAddr;       // 读键盘时有效
     assign Segctrl = ioWrite && isSegAddr;
     
