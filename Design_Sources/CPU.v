@@ -22,8 +22,19 @@
 
 module CPU(
     input clk,
-    input rstn
-    );
+    input rstn,
+    input conf_btn,
+    input [15:0] switch_d,
+    input ps2_clk,
+    input ps2_data,
+    input start_pg,
+    input rx,
+    output [7:0] digit_en,      
+    output [7:0] sseg,         
+    output [7:0] sseg1,
+    output [15:0] reg_LED,
+    output tx
+);
 
 //-------------------------------------------------------------
 // definations
@@ -41,17 +52,36 @@ module CPU(
     wire [31:0] MemData;
     wire [31:0] pc4_i;
     wire [15:0] switch_data;
-    wire conf_btn, conf_btn_out;
-    wire switch_d;
+    wire conf_btn_out;
+    wire cpu_clk;
+    wire upg_clk,upg_clko;
+    wire upg_wen_o;
+    wire upg_done_o;
+    wire [14:0] upg_addr_o;
+    wire [31:0] upg_data_o;
+    wire key_data;
 
 //-------------------------------------------------------------
 // Instantiation of modules
 //-------------------------------------------------------------
 
-    clk_wiz cpuclk(
+    cpuclk cpuclk(
         .clk_in1(clk),
         .clk_out1(cpu_clk),
-        .clk_out2(mem_clk)
+        .clk_out2(upg_clk)
+    );
+
+    uart_bmpg_0 uart (
+        .upg_clk_i(upg_clk),
+        .upg_rst_i(upg_rst),
+        .upg_rx_i(rx),
+
+        .upg_clk_o(upg_clk_w),
+        .upg_wen_o(upg_wen_w),
+        .upg_adr_o(upg_adr_w),
+        .upg_dat_o(upg_dat_w),
+        .upg_done_o(upg_done_w),
+        .upg_tx_o(tx)
     );
 
     IFetch ifetch(
@@ -133,11 +163,12 @@ module CPU(
         .rstn(rstn),
         .LEDCtrl(LEDCtrl),
         .seg_ctrl(seg_ctrl),
+        .en(en),
         .write_data(write_data),
-        .reg_LED(),
-        .reg_seg74(), //from left 7 6 5 4 -> 1 0
-        .reg_seg30(),
-        .reg_tub_sel()
+        .reg_LED(reg_LED),
+        .digit_en(digit_en),
+        .sseg(sseg),
+        .sseg1(sseg1)
     );
 
     debounce conf_btn_deb(
@@ -153,6 +184,14 @@ module CPU(
         .io_read(io_read),
         .switch_d(switch_d),
         .switch_data(switch_data)
+    );
+
+    keyboard_driver keyboard(
+        .clk(cpu_clk),
+        .rst(rstn),
+        .ps2_clk(ps2_clk),
+        .ps2_data(ps2_data),
+        .data_out(key_data)
     );
 
 

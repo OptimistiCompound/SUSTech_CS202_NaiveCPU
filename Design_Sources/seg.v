@@ -2,20 +2,21 @@ module seg(
     input        clk,      
     input        rst, 
     input  [9:0] data,      
-    input jizhi,
-    output reg [7:0] digit_en,    // 数码管片选信号（低电平有效） 
-    output reg [7:0] sseg,    // 数码管段选信号（a-g,dp）
+    input        base,
+    input        en,
+    output reg [7:0] digit_en,      
+    output reg [7:0] sseg,         
     output reg [7:0] sseg1
 );
     // 将12位数据分解为6个十进制数位
-    wire [3:0] digit0 = (jizhi) ? (data % 10)       : data[3:0];  // 个位/LSB
-    wire [3:0] digit1 = (jizhi) ? ((data / 10) % 10) : data[7:4];  // 十位
-    wire [3:0] digit2 = (jizhi) ? ((data / 100) % 10) : data[9:8]; // 百位（十六进制时可能超出范围）
-    wire [3:0] digit3 = (jizhi) ? ((data / 1000) % 10) : 4'b0;
-    wire [3:0] digit4 = (jizhi) ? (data % 10)       : data[3:0];  // 个位/LSB
-    wire [3:0] digit5 = (jizhi) ? ((data / 10) % 10) : data[7:4];  // 十位
-    wire [3:0] digit6 = (jizhi) ? ((data / 100) % 10) : data[9:8]; // 百位（十六进制时可能超出范围）
-    wire [3:0] digit7 = (jizhi) ? ((data / 1000) % 10) : 4'b0;
+    wire [3:0] digit0 = (base) ? (data % 10)       : data[3:0];  // 个位/LSB
+    wire [3:0] digit1 = (base) ? ((data / 10) % 10) : data[7:4];  // 十位
+    wire [3:0] digit2 = (base) ? ((data / 100) % 10) : data[11:8]; // 百位（十六进制时可能超出范围）
+    wire [3:0] digit3 = (base) ? ((data / 1000) % 10) :  data[15:12];
+    wire [3:0] digit4 = (base) ? ((data / 10000) % 10)  : data[19:16];  // 个位/LSB
+    wire [3:0] digit5 = (base) ? ((data / 100000) % 10) :  data[23:20];  // 十位
+    wire [3:0] digit6 = (base) ? ((data / 1000000) % 10) :  data[27:24]; // 百位（十六进制时可能超出范围）
+    wire [3:0] digit7 = (base) ? ((data / 10000000) % 10) :  data[31:28];
    
 
     parameter CLK_DIV = 16'd50000;  // 时钟分频系数，用于扫描控制
@@ -44,7 +45,7 @@ module seg(
     always @(posedge clk or posedge rst) begin
         if (rst) begin 
             digit_en <= 4'b0000;
-        end else begin 
+        end else if (en) begin 
             case (digit_sel)
                 3'b000: begin digit_en <= 8'b0000_0001; end 
                 3'b001: begin digit_en <= 8'b0000_0010; end 
@@ -56,7 +57,7 @@ module seg(
                 3'b111: begin digit_en <= 8'b1000_0000; end
                 default: begin digit_en <= 8'b0000_0000; end
             endcase
-        end
+        end else digit_en <= 8'b0000_0000; // 片选信号为高电平时，数码管不显示
     end
     always @(*) begin
           case (digit_sel)
