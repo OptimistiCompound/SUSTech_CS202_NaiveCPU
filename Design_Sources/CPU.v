@@ -31,8 +31,8 @@ module CPU(
 
     wire [31:0] inst;
     wire [31:0] ReadData1, ReadData2;
-    wire [31:0] imm32;
     wire [31:0] ALUResult;
+    wire [31:0] imm32;
     wire zero;
     wire Branch, ALUSrc, MemRead, MemWrite, MemtoReg, RegWrite;
     wire [1:0] ALUOp;
@@ -40,6 +40,9 @@ module CPU(
     wire [6:0] funct7;
     wire [31:0] MemData;
     wire [31:0] pc4_i;
+    wire [15:0] switch_data;
+    wire conf_btn, conf_btn_out;
+    wire switch_d;
 
 //-------------------------------------------------------------
 // Instantiation of modules
@@ -60,11 +63,6 @@ module CPU(
         .pc4_i(pc4_i)
     );
 
-    ImmGen immgen(
-        .inst(inst),
-        .imm32(imm32)
-    );
-
     Controller controller(
         .inst(inst),
         .ALUResult(ALUResult),
@@ -76,7 +74,9 @@ module CPU(
         .MemWrite(MemWrite),
         .MemtoReg(MemtoReg),
         .RegWrite(RegWrite),
-
+        .mem_io_reg(mem_io_reg),
+        .io_read(io_read),
+        .io_write(io_write)
     );
 
     ALU alu(
@@ -113,14 +113,15 @@ module CPU(
         .ioRead(io_read),       // read from IO
         .ioWrite(io_write),     // write to IO
         .addr_in(ALUResult),    // address from ALU
+        .conf_btn_out(conf_btn_out), 
         .addr_out(),            
         .m_rdata(MemData),
-        .switch_data(16'h0),
+        .switch_data(switch_data),
         .key_data(12'h0),
         .r_wdata(),
         .r_rdata(ReadData2),
         .write_data(),
-        .LEDCtrl(),
+        .LEDCtrl(LEDCtrl),
         .SwitchCtrl(),
         .KeyCtrl(),
         .seg_ctrl(),
@@ -130,12 +131,13 @@ module CPU(
     LED_con led(
         .clk(cpu_clk),
         .rstn(rstn),
-        .io_write(io_write),
-        .reg_LED(),
-        .reg_seg(),
-        .write_data(write_data),
         .LEDCtrl(LEDCtrl),
         .seg_ctrl(seg_ctrl),
+        .write_data(write_data),
+        .reg_LED(),
+        .reg_seg74(), //from left 7 6 5 4 -> 1 0
+        .reg_seg30(),
+        .reg_tub_sel()
     );
 
     debounce conf_btn_deb(
@@ -149,8 +151,8 @@ module CPU(
         .clk(cpu_clk),
         .rstn(rstn),
         .io_read(io_read),
-        .conf_btn_out(conf_btn_out),
-        .read_data(read_data)
+        .switch_d(switch_d),
+        .switch_data(switch_data)
     );
 
 
