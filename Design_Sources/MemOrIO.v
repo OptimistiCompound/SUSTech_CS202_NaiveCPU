@@ -1,6 +1,6 @@
 `include "../Header_Files/io_header.v"
 
-module MemOrIO( 
+module MemOrIO(
     // Inputs
     input mRead,                    // 读内存控制信号
     input mWrite,                   // 写内存控制信号
