@@ -153,6 +153,7 @@ IFetch
 | `input upg_done_i`       | uart当前命令输入完成       |
 | `output [31:0] inst`     | 32位指令输出，送往译码阶段     |
 | `output [31:0] pc4_i`    | 预计算的下一条指令地址（PC+4） |
+
 Decoder
 
 | Port                     | Description               |
