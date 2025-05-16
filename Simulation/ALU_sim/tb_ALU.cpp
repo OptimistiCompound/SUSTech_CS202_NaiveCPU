@@ -370,6 +370,29 @@ int main(int argc, char** argv) {
     }
 
 
+//-------------------------------------------------------------
+// Load-Store Test
+//-------------------------------------------------------------
+    printf("\n=== Load-Store Test ===\n\n");
+
+    // test24: load
+    dut->ReadData1 = 0xFEDCBA87;
+    dut->imm32 = 0x00000324;
+    dut->ALUOp = ALUOP_L_S;
+    dut->ALUSrc = 1;
+    dut->eval();
+    tfp->dump(main_time++);
+    ans = dut->ReadData1 + dut->imm32;
+    ans_zero = ans == 0;
+    if (dut->ALUResult == ans && dut->zero == ans_zero) {
+        printf("test24 passed!\n");
+    } else {
+        printf("test24 failed: load/store 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n",
+            dut->ReadData1, dut->imm32, dut->ALUResult, dut->zero);
+        printf("\tans=0x%08X\n", ans);
+    }
+
+
     // 清理资源
     tfp->close();
     delete dut;
