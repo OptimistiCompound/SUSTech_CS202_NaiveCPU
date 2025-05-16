@@ -1,3 +1,5 @@
 *.tcl
 *.json
 obj_dir
+*.obsidian
+*.vscode
