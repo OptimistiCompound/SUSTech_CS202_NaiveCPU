@@ -1,7 +1,7 @@
 module seg(
     input        clk,      
-    input        rst, 
-    input  [9:0] data,      
+    input        rstn, 
+    input  [31:0]data,      
     input        base,
     input        en,
     output reg [7:0] digit_en,      
@@ -25,8 +25,8 @@ module seg(
     reg [2:0] digit_sel;         
     reg [3:0] digit_data;
 
-    always @(posedge clk or posedge rst) begin
-        if (rst) begin
+    always @(posedge clk or negedge rstn) begin
+        if (!rstn) begin
             clk_div_cnt <= 16'd0;
             digit_sel <= 2'd0;
         end else begin
@@ -42,8 +42,8 @@ module seg(
     end
 
     // 数码管扫描控制（简化版，使用clk的低2位作为扫描信号）
-    always @(posedge clk or posedge rst) begin
-        if (rst) begin 
+    always @(posedge clk or negedge rstn) begin
+        if (!rstn) begin 
             digit_en <= 4'b0000;
         end else if (en) begin 
             case (digit_sel)

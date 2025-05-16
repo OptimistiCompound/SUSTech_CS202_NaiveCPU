@@ -115,10 +115,11 @@ module keyboard_driver (
                 8'd62: data_out <= 4'b1000;
                 8'd70: data_out <= 4'b1001;
                 8'd90: data_out <= 4'b1011;
-                default: data_out <=0; // 其他键
+                8'd13: data_out <= 4'b1100; // tab
+                default: data_out <=4'b1111; // 其他键
             endcase
         end else begin
-            data_out <= 0; // 无有效按键
+            data_out <= 4'b1111; // 无有效按键
         end
     end
 endmodule

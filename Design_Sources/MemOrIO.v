@@ -6,6 +6,7 @@ module MemOrIO(
     input ioRead,       // 读IO控制信号
     input ioWrite,      // 写IO控制信号
     input conf_btn_out, // 来自按键的信号(12�?)
+    input key_done,
     input [31:0] addr_in,  // 来自ALU的地�?
     input [31:0] m_rdata,   // 从数据存储器读取的数�?
     input [7:0] switch_data, // 从开关读取的数据(16�?)
@@ -43,8 +44,7 @@ module MemOrIO(
     // 片�?�信号（高电平有效）
     assign LEDCtrl = ioWrite && isLEDAddr;      // 写LED时有�?
     assign SwitchCtrl = ioRead && isSwitchAddr; // 读开关时有效
-    assign conf_btn_out = ioRead && isBtnAddr; // 读按键时有效
-    assign KeyCtrl = ioRead && isKeyAddr;       // 读键盘时有效
+    assign KeyCtrl = ioRead && isKeyAddr && !key_done;       // 读键盘时有效
     assign Segctrl = ioWrite && isSegAddr;
     
     // 写入数据选择
