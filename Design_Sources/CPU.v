@@ -24,7 +24,7 @@ module CPU(
     input clk,
     input rstn,
     input conf_btn,
-    input [15:0] switch_d,
+    input [10:0] switch_d,
     input ps2_clk,
     input ps2_data,
     input start_pg,
@@ -59,8 +59,12 @@ module CPU(
     wire upg_done_o;
     wire [14:0] upg_addr_o;
     wire [31:0] upg_data_o;
-    wire key_data;
-
+    wire [3:0]key_data_sub;
+    wire [11:0]key_data;
+    wire key_done;
+    wire LEDCtrl;
+    wire SwitchCtrl;
+    wire KeyCtrl;
 //-------------------------------------------------------------
 // Instantiation of modules
 //-------------------------------------------------------------
@@ -89,6 +93,11 @@ module CPU(
         .rst(rstn),
         .imm32(imm32),
         .Branch(Branch),
+        .upg_rst_i(upg_rst),
+        .upg_clk_i(upg_clk),
+        .upg_wen_i(upg_wen_w),
+        .upg_adr_i(upg_adr_w),
+        .upg_dat_i(upg_dat_w),
         .inst(inst),
         .pc4_i(pc4_i)
     );
@@ -144,18 +153,19 @@ module CPU(
         .ioWrite(io_write),     // write to IO
         .addr_in(ALUResult),    // address from ALU
         .conf_btn_out(conf_btn_out), 
+        .key_done(key_done),
         .addr_out(),            
         .m_rdata(MemData),
         .switch_data(switch_data),
-        .key_data(12'h0),
+        .key_data(key_data),
         .r_wdata(),
         .r_rdata(ReadData2),
         .write_data(),
         .LEDCtrl(LEDCtrl),
-        .SwitchCtrl(),
-        .KeyCtrl(),
-        .seg_ctrl(),
-        .seg_data()
+        .SwitchCtrl(SwitchCtrl),
+        .KeyCtrl(KeyCtrl),
+        .Segctrl(Segctrl),
+        .seg_data(seg_data)
     );
     
     LED_con led(
@@ -191,9 +201,15 @@ module CPU(
         .rst(rstn),
         .ps2_clk(ps2_clk),
         .ps2_data(ps2_data),
-        .data_out(key_data)
+        .data_out(key_data_sub)
     );
 
+    Keyboard_cache key_cache(
+        .rst(rstn),
+        .key_data(key_data_sub),
+        .data_out(key_data),
+        .done(key_done)
+    );
 
 //-------------------------------------------------------------
 // direct connections

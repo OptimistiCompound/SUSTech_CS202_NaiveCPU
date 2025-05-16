@@ -50,7 +50,7 @@ end
 
 assign pc4_i = PC + 32'h4;
 
-prgrom instmem (
+programrom instmem (
     .clka (mode? rom_clk_i : upg_clk_i ),
     .wea (mode? 1'b0 : upg_wen_i ),
     .addra (mode? PC[15:2] : upg_adr_i ),
