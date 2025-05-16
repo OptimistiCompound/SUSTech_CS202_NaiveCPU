@@ -24,7 +24,7 @@ module CPU(
     input clk,
     input rstn,
     input conf_btn,
-    input [10:0] switch_d,
+    input [11:0] switch_d,
     input ps2_clk,
     input ps2_data,
     input start_pg,
@@ -54,17 +54,21 @@ module CPU(
     wire [15:0] switch_data;
     wire conf_btn_out;
     wire cpu_clk;
+    wire [31:0]addr_out;
     wire upg_clk,upg_clko;
     wire upg_wen_o;
     wire upg_done_o;
+    wire ioRead,ioWrite;
     wire [14:0] upg_addr_o;
     wire [31:0] upg_data_o;
     wire [3:0]key_data_sub;
     wire [11:0]key_data;
     wire key_done;
+    wire SegCtrl;
     wire LEDCtrl;
     wire SwitchCtrl;
     wire KeyCtrl;
+    wire [31:0] write_data;
 //-------------------------------------------------------------
 // Instantiation of modules
 //-------------------------------------------------------------
@@ -114,8 +118,8 @@ module CPU(
         .MemtoReg(MemtoReg),
         .RegWrite(RegWrite),
         .mem_io_reg(mem_io_reg),
-        .io_read(io_read),
-        .io_write(io_write)
+        .ioRead(ioRead),
+        .ioWrite(ioWrite)
     );
 
     ALU alu(
@@ -130,11 +134,26 @@ module CPU(
         .zero(zero)
     );
     
+    DMem dmem(
+        .clk(cpu_clk),
+        .MemRead(MemRead),
+        .MemWrite(MemWrite),
+        .addr(addr_out),
+        .din(ReadData2),
+//        .upg_rst_i(upg_rst),
+//        .upg_clk_i(upg_clk),
+//        .upg_wen_i(upg_wen_w),
+//        .upg_addr_i(upg_adr_w[13:0]),
+//        .upg_data_i(upg_dat_w),
+//        .upg_done_i(upg_done_w),
+        .dout(MemData)
+    );
+    
     Decoder decoder(
         .clk(cpu_clk),
         .rstn(rstn),
         .ALUResult(ALUResult),
-        .MemData(MemData),
+        .MemData(r_wdata),
         .pc4_i(pc4_i),
         .regWrite(RegWrite),
         .MemtoReg(MemtoReg),
@@ -149,31 +168,26 @@ module CPU(
     MemOrIO memorio(
         .mRead(MemRead),        // read from Mem
         .mWrite(MemWrite),      // write to Mem
-        .ioRead(io_read),       // read from IO
-        .ioWrite(io_write),     // write to IO
-        .addr_in(ALUResult),    // address from ALU
+        .ioRead(ioRead),       // read from IO
+        .ioWrite(ioWrite),     // write to IO
         .conf_btn_out(conf_btn_out), 
-        .key_done(key_done),
-        .addr_out(),            
+        .addr_in(ALUResult),    // address from ALU         
         .m_rdata(MemData),
         .switch_data(switch_data),
         .key_data(key_data),
-        .r_wdata(),
         .r_rdata(ReadData2),
-        .write_data(),
+        .addr_out(addr_out),   
+        .r_wdata(r_wdata),
+        .write_data(write_data),
         .LEDCtrl(LEDCtrl),
-        .SwitchCtrl(SwitchCtrl),
-        .KeyCtrl(KeyCtrl),
-        .Segctrl(Segctrl),
-        .seg_data(seg_data)
+        .SegCtrl(SegCtrl)
     );
     
     LED_con led(
         .clk(cpu_clk),
         .rstn(rstn),
         .LEDCtrl(LEDCtrl),
-        .seg_ctrl(seg_ctrl),
-        .en(en),
+        .SegCtrl(SegCtrl),
         .write_data(write_data),
         .reg_LED(reg_LED),
         .digit_en(digit_en),
@@ -198,14 +212,14 @@ module CPU(
 
     keyboard_driver keyboard(
         .clk(cpu_clk),
-        .rst(rstn),
+        .rstn(rstn),
         .ps2_clk(ps2_clk),
         .ps2_data(ps2_data),
         .data_out(key_data_sub)
     );
 
     Keyboard_cache key_cache(
-        .rst(rstn),
+        .rstn(rstn),
         .key_data(key_data_sub),
         .data_out(key_data),
         .done(key_done)

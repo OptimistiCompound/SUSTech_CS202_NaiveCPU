@@ -1,6 +1,6 @@
 module keyboard_scan(
     input clk,
-    input rst,
+    input rstn,
     input ps2_clk,
     input ps2_data,
     output wire [15:0] xkey,
@@ -29,8 +29,8 @@ module keyboard_scan(
     end
 
     // 对ps2_clk和ps2_data进行滤波
-    always @(posedge DIR or negedge rst) begin
-        if (rst) begin
+    always @(posedge DIR or negedge rstn) begin
+        if (!rstn) begin
             ps2c_filter <= 0;
             ps2d_filter <= 0;
             ps2cf <= 1;
@@ -52,8 +52,8 @@ module keyboard_scan(
     end
 
     reg [3:0] count;
-    always @(negedge ps2cf or negedge rst) begin
-        if (rst) begin
+    always @(negedge ps2cf or negedge rstn) begin
+        if (!rstn) begin
             count <= 0;
         end else begin
             if (count >= 10 && ps2df == 1'b1) begin
@@ -66,8 +66,8 @@ module keyboard_scan(
         end
     end
 
-    always @(negedge ps2cf or negedge rst) begin
-        if (rst) begin
+    always @(negedge ps2cf or negedge rstn) begin
+        if (!rstn) begin
             shift1 <= 0;
             shift2 <= 0;
         end else begin
@@ -83,7 +83,7 @@ endmodule
 
 module keyboard_driver (
     input clk,
-    input rst,
+    input rstn,
     input ps2_clk,
     input ps2_data,
     output reg [3:0] data_out // 用于控制对应0 - 9的显示，每位对应一个数字键，高电平点亮（具体点亮逻辑需结合实际显示硬件，这里先按常规逻辑定义）
@@ -91,7 +91,7 @@ module keyboard_driver (
     wire [15:0] xkey;
     wire [21:0] ps_data;
     wire data_in;
-    keyboard_scan scan(.clk(clk),.rst(rst),.ps2_clk(ps2_clk),.ps2_data(ps2_data), 
+    keyboard_scan scan(.clk(clk),.rstn(rstn),.ps2_clk(ps2_clk),.ps2_data(ps2_data), 
                       .xkey(xkey),.data(ps_data),.data_in(data_in));
 
     wire [7:0] now_key, pre_key;
@@ -99,8 +99,8 @@ module keyboard_driver (
     assign pre_key = xkey[15:8];
     reg [10:0]cnt = 0;
     // 使用 clk 进入always
-    always @(posedge clk or negedge rst) begin
-        if (rst) begin
+    always @(posedge clk or negedge rstn) begin
+        if (!rstn) begin
             data_out <= 0; // 复位时全灭
         end else if (data_in) begin
             case (now_key)

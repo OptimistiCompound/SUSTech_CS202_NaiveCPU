@@ -4,8 +4,7 @@ module LED_con(
     input rstn,
     input base,
     input LEDCtrl,
-    input seg_ctrl,
-    input en,
+    input SegCtrl,
     input [31:0] write_data,
     output reg [15:0] reg_LED,
     output [7:0] digit_en,      
@@ -20,20 +19,19 @@ seg seg_output(
     .rstn(rstn),
     .data(seg_data),
     .base(base),
-    .en(en),
     .digit_en(digit_en),
     .sseg(sseg),
     .sseg1(sseg1)
 );
 
-always @(posedge clk, negedge rstn) begin
+always @(posedge clk or negedge rstn) begin
     if(!rstn) begin
         reg_LED <= 16'b0;
     end
     else if(LEDCtrl) begin
         reg_LED <= write_data[15:0];
     end
-    else if(seg_ctrl) begin
+    else if(SegCtrl) begin
         seg_data<= write_data[31:0];
     end
 end
