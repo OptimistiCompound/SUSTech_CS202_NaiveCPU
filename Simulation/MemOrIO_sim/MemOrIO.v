@@ -1,4 +1,4 @@
-`include "../Header_Files/io_header.v"
+`include "../../Header_Files/io_header.v"
 
 module MemOrIO( 
     // Inputs
