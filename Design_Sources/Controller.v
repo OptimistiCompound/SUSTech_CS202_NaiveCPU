@@ -34,7 +34,6 @@ module Controller(
     output MemWrite,
     output MemtoReg,
     output RegWrite,
-    output mem_io_reg,
     output ioRead,
     output ioWrite
     );
@@ -61,7 +60,6 @@ assign MemtoReg = (opcode == `OPCODE_L);
 assign RegWrite = (opcode == `OPCODE_R) || (opcode == `OPCODE_I) || (opcode == `OPCODE_L) || (opcode == `OPCODE_LUI) ||
             (opcode == `OPCODE_AUIPC) || (opcode == `OPCODE_JAL) || (opcode == `OPCODE_JALR);
 
-assign mem_io_reg = ioRead || ioWrite;
 assign ioRead = (opcode == `OPCODE_L) && ALUResult[31:8] == 24'hFFFFFC;
 assign ioWrite = (opcode == `OPCODE_S ) && ALUResult[31:8] == 24'hFFFFFC;
 

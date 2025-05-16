@@ -123,32 +123,36 @@ https://github.com/OptimistiCompound/SUSTech_CS202_NaiveCPU
 
 Controller
 
-| Port                 | Description                         |
-| -------------------- | ----------------------------------- |
-| `input [31:0] inst`  | 32位指令输入                             |
-| `output Branch`      | beq分支控制                             |
-| `output nBranch`     | bne分支控制                             |
-| `output Branch_lt`   | blt，bltu分支控制                        |
-| `output Branch_ge`   | bge，bgeu分支控制                        |
-| `output Jump`        | jal跳转控制                             |
-| `output [1:0] ALUOp` | 2位ALU操作码                            |
-| `output ALUSrc`      | ALU操作数选择（0=寄存器ReadData2，1=立即数imm32） |
-| `output MemRead`     | 内存读使能                               |
-| `output MemWrite`    | 内存写使能                               |
-| `output MemtoReg`    | 写回数据选择（0=ALU结果，1=内存数据）              |
-| `output RegWrite`    | 寄存器写使能                              |
+| Port                      | Description                         |
+| --------------------      | ----------------------------------- |
+| `input [31:0] inst`       | 32位指令输入                             |
+| `input [31:0] ALUResult`  | ALU运算结果                               |
+| `input zero`              | 分支跳转决定信号（1: 跳转）               |
+| `output [1:0] ALUOp`      | 2位ALU操作码                            |
+| `output ALUSrc`           | ALU操作数选择（0=寄存器ReadData2，1=立即数imm32） |
+| `output MemRead`          | 内存读使能                               |
+| `output MemWrite`         | 内存写使能                               |
+| `output MemtoReg`         | 写回数据选择（0=ALU结果，1=内存数据）              |
+| `output RegWrite`         | 寄存器写使能                              |
+| `output ioRead`           | IO读使能                                  |
+| `output ioWrite`          | IO写使能                                  |
 
 IFetch
 
 | Port                     | Description              |
-| ------------------------ | ------------------------ |
-| `input clk`              | 时钟信号                     |
-| `input rst`              | 低电平有效复位信号                |
-| `input [31:0] imm32`     | 扩展32位立即数                 |
-| `input zero`             | 标志位输入，用于条件分支判断          |
-| `input Branch`           | beq分支控制                  |
-| `output [31:0] inst`     | 32位指令输出，送往译码阶段           |
-
+|--------------------------|--------------------------|
+| `input clk`              | 时钟信号                  |
+| `input rst`              | 低电平有效复位信号           |
+| `input [31:0] imm32`     | 扩展32位立即数            |
+| `input Branch`           | 分支控制信号               |
+| `input upg_rst_i`        | uart复位信号（高电平？？？）    |
+| `input upg_clk_i`        | uart时钟信号         |
+| `input upg_wen_i`        | uart写使能信号，高电平有效 |
+| `input [13:0] upg_adr_i` | uart地址        |
+| `input [31:0] upg_dat_i` | uart数据        |
+| `input upg_done_i`       | uart当前命令输入完成       |
+| `output [31:0] inst`     | 32位指令输出，送往译码阶段     |
+| `output [31:0] pc4_i`    | 预计算的下一条指令地址（PC+4） |
 Decoder
 
 | Port                     | Description               |
@@ -173,10 +177,39 @@ ALU
 | `input [31:0] ReadData1`      | 来自寄存器rs1的32位数据输入                             |
 | `input [31:0] ReadData2`      | 来自寄存器rs2的32位数据输入                             |
 | `input [31:0] imm32`          | 扩展后32位立即数                                    |
-| `input ALUSrc`                | 多路选择器控制信号，决定第二个操作数来源（0: imm32, 1: ReadData2） |
+| `input ALUSrc`                | 多路选择器控制信号，决定第二个操作数来源（1: imm32, 0: ReadData2） |
 | `input [1:0] ALUOp`           | 2位ALU操作控制信号                                  |
 | `input [2:0] funct3`          | 来自指令的3位功能码                                   |
 | `input [6:0] funct7`          | 来自指令的7位功能码                                   |
 | `output reg [31:0] ALUResult` | 32位ALU运算结果输出                                 |
-| `output zero`                 | 零标志位输出，用于分支指令判断（1: 结果为零）                     |
+| `output zero`                 | 零标志位输出，用于分支指令判断（1: 要跳转）                     |
+
+
+MemOrIO
+
+| Port                     | Description                          |
+|--------------------------|--------------------------------------|
+| `input mRead`            | 读内存控制信号                        |
+| `input mWrite`           | 写内存控制信号                        |
+| `input ioRead`           | 读IO控制信号                         |
+| `input ioWrite`          | 写IO控制信号                         |
+| `input conf_btn_out`     | 读取自按键的信号                       |
+| `input [31:0] addr_in`   | 读取自ALU的运算结果                       |
+| `input [31:0] m_rdata`   | 读取自dMem的数据                     |
+| `input [11:0] switch_data` | 读取自Switch的数据           |
+| `input [3:0] key_data`   | 读取自Keyboard的数据          |
+| `input [31:0] r_rdata`   | 读取自Reg的数据                      |
+| `output [31:0] addr_out` | 输出地址，访问dMem                             |
+| `output [31:0] r_wdata`  | 写回Reg的数据（Load）              |
+| `output [31:0] write_data` | 写回Mem或者IO的数据（Store）                  |
+| `output LEDCtrl`         | LED控制信号                         |
+| `output SegCtrl`         | Seg控制信号                         |
+
+
+TODO：wang的模块
+LED，SEG，SWITCH，KEYBOARD，debounce
+
+
+
+TODO：wu的模块
 
