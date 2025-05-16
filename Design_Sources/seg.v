@@ -3,7 +3,6 @@ module seg(
     input        rstn, 
     input  [31:0]data,      
     input        base,
-    input        en,
     output reg [7:0] digit_en,      
     output reg [7:0] sseg,         
     output reg [7:0] sseg1
@@ -44,8 +43,8 @@ module seg(
     // 数码管扫描控制（简化版，使用clk的低2位作为扫描信号）
     always @(posedge clk or negedge rstn) begin
         if (!rstn) begin 
-            digit_en <= 4'b0000;
-        end else if (en) begin 
+            digit_en <= 8'b00000000;
+        end else begin 
             case (digit_sel)
                 3'b000: begin digit_en <= 8'b0000_0001; end 
                 3'b001: begin digit_en <= 8'b0000_0010; end 
@@ -57,7 +56,7 @@ module seg(
                 3'b111: begin digit_en <= 8'b1000_0000; end
                 default: begin digit_en <= 8'b0000_0000; end
             endcase
-        end else digit_en <= 8'b0000_0000; // 片选信号为高电平时，数码管不显示
+        end
     end
     always @(*) begin
           case (digit_sel)
@@ -76,43 +75,43 @@ module seg(
     always @(*) begin
         if(digit_sel<=3)begin
             case (digit_data)
-                4'h0: sseg = 7'b1111110;
-                4'h1: sseg = 7'b0110000; 
-                4'h2: sseg = 7'b1101101; 
-                4'h3: sseg = 7'b1111001;
-                4'h4: sseg = 7'b0110011; 
-                4'h5: sseg = 7'b1011011; 
-                4'h6: sseg = 7'b1011111;
-                4'h7: sseg = 7'b1110000;
-                4'h8: sseg = 7'b1111111;
-                4'h9: sseg = 7'b1111011; 
-                4'hA: sseg = 7'b1110111;
-                4'hB: sseg = 7'b0011111; 
-                4'hC: sseg = 7'b1001110;
-                4'hD: sseg = 7'b0111101;
-                4'hE: sseg = 7'b1001111; 
-                4'hF: sseg = 7'b1000111;
-                default: sseg = 7'b0000001; 
+                4'h0: sseg = 8'b1111110;
+                4'h1: sseg = 8'b0110000; 
+                4'h2: sseg = 8'b1101101; 
+                4'h3: sseg = 8'b1111001;
+                4'h4: sseg = 8'b0110011; 
+                4'h5: sseg = 8'b1011011; 
+                4'h6: sseg = 8'b1011111;
+                4'h7: sseg = 8'b1110000;
+                4'h8: sseg = 8'b1111111;
+                4'h9: sseg = 8'b1111011; 
+                4'hA: sseg = 8'b1110111;
+                4'hB: sseg = 8'b0011111; 
+                4'hC: sseg = 8'b1001110;
+                4'hD: sseg = 8'b0111101;
+                4'hE: sseg = 8'b1001111; 
+                4'hF: sseg = 8'b1000111;
+                default: sseg = 8'b0000001; 
             endcase
         end else begin
             case (digit_data)
-                4'h0: sseg1 = 7'b1111110;
-                4'h1: sseg1 = 7'b0110000; 
-                4'h2: sseg1 = 7'b1101101; 
-                4'h3: sseg1 = 7'b1111001;
-                4'h4: sseg1 = 7'b0110011; 
-                4'h5: sseg1 = 7'b1011011; 
-                4'h6: sseg1 = 7'b1011111;
-                4'h7: sseg1 = 7'b1110000;
-                4'h8: sseg1 = 7'b1111111;
-                4'h9: sseg1 = 7'b1111011; 
-                4'hA: sseg1 = 7'b1110111;
-                4'hB: sseg1 = 7'b0011111; 
-                4'hC: sseg1 = 7'b1001110;
-                4'hD: sseg1 = 7'b0111101;
-                4'hE: sseg1 = 7'b1001111; 
-                4'hF: sseg1 = 7'b1000111;
-                default: sseg1 = 7'b0000001; 
+                4'h0: sseg1 = 8'b1111110;
+                4'h1: sseg1 = 8'b0110000; 
+                4'h2: sseg1 = 8'b1101101; 
+                4'h3: sseg1 = 8'b1111001;
+                4'h4: sseg1 = 8'b0110011; 
+                4'h5: sseg1 = 8'b1011011; 
+                4'h6: sseg1 = 8'b1011111;
+                4'h7: sseg1 = 8'b1110000;
+                4'h8: sseg1 = 8'b1111111;
+                4'h9: sseg1 = 8'b1111011; 
+                4'hA: sseg1 = 8'b1110111;
+                4'hB: sseg1 = 8'b0011111; 
+                4'hC: sseg1 = 8'b1001110;
+                4'hD: sseg1 = 8'b0111101;
+                4'hE: sseg1 = 8'b1001111; 
+                4'hF: sseg1 = 8'b1000111;
+                default: sseg1 = 8'b0000001; 
             endcase
         end
     end

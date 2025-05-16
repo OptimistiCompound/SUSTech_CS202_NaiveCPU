@@ -54,7 +54,69 @@ https://github.com/OptimistiCompound/SUSTech_CS202_NaiveCPU
 
 ### 2. CPU接口定义
 
-#TODO 引脚说明
+|引脚|规格|名称|功能|
+| ---- | ---- | ---- | ---- |
+|T5|input|start_pg|接收uart数据|
+|R15|input|conf_btn|数据输入确认按键|
+|P17|input|clk|时钟引脚|
+|P15|input|rstn|复位按键|
+|K5|input|ps2_clk|PS2 接口时钟引脚|
+|L4|input|ps2_data|PS2 接口数据引脚|
+|L3|input|rx|UART 接收引脚|
+|N2|output|tx|UART 发送引脚|
+|V5|input|switch_d[8]|测试场景编号输入 0 位|
+|V2|input|switch_d[9]|测试场景编号输入 1 位|
+|U2|input|switch_d[10]|测试场景编号输入 2 位|
+|U3|input|switch_d[10]|测试场景编号输入 3 位|
+|R1|input|switch_d[0]|测试数据输入 0 位|
+|N4|input|switch_d[1]|测试数据输入 1 位|
+|M4|input|switch_d[2]|测试数据输入 2 位|
+|R2|input|switch_d[3]|测试数据输入 3 位|
+|P2|input|switch_d[4]|测试数据输入 4 位|
+|P3|input|switch_d[5]|测试数据输入 5 位|
+|P4|input|switch_d[6]|测试数据输入 6 位|
+|P5|input|switch_d[7]|测试数据输入 7 位|
+|G2|output|digit_en[7]|七段数码管位选引脚 7|
+|C2|output|digit_en[6]|七段数码管位选引脚 6|
+|C1|output|digit_en[5]|七段数码管位选引脚 5|
+|H1|output|digit_en[4]|七段数码管位选引脚 4|
+|G1|output|digit_en[3]|七段数码管位选引脚 3|
+|F1|output|digit_en[2]|七段数码管位选引脚 2|
+|E1|output|digit_en[1]|七段数码管位选引脚 1|
+|G6|output|digit_en[0]|七段数码管位选引脚 0|
+|D4|output|sseg[6]|七段数码管段选引脚 6|
+|E3|output|sseg[5]|七段数码管段选引脚 5|
+|D3|output|sseg[4]|七段数码管段选引脚 4|
+|F4|output|sseg[3]|七段数码管段选引脚 3|
+|F3|output|sseg[2]|七段数码管段选引脚 2|
+|E2|output|sseg[1]|七段数码管段选引脚 1|
+|D2|output|sseg[0]|七段数码管段选引脚 0|
+|H2|output|sseg[7]|七段数码管段选引脚 7|
+|B4|output|sseg1[6]|七段数码管段选引脚 6（另一组）|
+|A4|output|sseg1[5]|七段数码管段选引脚 5（另一组）|
+|A3|output|sseg1[4]|七段数码管段选引脚 4（另一组）|
+|B1|output|sseg1[3]|七段数码管段选引脚 3（另一组）|
+|A1|output|sseg1[2]|七段数码管段选引脚 2（另一组）|
+|B3|output|sseg1[1]|七段数码管段选引脚 1（另一组）|
+|B2|output|sseg1[0]|七段数码管段选引脚 0（另一组）|
+|D5|output|sseg1[7]|七段数码管段选引脚 7（另一组）|
+|K3|output|reg_LED[0]|LED指示灯引脚 0|
+|M1|output|reg_LED[1]|LED指示灯引脚 1|
+|L1|output|reg_LED[2]|LED指示灯引脚 2|
+|K6|output|reg_LED[3]|LED指示灯引脚 3|
+|J5|output|reg_LED[4]|LED指示灯引脚 4|
+|H5|output|reg_LED[5]|LED指示灯引脚 5|
+|H6|output|reg_LED[6]|LED指示灯引脚 6|
+|K1|output|reg_LED[7]|LED指示灯引脚 7|
+|K2|output|reg_LED[8]|LED指示灯引脚 8|
+|J2|output|reg_LED[9]|LED指示灯引脚 9|
+|J3|output|reg_LED[10]|LED指示灯引脚 10|
+|H4|output|reg_LED[11]|LED指示灯引脚 11|
+|J4|output|reg_LED[12]|LED指示灯引脚 12|
+|G3|output|reg_LED[13]|LED指示灯引脚 13|
+|G4|output|reg_LED[14]|LED指示灯引脚 14|
+|F6|output|reg_LED[15]|LED指示灯引脚 15|
+
 
 
 ## 各模块端口定义
@@ -117,65 +179,4 @@ ALU
 | `input [6:0] funct7`          | 来自指令的7位功能码                                   |
 | `output reg [31:0] ALUResult` | 32位ALU运算结果输出                                 |
 | `output zero`                 | 零标志位输出，用于分支指令判断（1: 结果为零）                     |
-## 接口定义
-|引脚|规格|名称|功能|
-| ---- | ---- | ---- | ---- |
-|T5|input|start_pg|接收uart数据|
-|R15|input|conf_btn|数据输入确认按键|
-|P17|input|clk|时钟引脚|
-|S6|input|rstn|复位按键|
-|K5|input|ps2_clk|PS2 接口时钟引脚|
-|L4|input|ps2_data|PS2 接口数据引脚|
-|L3|input|rx|UART 接收引脚|
-|N2|output|tx|UART 发送引脚|
-|V2|input|switch_d[8]|测试场景编号输入 0 位|
-|U2|input|switch_d[9]|测试场景编号输入 1 位|
-|U3|input|switch_d[10]|测试场景编号输入 2 位|
-|R1|input|switch_d[0]|测试数据输入 0 位|
-|N4|input|switch_d[1]|测试数据输入 1 位|
-|M4|input|switch_d[2]|测试数据输入 2 位|
-|R2|input|switch_d[3]|测试数据输入 3 位|
-|P2|input|switch_d[4]|测试数据输入 4 位|
-|P3|input|switch_d[5]|测试数据输入 5 位|
-|P4|input|switch_d[6]|测试数据输入 6 位|
-|P5|input|switch_d[7]|测试数据输入 7 位|
-|G2|output|digit_en[7]|七段数码管位选引脚 7|
-|C2|output|digit_en[6]|七段数码管位选引脚 6|
-|C1|output|digit_en[5]|七段数码管位选引脚 5|
-|H1|output|digit_en[4]|七段数码管位选引脚 4|
-|G1|output|digit_en[3]|七段数码管位选引脚 3|
-|F1|output|digit_en[2]|七段数码管位选引脚 2|
-|E1|output|digit_en[1]|七段数码管位选引脚 1|
-|G6|output|digit_en[0]|七段数码管位选引脚 0|
-|D4|output|sseg[6]|七段数码管段选引脚 6|
-|E3|output|sseg[5]|七段数码管段选引脚 5|
-|D3|output|sseg[4]|七段数码管段选引脚 4|
-|F4|output|sseg[3]|七段数码管段选引脚 3|
-|F3|output|sseg[2]|七段数码管段选引脚 2|
-|E2|output|sseg[1]|七段数码管段选引脚 1|
-|D2|output|sseg[0]|七段数码管段选引脚 0|
-|H2|output|sseg[7]|七段数码管段选引脚 7|
-|B4|output|sseg1[6]|七段数码管段选引脚 6（另一组）|
-|A4|output|sseg1[5]|七段数码管段选引脚 5（另一组）|
-|A3|output|sseg1[4]|七段数码管段选引脚 4（另一组）|
-|B1|output|sseg1[3]|七段数码管段选引脚 3（另一组）|
-|A1|output|sseg1[2]|七段数码管段选引脚 2（另一组）|
-|B3|output|sseg1[1]|七段数码管段选引脚 1（另一组）|
-|B2|output|sseg1[0]|七段数码管段选引脚 0（另一组）|
-|D5|output|sseg1[7]|七段数码管段选引脚 7（另一组）|
-|K3|output|reg_LED[0]|LED指示灯引脚 0|
-|M1|output|reg_LED[1]|LED指示灯引脚 1|
-|L1|output|reg_LED[2]|LED指示灯引脚 2|
-|K6|output|reg_LED[3]|LED指示灯引脚 3|
-|J5|output|reg_LED[4]|LED指示灯引脚 4|
-|H5|output|reg_LED[5]|LED指示灯引脚 5|
-|H6|output|reg_LED[6]|LED指示灯引脚 6|
-|K1|output|reg_LED[7]|LED指示灯引脚 7|
-|K2|output|reg_LED[8]|LED指示灯引脚 8|
-|J2|output|reg_LED[9]|LED指示灯引脚 9|
-|J3|output|reg_LED[10]|LED指示灯引脚 10|
-|H4|output|reg_LED[11]|LED指示灯引脚 11|
-|J4|output|reg_LED[12]|LED指示灯引脚 12|
-|G3|output|reg_LED[13]|LED指示灯引脚 13|
-|G4|output|reg_LED[14]|LED指示灯引脚 14|
-|F6|output|reg_LED[15]|LED指示灯引脚 15|
+

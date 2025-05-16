@@ -36,7 +36,7 @@ module Controller(
     output RegWrite,
     output mem_io_reg,
     output ioRead,
-    output ioRead
+    output ioWrite
     );
 //-------------------------------------------------------------
 // Includes
