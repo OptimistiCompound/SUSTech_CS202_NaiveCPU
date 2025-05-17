@@ -45,7 +45,7 @@ assign opcode = inst[6:0];
 wire [4:0] raddr1 = inst[19:15];
 wire [4:0] raddr2 = inst[24:20];
 wire [4:0] rd_v = inst[11:7];
-wire [2:0] funct3 = [14:12];
+wire [2:0] funct3 = inst[14:12];
 
 //-------------------------------------------------------------
 // Write data selection
@@ -58,8 +58,7 @@ always @(*) begin
         wdata = imm32;
     else if (opcode == `OPCODE_AUIPC)
         wdata = pc4_i + imm32;
-    else if (MemtoReg == 1)
-        always @(*) begin
+    else if (MemtoReg == 1) begin
             case (funct3)
             `INST_LB:
                 wdata = {{24{MemData[7]}}, MemData[7:0]};

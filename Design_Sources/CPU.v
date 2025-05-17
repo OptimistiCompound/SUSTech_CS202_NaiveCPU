@@ -117,7 +117,6 @@ module CPU(
         .MemWrite(MemWrite),
         .MemtoReg(MemtoReg),
         .RegWrite(RegWrite),
-        .mem_io_reg(mem_io_reg),
         .ioRead(ioRead),
         .ioWrite(ioWrite)
     );
