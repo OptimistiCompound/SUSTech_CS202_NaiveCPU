@@ -12,8 +12,9 @@ module DMem(
 
     output[31:0] dout
     );
-
+    wire clkn = ~clk;
+    
     RAM udram(
-        .clka(clk), .wea(MemWrite), .addra(addr[13:0]), .dina(din), .douta(dout)
+        .clka(clkn), .wea(MemWrite), .addra(addr[13:0]), .dina(din), .douta(dout)
         );
  endmodule

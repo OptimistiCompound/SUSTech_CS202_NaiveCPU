@@ -43,7 +43,7 @@ module seg(
     // 数码管扫描控制（简化版，使用clk的低2位作为扫描信号）
     always @(posedge clk or negedge rstn) begin
         if (!rstn) begin 
-            digit_en <= 8'b00000000;
+            digit_en <= 8'b11111111;
         end else begin 
             case (digit_sel)
                 3'b000: begin digit_en <= 8'b0000_0001; end 

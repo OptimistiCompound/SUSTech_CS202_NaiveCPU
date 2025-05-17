@@ -125,7 +125,7 @@ always @(*) begin
 end
 
 wire [63:0] signed_ext_operand1 = { {32{operand1[31]}}, operand1 };
-wire [63:0] shifted_ext_operand1 = signed_ext_operand1 >> operand2;
+wire [63:0] shifted_ext_operand1 = signed_ext_operand1 >> operand2[4:0];
 
 //-------------------------------------------------------------
 // Branch handling

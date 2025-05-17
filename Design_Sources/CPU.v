@@ -29,6 +29,7 @@ module CPU(
     input ps2_data,
     input start_pg,
     input rx,
+    input base,
     output [7:0] digit_en,      
     output [7:0] sseg,         
     output [7:0] sseg1,
@@ -68,7 +69,6 @@ module CPU(
     wire SwitchCtrl;
     wire KeyCtrl;
     wire [31:0] write_data;
-    reg base=1'b0;  // connect to switch to control the base of LED display
 //-------------------------------------------------------------
 // Instantiation of modules
 //-------------------------------------------------------------
@@ -79,29 +79,29 @@ module CPU(
         .clk_out2(upg_clk)
     );
 
-    uart_bmpg_0 uart (
-        .upg_clk_i(upg_clk),
-        .upg_rst_i(upg_rst),
-        .upg_rx_i(rx),
+//    uart_bmpg_0 uart (
+//        .upg_clk_i(upg_clk),
+//        .upg_rst_i(upg_rst),
+//        .upg_rx_i(rx),
 
-        .upg_clk_o(upg_clk_w),
-        .upg_wen_o(upg_wen_w),
-        .upg_adr_o(upg_adr_w),
-        .upg_dat_o(upg_dat_w),
-        .upg_done_o(upg_done_w),
-        .upg_tx_o(tx)
-    );
+//        .upg_clk_o(upg_clk_w),
+//        .upg_wen_o(upg_wen_w),
+//        .upg_adr_o(upg_adr_w),
+//        .upg_dat_o(upg_dat_w),
+//        .upg_done_o(upg_done_w),
+//        .upg_tx_o(tx)
+//    );
 
     IFetch ifetch(
         .clk(cpu_clk),
         .rstn(rstn),
         .imm32(imm32),
         .Branch(Branch),
-        .upg_rst_i(upg_rst),
-        .upg_clk_i(upg_clk),
-        .upg_wen_i(upg_wen_w),
-        .upg_adr_i(upg_adr_w),
-        .upg_dat_i(upg_dat_w),
+//        .upg_rst_i(upg_rst),
+//        .upg_clk_i(upg_clk),
+//        .upg_wen_i(upg_wen_w),
+//        .upg_adr_i(upg_adr_w),
+//        .upg_dat_i(upg_dat_w),
         .inst(inst),
         .pc4_i(pc4_i)
     );
@@ -117,7 +117,6 @@ module CPU(
         .MemWrite(MemWrite),
         .MemtoReg(MemtoReg),
         .RegWrite(RegWrite),
-        .mem_io_reg(mem_io_reg),
         .ioRead(ioRead),
         .ioWrite(ioWrite)
     );
@@ -138,7 +137,7 @@ module CPU(
         .clk(cpu_clk),
         .MemRead(MemRead),
         .MemWrite(MemWrite),
-        .addr(addr_out),
+        .addr(addr_out[15:2]),
         .din(ReadData2),
 //        .upg_rst_i(upg_rst),
 //        .upg_clk_i(upg_clk),
@@ -182,18 +181,35 @@ module CPU(
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl)
     );
-    
+    assign reg_LED = inst[15:0];
     LED_con led(
         .clk(cpu_clk),
         .rstn(rstn),
         .base(base),
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl),
-        .write_data(write_data),
-        .reg_LED(reg_LED),
-        .digit_en(digit_en),
-        .sseg(sseg),
-        .sseg1(sseg1)
+        .write_data(write_data)
+//        .reg_LED(reg_LED),
+//        .digit_en(digit_en),
+//        .sseg(sseg),
+//        .sseg1(sseg1)
+    );
+    reg [3:0]cnt;
+    always@(posedge cpu_clk) begin
+     if (conf_btn_out)cnt<=cnt+1;
+     end
+     wire [19:0]out;
+     assign out[7:4] =ioRead;
+     assign out[11:8] =ioWrite;
+     assign out[19:12] =write_data[7:0];
+    seg seg(
+    .clk(cpu_clk),
+    .rstn(rstn),
+    .data(out),
+    .base(base),
+    .digit_en(digit_en),
+            .sseg(sseg),
+            .sseg1(sseg1)
     );
 
     debounce conf_btn_deb(

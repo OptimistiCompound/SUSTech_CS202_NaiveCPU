@@ -13,11 +13,11 @@ reg key_stable_d;
 
 always @(posedge clk or negedge rstn) begin
     if(!rstn) begin
-        key_tmp      <= 1'b0;
-        key_stable   <= 1'b0;
+        key_tmp    <= 1'b0;
+        key_stable <= 1'b0;
         key_stable_d <= 1'b0;
-        cnt          <= 20'd0;
-        key_out      <= 1'b0;
+        cnt        <= 20'd0;
+        key_out    <= 1'b0;
     end 
     else begin
         key_tmp <= key_in;
