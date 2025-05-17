@@ -109,8 +109,9 @@ always @(*) begin
         `ALU_NONE:              ALUResult = 0;
         `ALU_SHIFTL:            ALUResult = operand1 << operand2[4:0];
         `ALU_SHIFTR:            ALUResult = operand1 >> operand2[4:0];
-        // `ALU_SHIFTR_ARITH:      ALUResult = $signed(operand1) >>> operand2[4:0];
-        `ALU_SHIFTR_ARITH:      ALUResult = shifted_ext_operand1[31:0];
+        `ALU_SHIFTR_ARITH:      ALUResult = $signed($signed(operand1) >>> $signed(operand2[4:0]));
+        // `ALU_SHIFTR_ARITH:      ALUResult = shifted_ext_operand1[31:0];
+        // `ALU_SHIFTR_ARITH:      ALUResult = ({{32{1'b1}}, operand1} >> operand2[4:0]);
         `ALU_ADD:               ALUResult = $signed(operand1) + $signed(operand2);
         `ALU_SUB:               ALUResult = $signed(operand1) - $signed(operand2);
         `ALU_AND:               ALUResult = operand1 & operand2;
@@ -124,8 +125,8 @@ always @(*) begin
     endcase
 end
 
-wire [63:0] signed_ext_operand1 = { {32{operand1[31]}}, operand1 };
-wire [63:0] shifted_ext_operand1 = signed_ext_operand1 >> operand2;
+// wire [63:0] shifted_ext_operand1 = { {32{operand1[31]}}, operand1 } >> operand2[4:0];
+// wire [63:0] shifted_ext_operand1 = { {32{1'b1}}, operand1 } >> operand2[4:0];
 
 //-------------------------------------------------------------
 // Branch handling
