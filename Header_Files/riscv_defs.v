@@ -73,6 +73,18 @@
 `define INST_SRAI                               3'h5
 `define INST_SLTUI                              3'h3
 
+// instruction funct for Load
+`define INST_LB                                 3'h0
+`define INST_LH                                 3'h1
+`define INST_LW                                 3'h2
+`define INST_LBU                                3'h4
+`define INST_LHU                                3'h5
+
+// instruction funct for S-type
+`define INST_SB                                 3'h0
+`define INST_SH                                 3'h1
+`define INST_SW                                 3'h2
+
 // instruction funct for B-type
 `define INST_BEQ                                3'h0
 `define INST_BNE                                3'h1
