@@ -23,7 +23,7 @@
 module IFetch(
     // Inputs
     input clk,
-    input rst,
+    input rstn,
     input [31:0] imm32,
     input Branch,
 
@@ -40,9 +40,9 @@ module IFetch(
     );
 wire mode = upg_rst_i | (~upg_rst_i & upg_done_i);
 reg [31:0] PC;
-wire [31:0] next_PC = (rst==0) ? 0 : (Branch) ? PC + imm32 : PC + 32'h4;
-always @(negedge clk or negedge rst) begin
-    if (~rst)
+wire [31:0] next_PC = (rstn==0) ? 0 : (Branch) ? PC + imm32 : PC + 32'h4;
+always @(negedge clk or negedge rstn) begin
+    if (~rstn)
         PC <= 0;
     else
         PC <= next_PC;

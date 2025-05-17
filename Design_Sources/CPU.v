@@ -94,7 +94,7 @@ module CPU(
 
     IFetch ifetch(
         .clk(cpu_clk),
-        .rst(rstn),
+        .rstn(rstn),
         .imm32(imm32),
         .Branch(Branch),
         .upg_rst_i(upg_rst),
