@@ -214,3 +214,48 @@ LED，SEG，SWITCH，KEYBOARD，debounce
 
 TODO：wu的模块
 
+Switch_con （但是被优化了，这部分不需要时序逻辑，暂时注释了，switch_data 直接从拨码开关信号连向 MemOrIO）
+
+| Port                            | Description                           |
+| ------------------------------- | ------------------------------------- |
+| `input clk`                     | 时钟信号                              |
+| `input rstn`                    | 复位信号                              |
+| `input io_read`                 | 读IO控制信号                          |
+| `input [15:0]switch_d`          | 读取自拨码开关的信息                  |
+| `output reg [15:0] switch_data` | 写回拨码开关数据，在MemOrIO中进行选择 |
+
+cpuclk
+
+| Port     | Description                     |
+| -------- | ------------------------------- |
+| clk_in1  | EGO1 的时钟信号，频率为 100MHz  |
+| clk_out1 | 单周期时钟信号，频率为 23MHz    |
+| clk_out2 | Uart 接口时钟信号，频率为 10MHz |
+
+LED_con
+
+| Port                        | Description |
+| --------------------------- | ----------- |
+| `input clk`                 | 时钟信号    |
+| `input rstn`                | 复位信号    |
+| `input base`                |             |
+| `input LEDCtrl`             |             |
+| `input SegCtrl`             |             |
+| `input [31:0] write_data`   |             |
+| `output reg [15:0] reg_LED` |             |
+| `output [7:0] digit_en`     |             |
+| `output [7:0] sseg`         |             |
+| `output [7:0] sseg1`        |             |
+
+seg
+
+| Port                        | Description                      |
+| --------------------------- | -------------------------------- |
+| `input clk`                 |                                  |
+| `input rstn`                |                                  |
+| `input [31:0]data`          |                                  |
+| `input base`                | 进制控制，为1表示十进制，为0表示 |
+| `output reg [7:0] digit_en` |                                  |
+| `output reg [7:0] sseg`     |                                  |
+| `output reg [7:0] sseg1`    |                                  |
+

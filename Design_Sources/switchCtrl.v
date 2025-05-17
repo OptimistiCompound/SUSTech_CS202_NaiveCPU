@@ -10,7 +10,7 @@ module Switch_con(
 always @(posedge clk,negedge rstn)
 begin
     if (!rstn)
-        switch_data <= 15'b0;
+        switch_data <= 16'b0;
     else if (io_read)
         switch_data <= switch_d;
     else

@@ -24,7 +24,7 @@ module CPU(
     input clk,
     input rstn,
     input conf_btn,
-    input [11:0] switch_d,
+    input [11:0] switch_data,
     input ps2_clk,
     input ps2_data,
     input start_pg,
@@ -51,7 +51,6 @@ module CPU(
     wire [6:0] funct7;
     wire [31:0] MemData;
     wire [31:0] pc4_i;
-    wire [15:0] switch_data;
     wire conf_btn_out;
     wire cpu_clk;
     wire [31:0]addr_out;
@@ -69,6 +68,7 @@ module CPU(
     wire SwitchCtrl;
     wire KeyCtrl;
     wire [31:0] write_data;
+    reg base=1'b0;  // connect to switch to control the base of LED display
 //-------------------------------------------------------------
 // Instantiation of modules
 //-------------------------------------------------------------
@@ -186,6 +186,7 @@ module CPU(
     LED_con led(
         .clk(cpu_clk),
         .rstn(rstn),
+        .base(base),
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl),
         .write_data(write_data),
@@ -202,13 +203,13 @@ module CPU(
         .key_out(conf_btn_out)
     );
 
-    Switch_con switch_con(
-        .clk(cpu_clk),
-        .rstn(rstn),
-        .io_read(io_read),
-        .switch_d(switch_d),
-        .switch_data(switch_data)
-    );
+    // Switch_con switch_con(
+    //     .clk(cpu_clk),
+    //     .rstn(rstn),
+    //     .io_read(io_read),
+    //     .switch_d(switch_d),
+    //     .switch_data(switch_data)
+    // );
 
     keyboard_driver keyboard(
         .clk(cpu_clk),
