@@ -137,7 +137,7 @@ module CPU(
         .clk(cpu_clk),
         .MemRead(MemRead),
         .MemWrite(MemWrite),
-        .addr(addr_out),
+        .addr(addr_out[15:2]),
         .din(ReadData2),
 //        .upg_rst_i(upg_rst),
 //        .upg_clk_i(upg_clk),
