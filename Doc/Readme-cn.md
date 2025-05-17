@@ -210,7 +210,21 @@ MemOrIO
 TODO：wang的模块
 LED，SEG，SWITCH，KEYBOARD，debounce
 
+keyboard_scan
+|Port| Description|
+|------ | ---------|
+|||
+|||
+|||
+|||
 
+keyboard_driver
+|Port| Description|
+|------ | ---------|
+|||
+|||
+|||
+|||
 
 TODO：wu的模块
 
@@ -238,24 +252,24 @@ LED_con
 | --------------------------- | ----------- |
 | `input clk`                 | 时钟信号    |
 | `input rstn`                | 复位信号    |
-| `input base`                |             |
-| `input LEDCtrl`             |             |
-| `input SegCtrl`             |             |
-| `input [31:0] write_data`   |             |
-| `output reg [15:0] reg_LED` |             |
-| `output [7:0] digit_en`     |             |
-| `output [7:0] sseg`         |             |
-| `output [7:0] sseg1`        |             |
+| `input base`                | 显示数字的进制|
+| `input LEDCtrl`             | led显示控制信号|
+| `input SegCtrl`             | 数码管显示控制信号|
+| `input [31:0] write_data`   | 写入的显示数值|
+| `output reg [15:0] reg_LED` | led显示信号|
+| `output [7:0] digit_en`     |数码管位选信号 |
+| `output [7:0] sseg`         |低位数码管段选信号|
+| `output [7:0] sseg1`        |高位数码管段选信号|
 
 seg
 
 | Port                        | Description                      |
 | --------------------------- | -------------------------------- |
-| `input clk`                 |                                  |
-| `input rstn`                |                                  |
-| `input [31:0]data`          |                                  |
+| `input clk`                 | 时钟信号 |
+| `input rstn`                | 复位信号|
+| `input [31:0]data`          | 输入的即将显示的值 |
 | `input base`                | 进制控制，为1表示十进制，为0表示 |
-| `output reg [7:0] digit_en` |                                  |
-| `output reg [7:0] sseg`     |                                  |
-| `output reg [7:0] sseg1`    |                                  |
+| `output reg [7:0] digit_en` | 数码管位选信号 |
+| `output reg [7:0] sseg`     | 低位数码管段选信号|
+| `output reg [7:0] sseg1`    | 高位数码管段选信号|
 
