@@ -86,7 +86,7 @@ RegisterFile uRegisterFile(
     .rstn(rstn),
     .raddr1(raddr1),
     .raddr2(raddr2),
-    .waddr(waddr),
+    .waddr(rd_v),
     .wdata(wdata),
     .regWrite(regWrite),
     .rdata1(rdata1),

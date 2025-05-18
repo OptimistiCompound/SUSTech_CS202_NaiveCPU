@@ -42,6 +42,7 @@ module CPU(
 //-------------------------------------------------------------
 
     wire [31:0] inst;
+    wire [31:0] r_wdata;
     wire [31:0] ReadData1, ReadData2;
     wire [31:0] ALUResult;
     wire [31:0] imm32;
@@ -78,6 +79,8 @@ module CPU(
         .clk_out1(cpu_clk),
         .clk_out2(upg_clk)
     );
+//assign cpu_clk=clk;
+//assign upg_clk=clk;
 
 //    uart_bmpg_0 uart (
 //        .upg_clk_i(upg_clk),
@@ -181,37 +184,21 @@ module CPU(
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl)
     );
-    assign reg_LED = inst[15:0];
+
     LED_con led(
         .clk(cpu_clk),
         .rstn(rstn),
         .base(base),
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl),
-        .write_data(write_data)
-//        .reg_LED(reg_LED),
-//        .digit_en(digit_en),
-//        .sseg(sseg),
-//        .sseg1(sseg1)
-    );
-    reg [3:0]cnt;
-    always@(posedge cpu_clk) begin
-     if (conf_btn_out)cnt<=cnt+1;
-     end
-     wire [19:0]out;
-     assign out[7:4] =ioRead;
-     assign out[11:8] =ioWrite;
-     assign out[19:12] =write_data[7:0];
-    seg seg(
-    .clk(cpu_clk),
-    .rstn(rstn),
-    .data(out),
-    .base(base),
-    .digit_en(digit_en),
-            .sseg(sseg),
-            .sseg1(sseg1)
+        .write_data(write_data),
+       .reg_LED(reg_LED),
+       .digit_en(digit_en),
+       .sseg(sseg),
+       .sseg1(sseg1)
     );
 
+//assign conf_btn_out = conf_btn;
     debounce conf_btn_deb(
         .clk(cpu_clk),
         .rstn(rstn),
