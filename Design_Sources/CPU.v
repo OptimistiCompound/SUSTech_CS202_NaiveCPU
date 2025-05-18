@@ -47,7 +47,7 @@ module CPU(
     wire [31:0] ALUResult;
     wire [31:0] imm32;
     wire zero;
-    wire Branch, ALUSrc, MemRead, MemWrite, MemtoReg, RegWrite;
+    wire Branch, Jump, Jalr,ALUSrc, MemRead, MemWrite, MemtoReg, RegWrite;
     wire [1:0] ALUOp;
     wire [2:0] funct3;
     wire [6:0] funct7;
@@ -74,13 +74,13 @@ module CPU(
 // Instantiation of modules
 //-------------------------------------------------------------
 
-//    cpuclk cpuclk(
-//        .clk_in1(clk),
-//        .clk_out1(cpu_clk),
-//        .clk_out2(upg_clk)
-//    );
-assign cpu_clk=clk;
-assign upg_clk=clk;
+    cpuclk cpuclk(
+        .clk_in1(clk),
+        .clk_out1(cpu_clk),
+        .clk_out2(upg_clk)
+    );
+//assign cpu_clk=clk;
+//assign upg_clk=clk;
 
 //    uart_bmpg_0 uart (
 //        .upg_clk_i(upg_clk),
@@ -100,6 +100,8 @@ assign upg_clk=clk;
         .rstn(rstn),
         .imm32(imm32),
         .Branch(Branch),
+        .Jump(Jump),
+        .Jalr(Jalr),
 //        .upg_rst_i(upg_rst),
 //        .upg_clk_i(upg_clk),
 //        .upg_wen_i(upg_wen_w),
@@ -114,6 +116,8 @@ assign upg_clk=clk;
         .ALUResult(ALUResult),
         .zero(zero),
         .Branch(Branch),
+        .Jump(Jump),
+        .Jalr(Jalr),
         .ALUOp(ALUOp),
         .ALUSrc(ALUSrc),
         .MemRead(MemRead),
@@ -211,23 +215,23 @@ assign upg_clk=clk;
 //         assign out[15:8] = write_data[7:0];
 //         assign out[31:16] =pc4_i[23:8];
          
-        seg seg(
-        .clk(cpu_clk),
-        .rstn(rstn),
-        .data(out),
-        .base(base),
-        .digit_en(digit_en),
-                .sseg(sseg),
-                .sseg1(sseg1)
-        );
-
-assign conf_btn_out = conf_btn;
-//    debounce conf_btn_deb(
+//        seg seg(
 //        .clk(cpu_clk),
 //        .rstn(rstn),
-//        .key_in(conf_btn),
-//        .key_out(conf_btn_out)
-//    );
+//        .data(out),
+//        .base(base),
+//        .digit_en(digit_en),
+//                .sseg(sseg),
+//                .sseg1(sseg1)
+//        );
+
+//assign conf_btn_out = conf_btn;
+    debounce conf_btn_deb(
+        .clk(cpu_clk),
+        .rstn(rstn),
+        .key_in(conf_btn),
+        .key_out(conf_btn_out)
+    );
 
     // Switch_con switch_con(
     //     .clk(cpu_clk),

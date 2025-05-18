@@ -18,7 +18,7 @@ module seg(
     wire [3:0] digit7 = (base) ? ((data / 10000000) % 10) :  data[31:28];
    
 
-    parameter CLK_DIV = 16'd50000;  // ʱ�ӷ�Ƶϵ��������ɨ�����
+    parameter CLK_DIV = 16'd50000;  // ʱ�ӷ�Ƶϵ��������ɨ�����?
     
     reg [15:0] clk_div_cnt;         // ʱ�ӷ�Ƶ������
     reg [2:0] digit_sel;         
@@ -28,7 +28,6 @@ module seg(
         if (!rstn) begin
             clk_div_cnt <= 16'd0;
             digit_sel <= 2'd0;
-            digit_data <= 4'd0;
         end else begin
             if (clk_div_cnt >= CLK_DIV) begin
                 clk_div_cnt <= 16'd0;
