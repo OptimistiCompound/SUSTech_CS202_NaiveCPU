@@ -51,8 +51,8 @@ wire [4:0] rd_v = inst[11:7];
 //-------------------------------------------------------------
 reg [31:0] wdata;
 always @(*) begin
-    if (opcode == `OPCODE_JAL)
-        wdata = rd_v;
+    if (opcode == `OPCODE_JAL || opcode == `OPCODE_JALR)
+        wdata = pc4_i;
     else if (opcode == `OPCODE_LUI)
         wdata = imm32;
     else if (opcode == `OPCODE_AUIPC)
