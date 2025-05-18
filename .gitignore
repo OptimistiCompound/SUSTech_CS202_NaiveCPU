@@ -3,3 +3,6 @@
 obj_dir
 *.obsidian
 *.vscode
+
+pipeline_CPU
+CPU_sim

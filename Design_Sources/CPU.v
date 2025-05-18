@@ -46,7 +46,7 @@ module CPU(
     wire [31:0] ALUResult;
     wire [31:0] imm32;
     wire zero;
-    wire Branch, ALUSrc, MemRead, MemWrite, MemtoReg, RegWrite;
+    wire Branch, Jump, Jalr, ALUSrc, MemRead, MemWrite, MemtoReg, RegWrite;
     wire [1:0] ALUOp;
     wire [2:0] funct3;
     wire [6:0] funct7;
@@ -98,6 +98,8 @@ module CPU(
         .rstn(rstn),
         .imm32(imm32),
         .Branch(Branch),
+        .Jump(Jump),
+        .Jalr(Jalr),
 //        .upg_rst_i(upg_rst),
 //        .upg_clk_i(upg_clk),
 //        .upg_wen_i(upg_wen_w),
@@ -112,6 +114,8 @@ module CPU(
         .ALUResult(ALUResult),
         .zero(zero),
         .Branch(Branch),
+        .Jump(Jump),
+        .Jalr(Jalr),
         .ALUOp(ALUOp),
         .ALUSrc(ALUSrc),
         .MemRead(MemRead),
