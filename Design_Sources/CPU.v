@@ -42,7 +42,6 @@ module CPU(
 //-------------------------------------------------------------
 
     wire [31:0] inst;
-    wire [31:0] r_wdata;
     wire [31:0] ReadData1, ReadData2;
     wire [31:0] ALUResult;
     wire [31:0] imm32;
@@ -70,6 +69,7 @@ module CPU(
     wire SwitchCtrl;
     wire KeyCtrl;
     wire [31:0] write_data;
+    wire [31:0] r_wdata;
 //-------------------------------------------------------------
 // Instantiation of modules
 //-------------------------------------------------------------
@@ -79,8 +79,6 @@ module CPU(
         .clk_out1(cpu_clk),
         .clk_out2(upg_clk)
     );
-//assign cpu_clk=clk;
-//assign upg_clk=clk;
 
 //    uart_bmpg_0 uart (
 //        .upg_clk_i(upg_clk),
@@ -140,7 +138,7 @@ module CPU(
         .clk(cpu_clk),
         .MemRead(MemRead),
         .MemWrite(MemWrite),
-        .addr(addr_out[15:2]),
+        .addr(addr_out),
         .din(ReadData2),
 //        .upg_rst_i(upg_rst),
 //        .upg_clk_i(upg_clk),
@@ -150,7 +148,7 @@ module CPU(
 //        .upg_done_i(upg_done_w),
         .dout(MemData)
     );
-    
+    wire reg_a5;
     Decoder decoder(
         .clk(cpu_clk),
         .rstn(rstn),
@@ -184,7 +182,6 @@ module CPU(
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl)
     );
-
     LED_con led(
         .clk(cpu_clk),
         .rstn(rstn),
@@ -192,13 +189,34 @@ module CPU(
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl),
         .write_data(write_data),
-       .reg_LED(reg_LED),
-       .digit_en(digit_en),
-       .sseg(sseg),
-       .sseg1(sseg1)
+        .reg_LED(reg_LED)
+//        .digit_en(digit_en),
+//        .sseg(sseg),
+//        .sseg1(sseg1)
+    );
+    reg [3:0]cnt_btn;
+    always@(posedge cpu_clk) begin
+     if (conf_btn_out)cnt_btn<=cnt_btn+1;
+     end
+     reg [3:0] cnt_iow;
+      always@(posedge cpu_clk) begin
+         if (conf_btn_out)cnt_iow<=cnt_iow+1;
+         end
+     wire [31:0]out;
+     assign out[3:0] = cnt_btn;
+     assign out[7:4] =cnt_iow;
+     assign out[15:8] =write_data[7:0];
+     assign out[31:16] =pc4_i[23:8];
+    seg seg(
+    .clk(cpu_clk),
+    .rstn(rstn),
+    .data(out),
+    .base(base),
+    .digit_en(digit_en),
+            .sseg(sseg),
+            .sseg1(sseg1)
     );
 
-//assign conf_btn_out = conf_btn;
     debounce conf_btn_deb(
         .clk(cpu_clk),
         .rstn(rstn),
