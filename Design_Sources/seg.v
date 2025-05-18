@@ -7,20 +7,20 @@ module seg(
     output reg [7:0] sseg,         
     output reg [7:0] sseg1
 );
-    // ½«12Î»Êý¾Ý·Ö½âÎª6¸öÊ®½øÖÆÊýÎ»
-    wire [3:0] digit0 = (base) ? (data % 10)       : data[3:0];  // ¸öÎ»/LSB
+    // ï¿½ï¿½12Î»ï¿½ï¿½ï¿½Ý·Ö½ï¿½Îª6ï¿½ï¿½Ê®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Î»
+    wire [3:0] digit0 = (base) ? (data % 10)       : data[3:0];  // ï¿½ï¿½Î»/LSB
     wire [3:0] digit1 = (base) ? ((data / 10) % 10) : data[7:4];  // Ê®Î»
-    wire [3:0] digit2 = (base) ? ((data / 100) % 10) : data[11:8]; // °ÙÎ»£¨Ê®Áù½øÖÆÊ±¿ÉÄÜ³¬³ö·¶Î§£©
+    wire [3:0] digit2 = (base) ? ((data / 100) % 10) : data[11:8]; // ï¿½ï¿½Î»ï¿½ï¿½Ê®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ü³ï¿½ï¿½ï¿½ï¿½ï¿½Î§ï¿½ï¿½
     wire [3:0] digit3 = (base) ? ((data / 1000) % 10) :  data[15:12];
-    wire [3:0] digit4 = (base) ? ((data / 10000) % 10)  : data[19:16];  // ¸öÎ»/LSB
+    wire [3:0] digit4 = (base) ? ((data / 10000) % 10)  : data[19:16];  // ï¿½ï¿½Î»/LSB
     wire [3:0] digit5 = (base) ? ((data / 100000) % 10) :  data[23:20];  // Ê®Î»
-    wire [3:0] digit6 = (base) ? ((data / 1000000) % 10) :  data[27:24]; // °ÙÎ»£¨Ê®Áù½øÖÆÊ±¿ÉÄÜ³¬³ö·¶Î§£©
+    wire [3:0] digit6 = (base) ? ((data / 1000000) % 10) :  data[27:24]; // ï¿½ï¿½Î»ï¿½ï¿½Ê®ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ü³ï¿½ï¿½ï¿½ï¿½ï¿½Î§ï¿½ï¿½
     wire [3:0] digit7 = (base) ? ((data / 10000000) % 10) :  data[31:28];
    
 
-    parameter CLK_DIV = 16'd50000;  // Ê±ÖÓ·ÖÆµÏµÊý£¬ÓÃÓÚÉ¨Ãè¿ØÖÆ
+    parameter CLK_DIV = 16'd50000;  // Ê±ï¿½Ó·ï¿½ÆµÏµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½É¨ï¿½ï¿½ï¿½ï¿½ï¿½
     
-    reg [15:0] clk_div_cnt;         // Ê±ÖÓ·ÖÆµ¼ÆÊýÆ÷
+    reg [15:0] clk_div_cnt;         // Ê±ï¿½Ó·ï¿½Æµï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     reg [2:0] digit_sel;         
     reg [3:0] digit_data;
 
@@ -28,6 +28,7 @@ module seg(
         if (!rstn) begin
             clk_div_cnt <= 16'd0;
             digit_sel <= 2'd0;
+            digit_data <= 4'd0;
         end else begin
             if (clk_div_cnt >= CLK_DIV) begin
                 clk_div_cnt <= 16'd0;
@@ -40,7 +41,7 @@ module seg(
         end
     end
 
-    // ÊýÂë¹ÜÉ¨Ãè¿ØÖÆ£¨¼ò»¯°æ£¬Ê¹ÓÃclkµÄµÍ2Î»×÷ÎªÉ¨ÃèÐÅºÅ£©
+    // ï¿½ï¿½ï¿½ï¿½ï¿½É¨ï¿½ï¿½ï¿½ï¿½Æ£ï¿½ï¿½ò»¯°æ£¬Ê¹ï¿½ï¿½clkï¿½Äµï¿½2Î»ï¿½ï¿½ÎªÉ¨ï¿½ï¿½ï¿½ÅºÅ£ï¿½
     always @(posedge clk or negedge rstn) begin
         if (!rstn) begin 
             digit_en <= 8'b11111111;
