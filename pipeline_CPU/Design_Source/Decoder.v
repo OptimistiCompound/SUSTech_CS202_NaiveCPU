@@ -1,0 +1,87 @@
+`timescale 1ns / 1ps
+//////////////////////////////////////////////////////////////////////////////////
+// Company: 
+// Engineer: 
+// 
+// Create Date: 2025/04/22 00:45:44
+// Design Name: 
+// Module Name: Decoder
+// Project Name: 
+// Target Devices: 
+// Tool Versions: 
+// Description: 
+// 
+// Dependencies: 
+// 
+// Revision:
+// Revision 0.01 - File Created
+// Additional Comments:
+// 
+//////////////////////////////////////////////////////////////////////////////////
+
+
+module Decoder(
+    // Inputs
+    input clk,
+    input rstn,
+    input [31:0] ALUResult, // WB
+    input [31:0] MemData,   // WB
+    input [31:0] pc4_i,
+    input regWrite,         // WB
+    input MemtoReg,         // WB
+    input [31:0] inst,
+
+    // Outputs
+    output [31:0] rdata1,
+    output [31:0] rdata2,
+    output [31:0] imm32
+    );
+//-------------------------------------------------------------
+// Includes
+//-------------------------------------------------------------
+`include "../Header_Files/riscv_defs.v"
+
+assign opcode = inst[6:0];
+wire [4:0] raddr1 = inst[19:15];
+wire [4:0] raddr2 = inst[24:20];
+wire [4:0] rd_v = inst[11:7];
+
+//-------------------------------------------------------------
+// Write data selection
+//-------------------------------------------------------------
+reg [31:0] wdata;
+always @(*) begin
+    if (opcode == `OPCODE_JAL || opcode == `OPCODE_JALR)
+        wdata = pc4_i;
+    else if (opcode == `OPCODE_LUI)
+        wdata = imm32;
+    else if (opcode == `OPCODE_AUIPC)
+        wdata = pc4_i + imm32;
+    else if (MemtoReg == 1)
+        wdata = MemData;
+    else 
+        wdata = ALUResult;
+end
+
+//-------------------------------------------------------------
+// Submodules
+//-------------------------------------------------------------
+RegisterFile uRegisterFile(
+    .clk(clk),
+    .rstn(rstn),
+    .raddr1(raddr1),
+    .raddr2(raddr2),
+    .waddr(rd_v),
+    .wdata(wdata),
+    .regWrite(regWrite),
+    .rdata1(rdata1),
+    .rdata2(rdata2)
+);
+
+ImmGen uImmGen(
+    .inst(inst),
+    .imm32(imm32)
+);
+
+
+endmodule
