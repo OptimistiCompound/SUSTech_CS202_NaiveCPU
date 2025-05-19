@@ -55,19 +55,20 @@ module CPU(
     wire conf_btn_out;
     wire cpu_clk;
     wire [31:0]addr_out;
-    wire upg_clk,upg_clko;
-    wire upg_wen_o;
-    wire upg_done_o;
     wire ioRead,ioWrite;
-    wire [14:0] upg_addr_o;
-    wire [31:0] upg_data_o;
+
+    wire upg_clk;
+    wire upg_clk_w;
+    wire upg_wen_w;
+    wire upg_done_w;
+    wire [14:0] upg_addr_w;
+    wire [31:0] upg_data_w;
+
     wire [3:0]key_data_sub;
     wire [31:0]key_data;
-    wire key_done;
+
     wire SegCtrl;
     wire LEDCtrl;
-    wire SwitchCtrl;
-    wire KeyCtrl;
     wire [31:0] write_data;
     wire [31:0] r_wdata;
 //-------------------------------------------------------------
@@ -87,8 +88,8 @@ module CPU(
 
         .upg_clk_o(upg_clk_w),
         .upg_wen_o(upg_wen_w),
-        .upg_adr_o(upg_adr_w),
-        .upg_dat_o(upg_dat_w),
+        .upg_adr_o(upg_addr_w[14:0]),
+        .upg_dat_o(upg_data_w),
         .upg_done_o(upg_done_w),
         .upg_tx_o(tx)
     );
@@ -101,10 +102,11 @@ module CPU(
         .Jump(Jump),
         .Jalr(Jalr),
         .upg_rst_i(start_pg),
-        .upg_clk_i(upg_clk),
+        .upg_clk_i(upg_clk_w),
         .upg_wen_i(upg_wen_w),
-        .upg_adr_i(upg_adr_w),
-        .upg_dat_i(upg_dat_w),
+        .upg_adr_i(upg_addr_w),
+        .upg_dat_i(upg_data_w),
+        .upg_done_i(upg_done_w),
         .inst(inst),
         .pc4_i(pc4_i)
     );
@@ -145,14 +147,14 @@ module CPU(
         .addr(addr_out[15:2]),
         .din(ReadData2),
         .upg_rst_i(start_pg),
-        .upg_clk_i(upg_clk),
+        .upg_clk_i(upg_clk_w),
         .upg_wen_i(upg_wen_w),
-        .upg_addr_i(upg_adr_w[13:0]),
-        .upg_data_i(upg_dat_w),
+        .upg_addr_i(upg_addr_w[13:0]),
+        .upg_data_i(upg_data_w),
         .upg_done_i(upg_done_w),
         .dout(MemData)
     );
-    wire reg_a5;
+
     Decoder decoder(
         .clk(cpu_clk),
         .rstn(rstn),
@@ -194,32 +196,32 @@ module CPU(
         .SegCtrl(SegCtrl),
         .write_data(write_data),
         .reg_LED(reg_LED)
-//        .digit_en(digit_en),
-//        .sseg(sseg),
-//        .sseg1(sseg1)
+       .digit_en(digit_en),
+       .sseg(sseg),
+       .sseg1(sseg1)
     );
-    reg [3:0]cnt_btn;
-    always@(posedge cpu_clk) begin
-     if (conf_btn_out)cnt_btn<=cnt_btn+1;
-     end
-     reg [3:0] cnt_iow;
-      always@(posedge cpu_clk) begin
-         if (conf_btn_out)cnt_iow<=cnt_iow+1;
-         end
-     wire [31:0]out;
-     assign out[3:0] = cnt_btn;
-     assign out[7:4] =cnt_iow;
-     assign out[15:8] =write_data[7:0];
-     assign out[31:16] =pc4_i[23:8];
-    seg seg(
-    .clk(cpu_clk),
-    .rstn(rstn),
-    .data(out),
-    .base(base),
-    .digit_en(digit_en),
-            .sseg(sseg),
-            .sseg1(sseg1)
-    );
+    // reg [3:0]cnt_btn;
+    // always@(posedge cpu_clk) begin
+    //  if (conf_btn_out)cnt_btn<=cnt_btn+1;
+    //  end
+    //  reg [3:0] cnt_iow;
+    //   always@(posedge cpu_clk) begin
+    //      if (conf_btn_out)cnt_iow<=cnt_iow+1;
+    //      end
+    //  wire [31:0]out;
+    //  assign out[3:0] = cnt_btn;
+    //  assign out[7:4] =cnt_iow;
+    //  assign out[15:8] =write_data[7:0];
+    //  assign out[31:16] =pc4_i[23:8];
+    // seg seg(
+    // .clk(cpu_clk),
+    // .rstn(rstn),
+    // .data(out),
+    // .base(base),
+    // .digit_en(digit_en),
+    //         .sseg(sseg),
+    //         .sseg1(sseg1)
+    // );
 
 //assign conf_btn_out = conf_btn;
     debounce conf_btn_deb(
