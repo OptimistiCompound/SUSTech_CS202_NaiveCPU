@@ -7,20 +7,20 @@ module seg(
     output reg [7:0] sseg,         
     output reg [7:0] sseg1
 );
-    // 将12位数据分解为6个十进制数位
-    wire [3:0] digit0 = (base) ? (data % 10)       : data[3:0];  // 个位/LSB
-    wire [3:0] digit1 = (base) ? ((data / 10) % 10) : data[7:4];  // 十位
-    wire [3:0] digit2 = (base) ? ((data / 100) % 10) : data[11:8]; // 百位（十六进制时可能超出范围）
+    wire [3:0] digit0 = (base) ? (data % 10)       : data[3:0];  
+    wire [3:0] digit1 = (base) ? ((data / 10) % 10) : data[7:4];  
+    wire [3:0] digit2 = (base) ? ((data / 100) % 10) : data[11:8]; 
     wire [3:0] digit3 = (base) ? ((data / 1000) % 10) :  data[15:12];
-    wire [3:0] digit4 = (base) ? ((data / 10000) % 10)  : data[19:16];  // 个位/LSB
-    wire [3:0] digit5 = (base) ? ((data / 100000) % 10) :  data[23:20];  // 十位
-    wire [3:0] digit6 = (base) ? ((data / 1000000) % 10) :  data[27:24]; // 百位（十六进制时可能超出范围）
+    wire [3:0] digit4 = (base) ? ((data / 10000) % 10)  : data[19:16]; 
+    wire [3:0] digit5 = (base) ? ((data / 100000) % 10) :  data[23:20];  
+    wire [3:0] digit6 = (base) ? ((data / 1000000) % 10) :  data[27:24];
     wire [3:0] digit7 = (base) ? ((data / 10000000) % 10) :  data[31:28];
    
 
-    parameter CLK_DIV = 16'd50000;  // 时钟分频系数，用于扫描控制
+    parameter CLK_DIV = 16'd50000; 
+    parameter init = 4'b0;
     
-    reg [15:0] clk_div_cnt;         // 时钟分频计数器
+    reg [15:0] clk_div_cnt;         
     reg [2:0] digit_sel;         
     reg [3:0] digit_data;
 
@@ -40,7 +40,6 @@ module seg(
         end
     end
 
-    // 数码管扫描控制（简化版，使用clk的低2位作为扫描信号）
     always @(posedge clk or negedge rstn) begin
         if (!rstn) begin 
             digit_en <= 8'b11111111;
@@ -60,14 +59,14 @@ module seg(
     end
     always @(*) begin
           case (digit_sel)
-              3'd0: digit_data = digit0;
-              3'd1: digit_data = digit1;
-              3'd2: digit_data = digit2;
-              3'd3: digit_data = digit3; 
-              3'd4: digit_data = digit4;
-              3'd5: digit_data = digit5;
-              3'd6: digit_data = digit6;
-              3'd7: digit_data = digit7;     
+              3'd0: digit_data = rstn ? digit0 : init;
+              3'd1: digit_data = rstn ? digit1 : init;
+              3'd2: digit_data = rstn ? digit2 : init;
+              3'd3: digit_data = rstn ? digit3 : init; 
+              3'd4: digit_data = rstn ? digit4 : init;
+              3'd5: digit_data = rstn ? digit5 : init;
+              3'd6: digit_data = rstn ? digit6 : init;
+              3'd7: digit_data = rstn ? digit7 : init;     
               default: digit_data = 4'd0;
           endcase
      end
