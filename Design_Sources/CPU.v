@@ -46,7 +46,7 @@ module CPU(
     wire [31:0] ALUResult;
     wire [31:0] imm32;
     wire zero;
-    wire Branch, Jump, Jalr, ALUSrc, MemRead, MemWrite, MemtoReg, RegWrite;
+    wire Branch, Jump, Jalr,ALUSrc, MemRead, MemWrite, MemtoReg, RegWrite;
     wire [1:0] ALUOp;
     wire [2:0] funct3;
     wire [6:0] funct7;
@@ -62,7 +62,7 @@ module CPU(
     wire [14:0] upg_addr_o;
     wire [31:0] upg_data_o;
     wire [3:0]key_data_sub;
-    wire [11:0]key_data;
+    wire [31:0]key_data;
     wire key_done;
     wire SegCtrl;
     wire LEDCtrl;
@@ -80,18 +80,18 @@ module CPU(
         .clk_out2(upg_clk)
     );
 
-//    uart_bmpg_0 uart (
-//        .upg_clk_i(upg_clk),
-//        .upg_rst_i(upg_rst),
-//        .upg_rx_i(rx),
+    uart_bmpg_0 uart (
+        .upg_clk_i(upg_clk),
+        .upg_rst_i(start_pg),
+        .upg_rx_i(rx),
 
-//        .upg_clk_o(upg_clk_w),
-//        .upg_wen_o(upg_wen_w),
-//        .upg_adr_o(upg_adr_w),
-//        .upg_dat_o(upg_dat_w),
-//        .upg_done_o(upg_done_w),
-//        .upg_tx_o(tx)
-//    );
+        .upg_clk_o(upg_clk_w),
+        .upg_wen_o(upg_wen_w),
+        .upg_adr_o(upg_adr_w),
+        .upg_dat_o(upg_dat_w),
+        .upg_done_o(upg_done_w),
+        .upg_tx_o(tx)
+    );
 
     IFetch ifetch(
         .clk(cpu_clk),
@@ -100,11 +100,11 @@ module CPU(
         .Branch(Branch),
         .Jump(Jump),
         .Jalr(Jalr),
-//        .upg_rst_i(upg_rst),
-//        .upg_clk_i(upg_clk),
-//        .upg_wen_i(upg_wen_w),
-//        .upg_adr_i(upg_adr_w),
-//        .upg_dat_i(upg_dat_w),
+        .upg_rst_i(start_pg),
+        .upg_clk_i(upg_clk),
+        .upg_wen_i(upg_wen_w),
+        .upg_adr_i(upg_adr_w),
+        .upg_dat_i(upg_dat_w),
         .inst(inst),
         .pc4_i(pc4_i)
     );
@@ -142,14 +142,14 @@ module CPU(
         .clk(cpu_clk),
         .MemRead(MemRead),
         .MemWrite(MemWrite),
-        .addr(addr_out),
+        .addr(addr_out[15:2]),
         .din(ReadData2),
-//        .upg_rst_i(upg_rst),
-//        .upg_clk_i(upg_clk),
-//        .upg_wen_i(upg_wen_w),
-//        .upg_addr_i(upg_adr_w[13:0]),
-//        .upg_data_i(upg_dat_w),
-//        .upg_done_i(upg_done_w),
+        .upg_rst_i(start_pg),
+        .upg_clk_i(upg_clk),
+        .upg_wen_i(upg_wen_w),
+        .upg_addr_i(upg_adr_w[13:0]),
+        .upg_data_i(upg_dat_w),
+        .upg_done_i(upg_done_w),
         .dout(MemData)
     );
     wire reg_a5;
@@ -221,6 +221,7 @@ module CPU(
             .sseg1(sseg1)
     );
 
+//assign conf_btn_out = conf_btn;
     debounce conf_btn_deb(
         .clk(cpu_clk),
         .rstn(rstn),
@@ -247,8 +248,7 @@ module CPU(
     Keyboard_cache key_cache(
         .rstn(rstn),
         .key_data(key_data_sub),
-        .data_out(key_data),
-        .done(key_done)
+        .data_out(key_data)
     );
 
 //-------------------------------------------------------------
