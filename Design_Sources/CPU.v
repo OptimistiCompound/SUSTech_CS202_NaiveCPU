@@ -56,12 +56,14 @@ module CPU(
     wire conf_btn_out;
     wire cpu_clk;
     wire [31:0]addr_out;
-    wire upg_clk,upg_clko;
-    wire upg_wen_o;
-    wire upg_done_o;
+  
+    wire upg_clk_w;
+    wire upg_wen_w;
+    wire upg_done_w;
+    wire [14:0] upg_addr_w;
+    wire [31:0] upg_data_w;
+
     wire ioRead,ioWrite;
-    wire [14:0] upg_addr_o;
-    wire [31:0] upg_data_o;
     wire [3:0]key_data_sub;
     wire [11:0]key_data;
     wire key_done;
@@ -74,7 +76,7 @@ module CPU(
 // Instantiation of modules
 //-------------------------------------------------------------
 
-    cpuclk cpuclk(
+    clk_wiz cpuclk(
         .clk_in1(clk),
         .clk_out1(cpu_clk),
         .clk_out2(upg_clk)
@@ -82,19 +84,18 @@ module CPU(
 //assign cpu_clk=clk;
 //assign upg_clk=clk;
 
-//    uart_bmpg_0 uart (
-//        .upg_clk_i(upg_clk),
-//        .upg_rst_i(upg_rst),
-//        .upg_rx_i(rx),
+   uart_bmpg_0 uart (
+        .upg_clk_i(upg_clk),
+        .upg_rst_i(start_pg),
+        .upg_rx_i(rx),
 
-//        .upg_clk_o(upg_clk_w),
-//        .upg_wen_o(upg_wen_w),
-//        .upg_adr_o(upg_adr_w),
-//        .upg_dat_o(upg_dat_w),
-//        .upg_done_o(upg_done_w),
-//        .upg_tx_o(tx)
-//    );
-
+        .upg_clk_o(upg_clk_w),
+        .upg_wen_o(upg_wen_w),
+        .upg_adr_o(upg_addr_w[14:0]),
+        .upg_dat_o(upg_data_w),
+        .upg_done_o(upg_done_w),
+        .upg_tx_o(tx)
+    );
     IFetch ifetch(
         .clk(cpu_clk),
         .rstn(rstn),
@@ -102,11 +103,12 @@ module CPU(
         .Branch(Branch),
         .Jump(Jump),
         .Jalr(Jalr),
-//        .upg_rst_i(upg_rst),
-//        .upg_clk_i(upg_clk),
-//        .upg_wen_i(upg_wen_w),
-//        .upg_adr_i(upg_adr_w),
-//        .upg_dat_i(upg_dat_w),
+        .upg_rst_i(start_pg),
+        .upg_clk_i(upg_clk_w),
+        .upg_wen_i(upg_wen_w),
+        .upg_adr_i(upg_addr_w),
+        .upg_dat_i(upg_data_w),
+        .upg_done_i(upg_done_w),
         .inst(inst),
         .pc4_i(pc4_i)
     );
@@ -146,12 +148,12 @@ module CPU(
         .MemWrite(MemWrite),
         .addr(addr_out[15:2]),
         .din(ReadData2),
-//        .upg_rst_i(upg_rst),
-//        .upg_clk_i(upg_clk),
-//        .upg_wen_i(upg_wen_w),
-//        .upg_addr_i(upg_adr_w[13:0]),
-//        .upg_data_i(upg_dat_w),
-//        .upg_done_i(upg_done_w),
+        .upg_rst_i(start_pg),
+        .upg_clk_i(upg_clk_w),
+        .upg_wen_i(upg_wen_w),
+        .upg_addr_i(upg_addr_w[13:0]),
+        .upg_data_i(upg_data_w),
+        .upg_done_i(upg_done_w),
         .dout(MemData)
     );
     
