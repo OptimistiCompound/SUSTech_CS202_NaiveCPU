@@ -80,6 +80,8 @@ module CPU(
         .clk_out1(cpu_clk),
         .clk_out2(upg_clk)
     );
+//assign cpu_clk=clk;
+//assign upg_clk=clk;
 
     uart_bmpg_0 uart (
         .upg_clk_i(upg_clk),
