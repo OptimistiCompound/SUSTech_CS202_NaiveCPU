@@ -41,8 +41,8 @@
 #define INST_AND                                0x700
 #define INST_SLL                                0x100
 #define INST_SRL                                0x500
-#define INST_SRA                                0x500
-#define INST_SLT                                0x220
+#define INST_SRA                                0x520
+#define INST_SLT                                0x200
 #define INST_SLTU                               0x300
 
 // instruction funct for I-type
