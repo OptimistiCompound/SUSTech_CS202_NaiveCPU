@@ -74,13 +74,13 @@ module CPU(
 // Instantiation of modules
 //-------------------------------------------------------------
 
-    cpuclk cpuclk(
-        .clk_in1(clk),
-        .clk_out1(cpu_clk),
-        .clk_out2(upg_clk)
-    );
-//assign cpu_clk=clk;
-//assign upg_clk=clk;
+//    clk_wiz cpuclk(
+//        .clk_in1(clk),
+//        .clk_out1(cpu_clk),
+//        .clk_out2(upg_clk)
+//    );
+assign cpu_clk=clk;
+assign upg_clk=clk;
 
 //    uart_bmpg_0 uart (
 //        .upg_clk_i(upg_clk),
@@ -225,13 +225,13 @@ module CPU(
 //                .sseg1(sseg1)
 //        );
 
-//assign conf_btn_out = conf_btn;
-    debounce conf_btn_deb(
-        .clk(cpu_clk),
-        .rstn(rstn),
-        .key_in(conf_btn),
-        .key_out(conf_btn_out)
-    );
+assign conf_btn_out = conf_btn;
+//    debounce conf_btn_deb(
+//        .clk(cpu_clk),
+//        .rstn(rstn),
+//        .key_in(conf_btn),
+//        .key_out(conf_btn_out)
+//    );
 
     // Switch_con switch_con(
     //     .clk(cpu_clk),

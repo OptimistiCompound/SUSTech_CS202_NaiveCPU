@@ -56,14 +56,14 @@ end
 
 assign pc4_i = PC + 32'h4;
 
-//programrom instmem (
+//programromm instmem (
 //    .clka (mode? rom_clk_i : upg_clk_i ),
 //    .wea (mode? 1'b0 : upg_wen_i ),
 //    .addra (mode? PC[15:2] : upg_adr_i ),
 //    .dina (mode? 32'h00000000 : upg_dat_i ),
 //    .douta (inst)
 //    );
-prgrom imem(
+prgm imem(
 .clka(clk),
 .addra(PC[15:2]),
 .douta(inst)

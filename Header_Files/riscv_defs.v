@@ -59,8 +59,8 @@
 `define INST_AND                                12'h7_00
 `define INST_SLL                                12'h1_00
 `define INST_SRL                                12'h5_00
-`define INST_SRA                                12'h5_00
-`define INST_SLT                                12'h2_20
+`define INST_SRA                                12'h5_20
+`define INST_SLT                                12'h2_00
 `define INST_SLTU                               12'h3_00
 
 // instruction funct for I-type
@@ -68,9 +68,10 @@
 `define INST_XORI                               3'h4
 `define INST_ORI                                3'h6
 `define INST_ANDI                               3'h7
-`define INST_SLLI                               3'h1
-`define INST_SRLI                               3'h5
-`define INST_SRAI                               3'h5
+`define INST_SLLI                               12'h1_00
+`define INST_SRLI                               12'h5_00
+`define INST_SRAI                               12'h5_20
+`define INST_SLTI                               3'h2
 `define INST_SLTUI                              3'h3
 
 // instruction funct for Load
