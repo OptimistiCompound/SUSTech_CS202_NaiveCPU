@@ -55,15 +55,14 @@ module CPU(
     wire conf_btn_out;
     wire cpu_clk;
     wire [31:0]addr_out;
-    wire ioRead,ioWrite;
-
-    wire upg_clk;
+  
     wire upg_clk_w;
     wire upg_wen_w;
     wire upg_done_w;
     wire [14:0] upg_addr_w;
     wire [31:0] upg_data_w;
 
+    wire ioRead,ioWrite;
     wire [3:0]key_data_sub;
     wire [31:0]key_data;
 
@@ -75,7 +74,7 @@ module CPU(
 // Instantiation of modules
 //-------------------------------------------------------------
 
-    cpuclk cpuclk(
+    clk_wiz cpuclk(
         .clk_in1(clk),
         .clk_out1(cpu_clk),
         .clk_out2(upg_clk)
@@ -83,7 +82,7 @@ module CPU(
 //assign cpu_clk=clk;
 //assign upg_clk=clk;
 
-    uart_bmpg_0 uart (
+   uart_bmpg_0 uart (
         .upg_clk_i(upg_clk),
         .upg_rst_i(start_pg),
         .upg_rx_i(rx),
@@ -95,7 +94,6 @@ module CPU(
         .upg_done_o(upg_done_w),
         .upg_tx_o(tx)
     );
-
     IFetch ifetch(
         .clk(cpu_clk),
         .rstn(rstn),
