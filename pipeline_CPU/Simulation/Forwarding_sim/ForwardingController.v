@@ -26,8 +26,8 @@
 //    WB_*: 即表示EX_MEM寄存器组中输出的WB_*
 module ForwardingController(
     // Inputs
-    input       MEM_RegWrite,
-    input       WB_RegWrite,
+    input MEM_RegWrite,
+    input WB_RegWrite,
     input [4:0] EX_rs1_addr,
     input [4:0] EX_rs2_addr,
     input [4:0] MEM_rs2_addr,
