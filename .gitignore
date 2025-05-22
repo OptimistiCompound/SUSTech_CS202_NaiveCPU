@@ -11,3 +11,5 @@ pipeline_CPU/Design_Source/led*
 pipeline_CPU/Design_Source/mode*
 
 CPU_sim/
+
+pipeline_CPU/Header_Files
