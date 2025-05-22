@@ -90,12 +90,14 @@ always @(*) begin
                 ALUControl = `ALU_OR;
             else if (funct3 == `INST_ANDI)
                 ALUControl = `ALU_AND;
-            else if (funct3 == `INST_SLLI)
+            else if (com_funct == `INST_SLLI)
                 ALUControl = `ALU_SHIFTL;
-            else if (funct3 == `INST_SRLI)
+            else if (com_funct == `INST_SRLI)
                 ALUControl = `ALU_SHIFTR;
-            else if (funct3 == `INST_SRAI)
+            else if (com_funct == `INST_SRAI)
                 ALUControl = `ALU_SHIFTR_ARITH;
+            else if (funct3 == `INST_SLTI)
+                ALUControl = `ALU_LESS_THAN_SIGNED;
             else if (funct3 == `INST_SLTUI)
                 ALUControl = `ALU_LESS_THAN_UNSIGNED;
             else
@@ -109,9 +111,7 @@ always @(*) begin
         `ALU_NONE:              ALUResult = 0;
         `ALU_SHIFTL:            ALUResult = operand1 << operand2[4:0];
         `ALU_SHIFTR:            ALUResult = operand1 >> operand2[4:0];
-        `ALU_SHIFTR_ARITH:      ALUResult = $signed($signed(operand1) >>> $signed(operand2[4:0]));
-        // `ALU_SHIFTR_ARITH:      ALUResult = shifted_ext_operand1[31:0];
-        // `ALU_SHIFTR_ARITH:      ALUResult = ({{32{1'b1}}, operand1} >> operand2[4:0]);
+        `ALU_SHIFTR_ARITH:      ALUResult = $signed(operand1) >>> operand2[4:0];
         `ALU_ADD:               ALUResult = $signed(operand1) + $signed(operand2);
         `ALU_SUB:               ALUResult = $signed(operand1) - $signed(operand2);
         `ALU_AND:               ALUResult = operand1 & operand2;
@@ -124,9 +124,6 @@ always @(*) begin
             ALUResult = 0;
     endcase
 end
-
-// wire [63:0] shifted_ext_operand1 = { {32{operand1[31]}}, operand1 } >> operand2[4:0];
-// wire [63:0] shifted_ext_operand1 = { {32{1'b1}}, operand1 } >> operand2[4:0];
 
 //-------------------------------------------------------------
 // Branch handling
