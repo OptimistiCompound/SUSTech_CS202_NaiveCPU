@@ -30,31 +30,18 @@ module IFetch(
     input Jalr,
     input [31:0] ALUResult,
 
-<<<<<<< HEAD
-    input upg_rst_i,
-    input upg_clk_i, 
-    input upg_wen_i,
-    input[13:0] upg_adr_i, 
-    input[31:0] upg_dat_i, 
-    input upg_done_i,
-=======
    input upg_rst_i,
    input upg_clk_i, 
    input upg_wen_i,
    input[13:0] upg_adr_i, 
    input[31:0] upg_dat_i, 
    input upg_done_i,
->>>>>>> aa7ed9ee21185d341767ab8763fcb1bbaf7e7939
 
     // Outputs
     output [31:0] inst,
     output [31:0] pc4_i
     );
 wire mode = upg_rst_i | (~upg_rst_i & upg_done_i);
-<<<<<<< HEAD
-
-=======
->>>>>>> aa7ed9ee21185d341767ab8763fcb1bbaf7e7939
 reg [31:0] PC;
 wire [31:0] next_PC =   (rstn==0) ? 0 : 
                         (Branch || Jump) ? PC + imm32 : 
@@ -70,19 +57,6 @@ end
 assign pc4_i = PC + 32'h4;
 
 programrom instmem (
-<<<<<<< HEAD
-    .clka (mode? clk : upg_clk_i ),
-    .wea (mode? 1'b0 : upg_wen_i ),
-    .addra (mode? PC[15:2] : upg_adr_i ),
-    .dina (mode? 32'h00000000 : upg_dat_i ),
-    .douta (inst)
-    );
-//prgrom imem(
-//.clka(clk),
-//.addra(PC[15:2]),
-//.douta(inst)
-//);
-=======
    .clka (mode? clk : upg_clk_i ),
    .wea (mode? 1'b0 : upg_wen_i ),
    .addra (mode? PC[15:2] : upg_adr_i ),
@@ -94,6 +68,5 @@ programrom instmem (
 // .addra(PC[15:2]),
 // .douta(inst)
 // );
->>>>>>> aa7ed9ee21185d341767ab8763fcb1bbaf7e7939
 
 endmodule
