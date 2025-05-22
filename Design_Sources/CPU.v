@@ -46,16 +46,21 @@ module CPU(
     wire [31:0] ALUResult;
     wire [31:0] imm32;
     wire zero;
-    wire Branch, Jump, Jalr,ALUSrc, MemRead, MemWrite, MemtoReg, RegWrite;
+    wire Branch, Jump, Jalr, ALUSrc, MemRead, MemWrite, MemtoReg, RegWrite;
+    wire eRead, eWrite, eBreak;
+    wire [11:0] EcallOp;
     wire [1:0] ALUOp;
     wire [2:0] funct3;
     wire [6:0] funct7;
     wire [31:0] MemData;
     wire [31:0] pc4_i;
     wire conf_btn_out;
+    wire wiz_clk;
     wire cpu_clk;
     wire [31:0]addr_out;
     wire ioRead,ioWrite;
+    wire [31:0] ecall_code;
+    wire [31:0] ecall_a0_data;
 
     wire upg_clk;
     wire upg_clk_w;
@@ -77,8 +82,18 @@ module CPU(
 
     cpuclk cpuclk(
         .clk_in1(clk),
-        .clk_out1(cpu_clk),
+        .clk_out1(wiz_clk),
         .clk_out2(upg_clk)
+    );
+
+    Debug_Controller debug_ctrl(
+        .clk(clk),
+        .rstn(rstn),
+        .eBreak(eBreak),
+        .btn1(btn1),
+        .btn2(btn2),
+        .clk_in(wiz_clk),
+        .clk_out(cpu_clk)
     );
 
     uart_bmpg_0 uart (
@@ -115,6 +130,7 @@ module CPU(
         .inst(inst),
         .ALUResult(ALUResult),
         .zero(zero),
+        .ecall_code(ecall_code),
         .Branch(Branch),
         .Jump(Jump),
         .Jalr(Jalr),
@@ -125,7 +141,11 @@ module CPU(
         .MemtoReg(MemtoReg),
         .RegWrite(RegWrite),
         .ioRead(ioRead),
-        .ioWrite(ioWrite)
+        .ioWrite(ioWrite),
+        .eRead(eRead),
+        .eWrite(eWrite),
+        .EcallOp(EcallOp),
+        .eBreak(eBreak)
     );
 
     ALU alu(
@@ -163,10 +183,13 @@ module CPU(
         .pc4_i(pc4_i),
         .regWrite(RegWrite),
         .MemtoReg(MemtoReg),
+        .eRead(eRead),
         .inst(inst),
         .rdata1(ReadData1),
         .rdata2(ReadData2),
-        .imm32(imm32)
+        .imm32(imm32),
+        .ecall_code(ecall_code),
+        .ecall_a0_data(ecall_a0_data)
     );
 
     // need to test and complicate
@@ -176,12 +199,16 @@ module CPU(
         .mWrite(MemWrite),      // write to Mem
         .ioRead(ioRead),       // read from IO
         .ioWrite(ioWrite),     // write to IO
+        .eRead(eRead),
+        .eWrite(eWrite),
+        .EcallOp(EcallOp),
         .conf_btn_out(conf_btn_out), 
         .addr_in(ALUResult),    // address from ALU         
         .m_rdata(MemData),
         .switch_data(switch_data),
         .key_data(key_data),
         .r_rdata(ReadData2),
+        .ecall_a0_data(ecall_a0_data),
         .addr_out(addr_out),   
         .r_wdata(r_wdata),
         .write_data(write_data),
@@ -195,7 +222,7 @@ module CPU(
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl),
         .write_data(write_data),
-        .reg_LED(reg_LED)
+        .reg_LED(reg_LED),
        .digit_en(digit_en),
        .sseg(sseg),
        .sseg1(sseg1)

@@ -15,8 +15,6 @@ module DMem(
     wire clkn = ~clk;
     wire mode = upg_rst_i | (~upg_rst_i & upg_done_i);
     
-    wire mode = upg_rst_i | (~upg_rst_i & upg_done_i);
-    
     RAM udram(
         .clka (mode ? clkn : upg_clk_i),
         .wea (mode ? MemWrite : upg_wen_i),

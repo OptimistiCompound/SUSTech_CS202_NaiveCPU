@@ -96,7 +96,8 @@
 `define INST_BGEU                               3'h7
 
 // instruction funct for Ecall
-`define INST_ECALL                              3'h0
+`define INST_ECALL                              12'h0
+`define INST_EBREAK                             12'h1
 
 // Operation code for EcallOp
 `define EOP_PRINT_INT                           12'h1
