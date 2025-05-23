@@ -1,4 +1,5 @@
 `include "../Header_Files/io_header.v"
+`include "../Header_Files/riscv_defs.v"
 
 module MemOrIO(
     // Inputs
@@ -44,9 +45,9 @@ module MemOrIO(
         else if (ioRead && isSwitchAddr)
             r_wdata = {20'h0, switch_data};
         else if (ioRead && isBntAddr)
-            r_wdata = {31'b0, conf_btn_out}
+            r_wdata = {31'b0, conf_btn_out};
         else if (ioRead && isKeyAddr)
-            r_wdata = {28'h0, key_data}
+            r_wdata = {28'h0, key_data};
         else if (eRead && EcallOp == `EOP_READ_INT)
             r_wdata = {20'h0, switch_data};
         else 
@@ -54,10 +55,10 @@ module MemOrIO(
     end
 
     // For Store: write Mem or IO
-    assign LEDCtrl = (ioWrite && isLEDAddr || Ecall);
+    assign LEDCtrl = (ioWrite && isLEDAddr || eWrite);
     assign SegCtrl = ioWrite && isSegAddr;
     always @* begin
-        if (mWrite || (ioWrite && !Ecall) )
+        if (mWrite || (ioWrite && !eWrite) )
             write_data = r_rdata;
         else if (eWrite && EcallOp == `EOP_PRINT_INT)
             write_data = ecall_a0_data;
