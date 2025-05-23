@@ -38,6 +38,7 @@ reg [31:0] registers [31:0];
 
 assign rdata1 = registers[raddr1];
 assign rdata2 = registers[raddr2];
+
 integer i;
 always @(posedge clk or negedge rstn) begin
     registers[0] = 0;
