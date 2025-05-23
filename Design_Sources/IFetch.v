@@ -58,7 +58,7 @@ always @(negedge clk or negedge rstn) begin
         init <= 0;
         end
 end
-
+ 
 assign pc4_i = PC + 32'h4;
 
 programrom instmem (
@@ -73,5 +73,6 @@ programrom instmem (
 //.addra(PC[15:2]),
 //.douta(inst)
 //);
+
 
 endmodule

@@ -15,7 +15,7 @@ module seg(
     wire [3:0] digit5 = (base) ? ((data / 100000) % 10) :  data[23:20];  
     wire [3:0] digit6 = (base) ? ((data / 1000000) % 10) :  data[27:24];
     wire [3:0] digit7 = (base) ? ((data / 10000000) % 10) :  data[31:28];
-   
+    
 
     parameter CLK_DIV = 16'd50000; 
     parameter init = 4'b0;

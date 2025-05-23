@@ -234,14 +234,7 @@ module CPU(
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl)
     );
-    
-    
-//     display_cache display(
-//           .rstn(rstn),
-//           .init(init),
-//           .write_data(write_data),
-//           .data(write_Data)
-//       );
+ 
     LED_con led(
         .clk(clk),
         .cpu_clk(cpu_clk),
