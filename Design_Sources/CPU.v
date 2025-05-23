@@ -75,6 +75,8 @@ module CPU(
 // Instantiation of modules
 //-------------------------------------------------------------
 
+
+
     cpuclk cpuclk(
         .clk_in1(clk),
         .clk_out1(cpu_clk),
@@ -230,13 +232,13 @@ module CPU(
     //         .sseg1(sseg1)
     // );
 
-//assign conf_btn_out = conf_btn;
-    debounce conf_btn_deb(
-        .clk(cpu_clk),
-        .rstn(rstn),
-        .key_in(conf_btn),
-        .key_out(conf_btn_out)
-    );
+assign conf_btn_out = conf_btn;
+//    debounce conf_btn_deb(
+//        .clk(cpu_clk),
+//        .rstn(rstn),
+//        .key_in(conf_btn),
+//        .key_out(conf_btn_out)
+//    );
 
     // Switch_con switch_con(
     //     .clk(cpu_clk),
