@@ -53,8 +53,10 @@ module CPU(
     wire [31:0] MemData;
     wire [31:0] pc4_i;
     wire conf_btn_out;
+    wire start_pg_debounce;
     wire cpu_clk;
     wire [31:0]addr_out;
+    wire upg_clk;
   
     wire upg_clk_w;
     wire upg_wen_w;
@@ -73,6 +75,18 @@ module CPU(
 //-------------------------------------------------------------
 // Instantiation of modules
 //-------------------------------------------------------------
+    reg upg_rst;
+    always@(posedge clk)begin 
+        if(~rstn)begin
+            upg_rst <= 1'b1;
+        end
+        else if(start_pg_debounce)begin
+            upg_rst <= 0;
+        end
+    end
+    
+    wire rst;
+    assign rst = rstn | !upg_rst;
 
     clk_wiz cpuclk(
         .clk_in1(clk),
@@ -84,7 +98,7 @@ module CPU(
 
    uart_bmpg_0 uart (
         .upg_clk_i(upg_clk),
-        .upg_rst_i(start_pg),
+        .upg_rst_i(upg_rst),
         .upg_rx_i(rx),
 
         .upg_clk_o(upg_clk_w),
@@ -96,13 +110,13 @@ module CPU(
     );
     IFetch ifetch(
         .clk(cpu_clk),
-        .rstn(rstn),
+        .rstn(rst),
         .imm32(imm32),
         .Branch(Branch),
         .Jump(Jump),
         .Jalr(Jalr),
-        .upg_rst_i(start_pg),
-        .upg_clk_i(upg_clk_w),
+        .upg_rst_i(upg_rst),
+        .upg_clk_i(upg_clk),
         .upg_wen_i(upg_wen_w),
         .upg_adr_i(upg_addr_w),
         .upg_dat_i(upg_data_w),
@@ -146,8 +160,8 @@ module CPU(
         .MemWrite(MemWrite),
         .addr(addr_out[15:2]),
         .din(ReadData2),
-        .upg_rst_i(start_pg),
-        .upg_clk_i(upg_clk_w),
+        .upg_rst_i(upg_rst),
+        .upg_clk_i(upg_clk),
         .upg_wen_i(upg_wen_w),
         .upg_addr_i(upg_addr_w[13:0]),
         .upg_data_i(upg_data_w),
@@ -157,7 +171,7 @@ module CPU(
 
     Decoder decoder(
         .clk(cpu_clk),
-        .rstn(rstn),
+        .rstn(rst),
         .ALUResult(ALUResult),
         .MemData(r_wdata),
         .pc4_i(pc4_i),
@@ -188,13 +202,20 @@ module CPU(
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl)
     );
+    wire [31:0]write_Data;
+    
+     display_cache display(
+           .rstn(rst),
+           .write_data(write_data),
+           .data(write_Data)
+       );
     LED_con led(
         .clk(cpu_clk),
-        .rstn(rstn),
+        .rstn(rst),
         .base(base),
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl),
-        .write_data(write_data),
+        .write_data(write_Data),
         .reg_LED(reg_LED),
        .digit_en(digit_en),
        .sseg(sseg),
@@ -226,9 +247,15 @@ module CPU(
 //assign conf_btn_out = conf_btn;
     debounce conf_btn_deb(
         .clk(cpu_clk),
-        .rstn(rstn),
+        .rstn(rst),
         .key_in(conf_btn),
         .key_out(conf_btn_out)
+    );
+    debounce pg_deb(
+        .clk(upg_clk),
+        .rstn(rst),
+        .key_in(start_pg),
+        .key_out(start_pg_debounce)
     );
 
     // Switch_con switch_con(
@@ -241,14 +268,14 @@ module CPU(
 
     keyboard_driver keyboard(
         .clk(cpu_clk),
-        .rstn(rstn),
+        .rstn(rst),
         .ps2_clk(ps2_clk),
         .ps2_data(ps2_data),
         .data_out(key_data_sub)
     );
 
     Keyboard_cache key_cache(
-        .rstn(rstn),
+        .rstn(rst),
         .key_data(key_data_sub),
         .data_out(key_data)
     );
