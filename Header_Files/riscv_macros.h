@@ -12,6 +12,7 @@
 #define OPCODE_AUIPC                            0b0010111
 #define OPCODE_JAL                              0b1101111
 #define OPCODE_JALR                             0b1100111
+#define OPCODE_E                                0b1110011
 
 // ALUOp
 #define ALUOP_L_S                               0b00
@@ -41,8 +42,8 @@
 #define INST_AND                                0x700
 #define INST_SLL                                0x100
 #define INST_SRL                                0x500
-#define INST_SRA                                0x500
-#define INST_SLT                                0x220
+#define INST_SRA                                0x520
+#define INST_SLT                                0x200
 #define INST_SLTU                               0x300
 
 // instruction funct for I-type
@@ -50,9 +51,10 @@
 #define INST_XORI                               0x4
 #define INST_ORI                                0x6
 #define INST_ANDI                               0x7
-#define INST_SLLI                               0x1
-#define INST_SRLI                               0x5
-#define INST_SRAI                               0x5
+#define INST_SLLI                               0x100
+#define INST_SRLI                               0x500
+#define INST_SRAI                               0x520
+#define INST_SLTI                               0x2
 #define INST_SLTUI                              0x3
 
 // instruction funct for B-type

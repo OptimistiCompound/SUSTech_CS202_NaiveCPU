@@ -31,7 +31,7 @@ int main(int argc, char** argv) {
     dut->ALUSrc = 0; // from reg
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == (dut->ReadData1 + dut->ReadData2) && dut->zero == 0) {
+    if (dut->ALUResult == (dut->ReadData1 + dut->ReadData2) && dut->zero == (dut->ALUResult == 0)) {
         printf("test1 passed!\n");
     } else {
         printf("test1 failed: ADD 0x%08X 0x%08X: Result=0x%08X, zero=%d\n", 
@@ -43,7 +43,7 @@ int main(int argc, char** argv) {
     dut->funct7 = (INST_SUB & 0x0FF);
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == (dut->ReadData1 - dut->ReadData2) && dut->zero == 0) {
+    if (dut->ALUResult == (dut->ReadData1 - dut->ReadData2) && dut->zero == (dut->ALUResult == 0)) {
         printf("test2 passed!\n");
     } else {
         printf("test2 failed: SUB 0x%08X 0x%08X: Result=0x%08X, zero=%d\n", 
@@ -57,7 +57,7 @@ int main(int argc, char** argv) {
     dut->funct7 = (INST_XOR & 0x0FF);
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == (dut->ReadData1 ^ dut->ReadData2) && dut->zero == 0) {
+    if (dut->ALUResult == (dut->ReadData1 ^ dut->ReadData2) && dut->zero == (dut->ALUResult == 0)) {
         printf("test3 passed!\n");
     } else {
         printf("test3 failed: XOR 0x%08X 0x%08X: Result=0x%08X, zero=%d\n", 
@@ -71,7 +71,7 @@ int main(int argc, char** argv) {
     dut->funct7 = (INST_OR & 0x0FF);  // 0x00
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == (dut->ReadData1 | dut->ReadData2) && dut->zero == 0) {
+    if (dut->ALUResult == (dut->ReadData1 | dut->ReadData2) && dut->zero == (dut->ALUResult == 0)) {
         printf("test4 passed!\n");
     } else {
         printf("test4 failed: OR 0x%08X 0x%08X: Result=0x%08X, zero=%d\n",
@@ -86,7 +86,7 @@ int main(int argc, char** argv) {
     dut->ReadData2 = 0x0F0F0FFF;
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == (dut->ReadData1 & dut->ReadData2) && dut->zero == 0) {
+    if (dut->ALUResult == (dut->ReadData1 & dut->ReadData2) && dut->zero == (dut->ALUResult == 0)) {
         printf("test5 passed!\n");
     } else {
         printf("test5 failed: ADD 0x%08X 0x%08X: Result=0x%08X, zero=%d\n", 
@@ -100,7 +100,7 @@ int main(int argc, char** argv) {
     dut->funct7 = (INST_SLL & 0x0FF);
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == (dut->ReadData1 << (dut->ReadData2 & 0x1F)) && dut->zero == 0) {
+    if (dut->ALUResult == (dut->ReadData1 << (dut->ReadData2 & 0x1F)) && dut->zero == (dut->ALUResult == 0)) {
         printf("test6 passed!\n");
     } else {
         printf("test6 failed: SLL 0x%08X by 0x%08X: Result=0x%08X, zero=%d\n",
@@ -114,7 +114,7 @@ int main(int argc, char** argv) {
     dut->funct7 = (INST_SRL & 0x0FF); // 0x00
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == ((uint32_t)dut->ReadData1 >> (dut->ReadData2 & 0x1F)) && dut->zero == 0) {
+    if (dut->ALUResult == ((uint32_t)dut->ReadData1 >> (dut->ReadData2 & 0x1F)) && dut->zero == (dut->ALUResult == 0)) {
         printf("test7 passed!\n");
     } else {
         printf("test7 failed: SRL 0x%08X by 0x%08X: Result=0x%08X, zero=%d\n",
@@ -128,7 +128,7 @@ int main(int argc, char** argv) {
     dut->funct7 = (INST_SRA & 0x0FF); // 0x20
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == ((int32_t)dut->ReadData1 >> (dut->ReadData2 & 0x1F)) && dut->zero == 0) {
+    if (dut->ALUResult == ((int32_t)dut->ReadData1 >> (dut->ReadData2 & 0x1F)) && dut->zero == (dut->ALUResult == 0)) {
         printf("test8 passed!\n");
     } else {
         printf("test8 failed: SRA 0x%08X by 0x%08X: Result=0x%08X, zero=%d\n",
@@ -142,7 +142,7 @@ int main(int argc, char** argv) {
     dut->funct7 = (INST_SLT & 0x0FF); // 0x00
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == ((int32_t)dut->ReadData1 < (int32_t)dut->ReadData2) & 0xFFFFFFFF && dut->zero == 0) { // -2 < 1 → 1
+    if (dut->ALUResult == ((int32_t)dut->ReadData1 < (int32_t)dut->ReadData2) & 0xFFFFFFFF && dut->zero == (dut->ALUResult == 0)) { // -2 < 1 → 1
         printf("test9 passed!\n");
     } else {
         printf("test9 failed: SLT 0x%08X vs 0x%08X: Result=0x%08X, zero=%d\n",
@@ -156,7 +156,7 @@ int main(int argc, char** argv) {
     dut->funct7 = (INST_SLTU & 0x0FF);// 0x00 
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == (((uint32_t)dut->ReadData1 < (uint32_t)dut->ReadData2) & 0xFFFFFFFF) && dut->zero == 1) { // 4294967294 > 1 → 0
+    if (dut->ALUResult == (((uint32_t)dut->ReadData1 < (uint32_t)dut->ReadData2) & 0xFFFFFFFF) && dut->zero == (dut->ALUResult == 0)) { // 4294967294 > 1 → 0
         printf("test10 passed!\n");
     } else {
         printf("test10 failed: SLTU 0x%08X vs 0x%08X: Result=0x%08X, zero=%d\n",
@@ -177,7 +177,7 @@ int main(int argc, char** argv) {
     dut->ALUSrc = 1;                     // 使用立即数
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == (dut->ReadData1 + (int32_t)dut->imm32) && dut->zero == 0) {
+    if (dut->ALUResult == (dut->ReadData1 + (int32_t)dut->imm32) && dut->zero == (dut->ALUResult == 0)) {
         printf("test11 passed!\n");
     } else {
         printf("test11 failed: ADDI 0x%08X 0x%08X: Result=0x%08X, zero=%d\n",
@@ -190,7 +190,7 @@ int main(int argc, char** argv) {
     dut->funct3 = (INST_XORI);       // funct3=4 (100b)
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == (dut->ReadData1 ^ (int32_t)dut->imm32) && dut->zero == 0) {
+    if (dut->ALUResult == (dut->ReadData1 ^ (int32_t)dut->imm32) && dut->zero == (dut->ALUResult == 0)) {
         printf("test12 passed!\n");
     } else {
         printf("test12 failed: XORI 0x%08X 0x%08X: Result=0x%08X, zero=%d\n",
@@ -203,7 +203,7 @@ int main(int argc, char** argv) {
     dut->funct3 = (INST_ORI);       // funct3=6 (110b)
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == (dut->ReadData1 | (int32_t)dut->imm32) && dut->zero == 0) {
+    if (dut->ALUResult == (dut->ReadData1 | (int32_t)dut->imm32) && dut->zero == (dut->ALUResult == 0)) {
         printf("test13 passed!\n");
     } else {
         printf("test13 failed: ORI 0x%08X 0x%08X: Result=0x%08X, zero=%d\n",
@@ -216,7 +216,7 @@ int main(int argc, char** argv) {
     dut->funct3 = (INST_ANDI);      // funct3=7 (111b)
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == (dut->ReadData1 & dut->imm32) && dut->zero == 1) {
+    if (dut->ALUResult == (dut->ReadData1 & dut->imm32) && dut->zero == (dut->ALUResult == 0)) {
         printf("test14 passed!\n");
     } else {
         printf("test14 failed: ANDI 0x%08X 0x%08X: Result=0x%08X, zero=%d\n",
@@ -225,11 +225,12 @@ int main(int argc, char** argv) {
 
     // test15: SLLI
     dut->ReadData1 = 0x0000000F;
-    dut->imm32 = 0x0000001C;         // 移位量（取低5位：0x1C & 0x1F = 28）
-    dut->funct3 = (INST_SLLI);      // funct3=1 (001b)
+    dut->imm32 = 0x00000004;        // imm[11:5]=0x00
+    dut->funct3 = (INST_SLLI >> 8);  
+    dut->funct7 = (INST_SLLI & 0x0FF);
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == (dut->ReadData1 << (dut->imm32 & 0x1F)) && dut->zero == 0) {
+    if (dut->ALUResult == (dut->ReadData1 << (dut->imm32 & 0x1F)) && dut->zero == (dut->ALUResult == 0)) {
         printf("test15 passed!\n");
     } else {
         printf("test15 failed: SLLI 0x%08X by 0x%08X: Result=0x%08X, zero=%d\n",
@@ -238,12 +239,13 @@ int main(int argc, char** argv) {
 
     // test16: SRLI（逻辑右移）
     dut->ReadData1 = 0x80000000;
-    dut->imm32 = 0x00000004;         // 移位量
-    dut->funct3 = (INST_SRLI);      // funct3=5 (101b)
+    dut->imm32 = 0x00000004;         // imm[11:5]=0x00
+    dut->funct3 = (INST_SRLI >> 8);  
+    dut->funct7 = (INST_SRLI & 0x0FF);
     dut->funct7 = 0x00;                  // 区分SRAI
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == ((uint32_t)dut->ReadData1 >> (dut->imm32 & 0x1F)) && dut->zero == 0) {
+    if (dut->ALUResult == ((uint32_t)dut->ReadData1 >> (dut->imm32 & 0x1F)) && dut->zero == (dut->ALUResult == 0)) {
         printf("test16 passed!\n");
     } else {
         printf("test16 failed: SRLI 0x%08X by 0x%08X: Result=0x%08X, zero=%d\n",
@@ -252,15 +254,29 @@ int main(int argc, char** argv) {
 
     // test17: SRAI（算术右移）
     dut->ReadData1 = 0x80000000;
-    dut->imm32 = 0x00000004;         // 移位量
-    dut->funct3 = (INST_SRAI);      // funct3=5 (101b)
+    dut->imm32 = 0x00000204;         // imm[11:5]=0x20
+    dut->funct3 = (INST_SRAI >> 8);  
+    dut->funct7 = (INST_SRAI & 0x0FF);
     dut->funct7 = 0x20;                  // 设置高位区分SRLI[7,12](@ref)
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == ((int32_t)dut->ReadData1 >> (dut->imm32 & 0x1F)) && dut->zero == 0) {
+    if (dut->ALUResult == ((int32_t)dut->ReadData1 >> (dut->imm32 & 0x1F)) && dut->zero == (dut->ALUResult == 0)) {
         printf("test17 passed!\n");
     } else {
         printf("test17 failed: SRAI 0x%08X by 0x%08X: Result=0x%08X, zero=%d\n",
+            dut->ReadData1, dut->imm32, dut->ALUResult, dut->zero);
+    }
+
+    // test18: SLTI（有符号比较）
+    dut->ReadData1 = 0xFFFFFFFF;     // -1
+    dut->imm32 = 0x00000001;         // 1
+    dut->funct3 = (INST_SLTI);
+    dut->eval();
+    tfp->dump(main_time++);
+    if (dut->ALUResult == ((int32_t)dut->ReadData1 < (int32_t)dut->imm32) && dut->zero == (dut->ALUResult == 0)) { // -1 < 1
+        printf("test18 passed!\n");
+    } else {
+        printf("test18 failed: SLTI 0x%08X vs 0x%08X: Result=0x%08X, zero=%d\n",
             dut->ReadData1, dut->imm32, dut->ALUResult, dut->zero);
     }
 
@@ -270,10 +286,10 @@ int main(int argc, char** argv) {
     dut->funct3 = (INST_SLTUI);     // funct3=3 (011b)
     dut->eval();
     tfp->dump(main_time++);
-    if (dut->ALUResult == 0x0 && dut->zero == 1) { // 4294967295 > 1
-        printf("test18 passed!\n");
+    if (dut->ALUResult == ((uint32_t)dut->ReadData1 < (uint32_t)dut->imm32) && dut->zero == (dut->ALUResult == 0)) { // 4294967295 > 1
+        printf("test19 passed!\n");
     } else {
-        printf("test18 failed: SLTUI 0x%08X vs 0x%08X: Result=0x%08X, zero=%d\n",
+        printf("test19 failed: SLTUI 0x%08X vs 0x%08X: Result=0x%08X, zero=%d\n",
             dut->ReadData1, dut->imm32, dut->ALUResult, dut->zero);
     }
 
@@ -298,9 +314,9 @@ int main(int argc, char** argv) {
     ans = dut->ReadData1 - dut->ReadData2;
     ans_zero = ans == 0;
     if (dut->ALUResult == ans && dut->zero == ans_zero) {
-        printf("test19 passed!\n");
+        printf("test20 passed!\n");
     } else {
-        printf("test19 failed: BEQ 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n", 
+        printf("test20 failed: BEQ 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n", 
             dut->ReadData1, dut->ReadData2, dut->ALUResult, dut->zero);
         printf("\tans=0x%08X\n", ans);
     }
@@ -314,9 +330,9 @@ int main(int argc, char** argv) {
     ans = dut->ReadData1 - dut->ReadData2;
     ans_zero = ans != 0;
     if (dut->ALUResult == ans && dut->zero == ans_zero) {
-        printf("test20 passed!\n");
+        printf("test21 passed!\n");
     } else {
-        printf("test20 failed: BNE 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n",
+        printf("test21 failed: BNE 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n",
             dut->ReadData1, dut->ReadData2, dut->ALUResult, dut->zero);
         printf("\tans=0x%08X\n", ans);
     }
@@ -330,9 +346,9 @@ int main(int argc, char** argv) {
     ans = dut->ReadData1 - dut->ReadData2;
     ans_zero = ans < 0;
     if (dut->ALUResult == ans && dut->zero == ans_zero) {
-        printf("test21 passed!\n");
+        printf("test22 passed!\n");
     } else {
-        printf("test21 failed: BLT 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n",
+        printf("test22 failed: BLT 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n",
             dut->ReadData1, dut->ReadData2, dut->ALUResult, dut->zero);
         printf("\tans=0x%08X\n", ans);
     }
@@ -346,9 +362,9 @@ int main(int argc, char** argv) {
     ans = (uint32_t)dut->ReadData1 - (uint32_t)dut->ReadData2;
     ans_zero = (uint32_t)ans >= 0;
     if (dut->ALUResult == ans && dut->zero == ans_zero) {
-        printf("test22 passed!\n");
+        printf("test23 passed!\n");
     } else {
-        printf("test22 failed: BGEU 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n",
+        printf("test23 failed: BGEU 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n",
             dut->ReadData1, dut->ReadData2, dut->ALUResult, dut->zero);
         printf("\tans=0x%08X\n", ans);
     }
@@ -362,9 +378,9 @@ int main(int argc, char** argv) {
     ans = (uint32_t)dut->ReadData1 - (uint32_t)dut->ReadData2;
     ans_zero = (uint32_t)ans < 0;
     if (dut->ALUResult == ans && dut->zero == ans_zero) {
-        printf("test23 passed!\n");
+        printf("test24 passed!\n");
     } else {
-        printf("test23 failed: BLTU 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n",
+        printf("test24 failed: BLTU 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n",
             dut->ReadData1, dut->ReadData2, dut->ALUResult, dut->zero);
         printf("\tans=0x%08X\n", ans);
     }
@@ -385,9 +401,9 @@ int main(int argc, char** argv) {
     ans = dut->ReadData1 + dut->imm32;
     ans_zero = ans == 0;
     if (dut->ALUResult == ans && dut->zero == ans_zero) {
-        printf("test24 passed!\n");
+        printf("test25 passed!\n");
     } else {
-        printf("test24 failed: load/store 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n",
+        printf("test25 failed: load/store 0x%08X vs 0x%08X, Result=0x%08X zero=0x%08X\n",
             dut->ReadData1, dut->imm32, dut->ALUResult, dut->zero);
         printf("\tans=0x%08X\n", ans);
     }

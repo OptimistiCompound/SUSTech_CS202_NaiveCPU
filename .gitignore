@@ -4,5 +4,12 @@ obj_dir
 *.obsidian
 *.vscode
 
-pipeline_CPU
-CPU_sim
+pipeline_CPU/Design_Source/seg*
+pipeline_CPU/Design_Source/switch*
+pipeline_CPU/Design_Source/key*
+pipeline_CPU/Design_Source/led*
+pipeline_CPU/Design_Source/mode*
+
+CPU_sim/
+
+pipeline_CPU/Header_Files
