@@ -198,28 +198,28 @@ module CPU(
 //        .sseg(sseg),
 //        .sseg1(sseg1)
     );
-    reg [3:0]cnt_btn;
-    always@(posedge cpu_clk) begin
-     if (conf_btn_out)cnt_btn<=cnt_btn+1;
-     end
-     reg [3:0] cnt_iow;
-      always@(posedge cpu_clk) begin
-         if (conf_btn_out)cnt_iow<=cnt_iow+1;
-         end
-     wire [31:0]out;
-     assign out[3:0] = cnt_btn;
-     assign out[7:4] =cnt_iow;
-     assign out[15:8] =write_data[7:0];
-     assign out[31:16] =pc4_i[23:8];
-    seg seg(
-    .clk(cpu_clk),
-    .rstn(rstn),
-    .data(out),
-    .base(base),
-    .digit_en(digit_en),
-            .sseg(sseg),
-            .sseg1(sseg1)
-    );
+    // reg [3:0]cnt_btn;
+    // always@(posedge cpu_clk) begin
+    //  if (conf_btn_out)cnt_btn<=cnt_btn+1;
+    //  end
+    //  reg [3:0] cnt_iow;
+    //   always@(posedge cpu_clk) begin
+    //      if (conf_btn_out)cnt_iow<=cnt_iow+1;
+    //      end
+    //  wire [31:0]out;
+    //  assign out[3:0] = cnt_btn;
+    //  assign out[7:4] =cnt_iow;
+    //  assign out[15:8] =write_data[7:0];
+    //  assign out[31:16] =pc4_i[23:8];
+    // seg seg(
+    // .clk(cpu_clk),
+    // .rstn(rstn),
+    // .data(out),
+    // .base(base),
+    // .digit_en(digit_en),
+    //         .sseg(sseg),
+    //         .sseg1(sseg1)
+    // );
 
     debounce conf_btn_deb(
         .clk(cpu_clk),
