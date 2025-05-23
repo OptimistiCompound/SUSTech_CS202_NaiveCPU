@@ -42,7 +42,7 @@ always @(posedge clk or negedge rstn) begin
         reg_LED <= 16'b0;
     end 
     else if(led_mode) begin
-        reg_LED <= {cpu_clk,15'b0};
+        reg_LED <= {cpu_clk,mode,14'b0};
     end 
     else if(LEDCtrl) begin
         reg_LED <= write_data[15:0];

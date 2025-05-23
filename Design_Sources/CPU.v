@@ -59,6 +59,9 @@ module CPU(
     wire [31:0] pc4_i;
     wire conf_btn_out;
     wire start_pg_debounce;
+    wire btn1_debounce;
+    wire btn2_debounce;
+    wire btn3_debounce;
     wire wiz_clk;
     wire cpu_clk;
     wire [31:0]addr_out;
@@ -106,8 +109,8 @@ module CPU(
         .clk(clk),
         .rstn(rstn),
         .eBreak(eBreak),
-        .btn1(btn1),
-        .btn2(btn2),
+        .btn1(btn1_debounce),
+        .btn2(btn2_debounce),
         .clk_in(wiz_clk),
         .clk_out(cpu_clk)
     );
@@ -288,6 +291,25 @@ module CPU(
         .rstn(rstn),
         .key_in(start_pg),
         .key_out(start_pg_debounce)
+    );
+
+    debounce btn1_deb(
+        .clk(cpu_clk),
+        .rstn(rstn),
+        .key_in(btn1),
+        .key_out(btn1_debounce)
+    );
+    debounce btn2_deb(
+        .clk(cpu_clk),
+        .rstn(rstn),
+        .key_in(btn2),
+        .key_out(btn2_debounce)
+    );
+    debounce btn3_deb(
+        .clk(cpu_clk),
+        .rstn(rstn),
+        .key_in(btn3),
+        .key_out(btn3_debounce)
     );
 
     // Switch_con switch_con(
