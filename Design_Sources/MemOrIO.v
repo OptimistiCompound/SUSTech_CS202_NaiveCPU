@@ -22,7 +22,7 @@ module MemOrIO(
     output SegCtrl                  // Seg控制信号
 );
     assign addr_out = addr_in;
-
+ 
     // Decide Read address
     wire isSwitchAddr    = (addr_in == `SWITCH_BASE_ADDR);
     wire isKeyAddr       = (addr_in == `KEY_BASE_ADDR);

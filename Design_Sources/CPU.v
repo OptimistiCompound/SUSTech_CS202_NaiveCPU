@@ -96,13 +96,7 @@ module CPU(
         .upg_tx_o(tx)
     );
 
-        .upg_clk_o(upg_clk_w),
-        .upg_wen_o(upg_wen_w),
-        .upg_adr_o(upg_addr_w[14:0]),
-        .upg_dat_o(upg_data_w),
-        .upg_done_o(upg_done_w),
-        .upg_tx_o(tx)
-    );
+       
     IFetch ifetch(
         .clk(cpu_clk),
         .rstn(rstn),
@@ -197,6 +191,7 @@ module CPU(
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl)
     );
+ 
     LED_con led(
         .clk(cpu_clk),
         .rstn(rstn),
@@ -232,13 +227,13 @@ module CPU(
     //         .sseg1(sseg1)
     // );
 
-assign conf_btn_out = conf_btn;
-//    debounce conf_btn_deb(
-//        .clk(cpu_clk),
-//        .rstn(rstn),
-//        .key_in(conf_btn),
-//        .key_out(conf_btn_out)
-//    );
+//assign conf_btn_out = conf_btn;
+    debounce conf_btn_deb(
+        .clk(cpu_clk),
+        .rstn(rstn),
+        .key_in(conf_btn),
+        .key_out(conf_btn_out)
+    );
 
     // Switch_con switch_con(
     //     .clk(cpu_clk),
