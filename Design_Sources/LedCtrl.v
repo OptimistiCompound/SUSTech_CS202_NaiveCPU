@@ -12,7 +12,7 @@ module LED_con(
     output [7:0] sseg1
 );
 reg [31:0] seg_data;
-
+ 
 
 seg seg_output(
     .clk(clk),

@@ -53,7 +53,7 @@ always @(negedge clk or negedge rstn) begin
     else
         PC <= next_PC;
 end
-
+ 
 assign pc4_i = PC + 32'h4;
 
 //programromm instmem (

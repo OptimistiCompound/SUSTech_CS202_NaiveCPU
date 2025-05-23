@@ -62,7 +62,7 @@
 `define INST_SRA                                12'h5_20
 `define INST_SLT                                12'h2_00
 `define INST_SLTU                               12'h3_00
-
+ 
 // instruction funct for I-type
 `define INST_ADDI                               3'h0
 `define INST_XORI                               3'h4

@@ -10,7 +10,7 @@ reg [19:0] cnt;
 reg key_tmp; 
 reg key_stable;    
 reg key_stable_d;  
-
+ 
 always @(posedge clk or negedge rstn) begin
     if(!rstn) begin
         key_tmp    <= 1'b0;
