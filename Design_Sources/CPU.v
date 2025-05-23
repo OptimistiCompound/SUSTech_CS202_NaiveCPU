@@ -22,12 +22,15 @@
 
 module CPU(
     input clk,
-    input rstn,
+    input rstn_fpga,
     input conf_btn,
     input [11:0] switch_data,
     input ps2_clk,
     input ps2_data,
     input start_pg,
+    input btn1,
+    input btn2,
+    input btn3,
     input rx,
     input base,
     output [7:0] digit_en,      
@@ -82,7 +85,7 @@ module CPU(
 //-------------------------------------------------------------
     reg upg_rst;
     always@(posedge clk)begin 
-        if(~rstn)begin
+        if(~rstn_fpga)begin
             upg_rst <= 1'b1;
         end
         else if(start_pg_debounce)begin
@@ -90,8 +93,8 @@ module CPU(
         end
     end
     
-    wire rst;
-    assign rst = rstn | !upg_rst;
+    wire rstn;
+    assign rstn = rstn_fpga | !upg_rst;
 
     clk_wiz cpuclk(
         .clk_in1(clk),
@@ -124,7 +127,7 @@ module CPU(
 
     IFetch ifetch(
         .clk(cpu_clk),
-        .rstn(rst),
+        .rstn(rstn_fpga),
         .imm32(imm32),
         .Branch(Branch),
         .Jump(Jump),
@@ -190,7 +193,7 @@ module CPU(
 
     Decoder decoder(
         .clk(cpu_clk),
-        .rstn(rst),
+        .rstn(rstn),
         .ALUResult(ALUResult),
         .MemData(r_wdata),
         .pc4_i(pc4_i),
@@ -228,20 +231,23 @@ module CPU(
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl)
     );
-    wire [31:0]write_Data;
     
-     display_cache display(
-           .rstn(rst),
-           .write_data(write_data),
-           .data(write_Data)
-       );
+    
+//     display_cache display(
+//           .rstn(rstn),
+//           .init(init),
+//           .write_data(write_data),
+//           .data(write_Data)
+//       );
     LED_con led(
-        .clk(cpu_clk),
-        .rstn(rst),
+        .clk(clk),
+        .cpu_clk(cpu_clk),
+        .rstn(rstn),
         .base(base),
+        .btn(btn3),
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl),
-        .write_data(write_Data),
+        .write_data(write_data),
         .reg_LED(reg_LED),
        .digit_en(digit_en),
        .sseg(sseg),
@@ -273,13 +279,13 @@ module CPU(
 //assign conf_btn_out = conf_btn;
     debounce conf_btn_deb(
         .clk(cpu_clk),
-        .rstn(rst),
+        .rstn(rstn),
         .key_in(conf_btn),
         .key_out(conf_btn_out)
     );
     debounce pg_deb(
         .clk(upg_clk),
-        .rstn(rst),
+        .rstn(rstn),
         .key_in(start_pg),
         .key_out(start_pg_debounce)
     );
@@ -294,14 +300,14 @@ module CPU(
 
     keyboard_driver keyboard(
         .clk(cpu_clk),
-        .rstn(rst),
+        .rstn(rstn),
         .ps2_clk(ps2_clk),
         .ps2_data(ps2_data),
         .data_out(key_data_sub)
     );
 
     Keyboard_cache key_cache(
-        .rstn(rst),
+        .rstn(rstn),
         .key_data(key_data_sub),
         .data_out(key_data)
     );

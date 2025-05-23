@@ -3,28 +3,29 @@
 
 module MemOrIO(
     // Inputs
-    input mRead,                    // 读内存控制信号
-    input mWrite,                   // 写内存控制信号
-    input ioRead,                   // 读IO控制信号
-    input ioWrite,                  // 写IO控制信号
-    input eRead,                    // 从外界读取
-    input eWrite,                   // 向外界显示
-    input [11:0] EcallOp,                  // 系统调用操作码
+    input mRead,                    // ???????
+    input mWrite,                   // ???????
+    input ioRead,                   // ?IO????
+    input ioWrite,                  // ?IO????
+    input eRead,                    // ?????
+    input eWrite,                   // ?????
+    input [11:0] EcallOp,                  // ???????
 
-    input conf_btn_out,             // 来自按键的信号
-    input [31:0] addr_in,           // 来自ALU的地址
-    input [31:0] m_rdata,           // 从dMem读取的数据
-    input [11:0] switch_data,       // 从Switch读取的数据(12bits)
-    input [31:0] key_data,           // 从Keyboard读取的数据(4bits)
-    input [31:0] r_rdata,           // 从Reg读取的数据
+    input conf_btn_out,             // ???????
+    input [31:0] addr_in,           // ??ALU???
+    input [31:0] m_rdata,           // ?dMem?????
+    input [11:0] switch_data,       // ?Switch?????(12bits)
+    input [31:0] key_data,           // ?Keyboard?????(32bits)
+    input [31:0] r_rdata,           // ?Reg?????
     input [31:0] ecall_a0_data,
+    // input rstn,                     // ????
 
     // Outputs
     output [31:0] addr_out,
     output reg [31:0] r_wdata,          // write back data to Reg
     output reg [31:0] write_data,   // data to Mem and IO
-    output LEDCtrl,                 // LED控制信号
-    output SegCtrl                  // Seg控制信号
+    output LEDCtrl,                 // LED????
+    output SegCtrl                  // Seg????
 );
     assign addr_out = addr_in;
 
@@ -47,7 +48,7 @@ module MemOrIO(
         else if (ioRead && isBntAddr)
             r_wdata = {31'b0, conf_btn_out};
         else if (ioRead && isKeyAddr)
-            r_wdata = {28'h0, key_data};
+            r_wdata = {key_data};
         else if (eRead && EcallOp == `EOP_READ_INT)
             r_wdata = {20'h0, switch_data};
         else 
@@ -55,9 +56,12 @@ module MemOrIO(
     end
 
     // For Store: write Mem or IO
-    assign LEDCtrl = (ioWrite && isLEDAddr || eWrite);
-    assign SegCtrl = ioWrite && isSegAddr;
+    assign LEDCtrl = (ioWrite && isLEDAddr);
+    assign SegCtrl = ioWrite && isSegAddr || eWrite;
     always @* begin
+        // if (!rstn) begin
+        //     write_data = 32'h0;
+        // end else
         if (mWrite || (ioWrite && !eWrite) )
             write_data = r_rdata;
         else if (eWrite && EcallOp == `EOP_PRINT_INT)

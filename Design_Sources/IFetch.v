@@ -39,7 +39,8 @@ module IFetch(
 
     // Outputs
     output [31:0] inst,
-    output [31:0] pc4_i
+    output [31:0] pc4_i,
+    output reg init
     );
 wire mode = upg_rst_i | (~upg_rst_i & upg_done_i);
 reg [31:0] PC;
@@ -48,10 +49,14 @@ wire [31:0] next_PC =   (rstn==0) ? 0 :
                         (Jalr) ? ALUResult : 
                         PC + 32'h4;
 always @(negedge clk or negedge rstn) begin
-    if (~rstn)
+    if (~rstn) begin
         PC <= 0;
-    else
+        init <= 1;
+        end
+    else begin
         PC <= next_PC;
+        init <= 0;
+        end
 end
 
 assign pc4_i = PC + 32'h4;

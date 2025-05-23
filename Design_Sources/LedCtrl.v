@@ -1,7 +1,10 @@
 `timescale 1ns / 1ps
 module LED_con(
     input clk,
+    input cpu_clk,
     input rstn,
+    input mode,
+    input btn,
     input base,
     input LEDCtrl,
     input SegCtrl,
@@ -13,6 +16,16 @@ module LED_con(
 );
 reg [31:0] seg_data;
 
+reg led_mode;
+always @ * begin
+    if (mode && btn) begin
+        led_mode = !led_mode;
+    end else if (mode && !btn) begin
+        led_mode = led_mode;
+    end else begin
+        led_mode = 1'b0;
+    end
+end
 
 seg seg_output(
     .clk(clk),
@@ -27,13 +40,22 @@ seg seg_output(
 always @(posedge clk or negedge rstn) begin
     if(!rstn) begin
         reg_LED <= 16'b0;
-    end
+    end 
+    else if(led_mode) begin
+        reg_LED <= {cpu_clk,15'b0};
+    end 
     else if(LEDCtrl) begin
         reg_LED <= write_data[15:0];
     end
+end
+
+always @(posedge clk or negedge rstn) begin
+    if(!rstn) begin
+        seg_data <= 32'b0;
+    end 
     else if(SegCtrl) begin
-        seg_data<= write_data[31:0];
-    end
+        seg_data <= write_data;
+    end 
 end
 
 endmodule
