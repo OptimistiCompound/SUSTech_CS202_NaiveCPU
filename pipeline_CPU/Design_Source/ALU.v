@@ -37,7 +37,7 @@ module ALU(
 //-------------------------------------------------------------
 // Includes
 //-------------------------------------------------------------
-`include "../../Header_Files/riscv_defs.v"
+`include "../Header_Files/riscv_defs.v"
 
 //-------------------------------------------------------------
 // Decode ALUOp and funct to ALUControl

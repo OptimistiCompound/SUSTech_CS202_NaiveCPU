@@ -18,17 +18,17 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
- 
+
 
 module Decoder(
     // Inputs
     input clk,
     input rstn,
-    input [31:0] ALUResult,
-    input [31:0] MemData,
+    input [31:0] ALUResult, // WB
+    input [31:0] MemData,   // WB
     input [31:0] pc4_i,
-    input regWrite,
-    input MemtoReg,
+    input regWrite,         // WB
+    input MemtoReg,         // WB
     input [31:0] inst,
 
     // Outputs
@@ -62,7 +62,7 @@ always @(*) begin
     else 
         wdata = ALUResult;
 end
- 
+
 //-------------------------------------------------------------
 // Submodules
 //-------------------------------------------------------------

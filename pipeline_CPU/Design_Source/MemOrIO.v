@@ -11,7 +11,7 @@ module MemOrIO(
     input [31:0] addr_in,           // 来自ALU的地址
     input [31:0] m_rdata,           // 从dMem读取的数据
     input [11:0] switch_data,       // 从Switch读取的数据(12bits)
-    input [31:0] key_data,           // 从Keyboard读取的数据(4bits)
+    input [3:0] key_data,           // 从Keyboard读取的数据(4bits)
     input [31:0] r_rdata,           // 从Reg读取的数据
 
     // Outputs
@@ -22,7 +22,7 @@ module MemOrIO(
     output SegCtrl                  // Seg控制信号
 );
     assign addr_out = addr_in;
- 
+
     // Decide Read address
     wire isSwitchAddr    = (addr_in == `SWITCH_BASE_ADDR);
     wire isKeyAddr       = (addr_in == `KEY_BASE_ADDR);
