@@ -22,17 +22,17 @@
 
 module ALU(
     // Inputs
-    input [31:0] ReadData1,         // data from rs1
-    input [31:0] ReadData2,         // data from rs2
-    input [31:0] imm32,             // immediate
-    input ALUSrc,                   // MUX control, operand2 = (ALU == 1) ? rs2 : imm
-    input [1:0] ALUOp,              // 2bits control
-    input [2:0] funct3,             // from instruction
-    input [6:0] funct7,             // from instruction
+    input [31:0] ReadData1,         // Forwarding Controller
+    input [31:0] ReadData2,         // Forwarding Controller
+    input [31:0] imm32,             // ID_EX
+    input ALUSrc,                   // ID_EX
+    input [1:0] ALUOp,              // ID_EX
+    input [2:0] funct3,             // ID_EX
+    input [6:0] funct7,             // ID_EX
 
     // Outputs
-    output reg [31:0] ALUResult,    // result of ALU
-    output reg zero                     // for B-type, from ALU to IFetch
+    output reg [31:0] ALUResult,    // EX_MEM
+    output reg zero                 // EX_MEM
     );
 //-------------------------------------------------------------
 // Includes

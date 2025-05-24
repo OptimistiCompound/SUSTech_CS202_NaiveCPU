@@ -23,6 +23,9 @@
 module ID_EX(
     // Inputs
     input clk, rstn, Pause, Flush,
+    input        ID_Branch,     // Controller
+    input        ID_Jump,
+    input        ID_Jalr,
     input [1:0]  ID_ALUOp,
     input        ID_ALUSrc,
     input        ID_MemRead,
@@ -31,32 +34,35 @@ module ID_EX(
     input        ID_RegWrite,
     input        ID_ioRead,
     input        ID_ioWrite,
-    input [4:0]  ID_rs1_addr,
-    input [4:0]  ID_rs2_addr,
 
-    input [31:0] ID_rs1_v,
-    input [31:0] ID_rs2_v,
-    input [31:0] ID_imm32,
-    input [2:0]  ID_funct3,
-    input [6:0]  ID_funct7,
+    input [4:0]  ID_rs1_addr,   // ID
+    input [4:0]  ID_rs2_addr,   // ID
+    input [31:0] ID_rs1_v,      // ID
+    input [31:0] ID_rs2_v,      // ID
+    input [31:0] ID_imm32,      // ID
+    input [2:0]  ID_funct3,     // ID
+    input [6:0]  ID_funct7,     // ID
 
     // Outputs
-    output reg [1:0]  EX_ALUOp,
+    output reg        EX_Branch,
+    output reg        EX_Jump,
+    output reg        EX_Jalr,
+    output reg [1:0]  EX_ALUOp,     // EX_MEM
     output reg        EX_ALUSrc,
     output reg        EX_MemRead,
     output reg        EX_MemWrite,
     output reg        EX_MemtoReg,
     output reg        EX_RegWrite,
     output reg        EX_ioRead,
-    output reg        EX_ioWrite
-    output reg [4:0]  EX_rs1_addr,
-    output reg [4:0]  EX_rs2_addr,
+    output reg        EX_ioWrite    // EX_MEM
 
+    output reg [4:0]  EX_rs1_addr,  // EX_MEM
+    output reg [4:0]  EX_rs2_addr,
     output reg [31:0] EX_ReadData1,
     output reg [31:0] EX_ReadData2,
     output reg [31:0] EX_imm32,
     output reg [2:0]  EX_funct3,
-    output reg [6:0]  EX_funct7
+    output reg [6:0]  EX_funct7     // EX_MEM
     );
 //-------------------------------------------------------------
 // Includes
@@ -64,6 +70,9 @@ module ID_EX(
 `include "../Header_Files/riscv_defs.v"
 always @(posedge clk) begin
     if (~rstn || Pause || Flush) begin
+        EX_Branch        = 0;
+        EX_Jump          = 0;
+        EX_Jalr          = 0;
         EX_ALUOp         = 0;
         EX_ALUSrc        = 0;
         EX_MemRead       = 0;
@@ -82,6 +91,9 @@ always @(posedge clk) begin
         EX_funct7        = 0;
     end
     else begin
+        EX_Branch       <= ID_Branch;
+        EX_Jump         <= ID_Branch;
+        EX_Jalr         <= ID_Branch;
         EX_ALUOp        <= ID_ALUOp;
         EX_ALUSrc       <= ID_ALUSrc;
         EX_MemRead      <= ID_MemRead;

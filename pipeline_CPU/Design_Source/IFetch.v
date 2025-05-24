@@ -24,11 +24,11 @@ module IFetch(
     // Inputs
     input clk,
     input rstn,
-    input [31:0] imm32,
-    input Branch,
-    input Jump,
-    input Jalr,
-    input [31:0] ALUResult,
+    input Branch,           // Controller
+    input Jump,             // Controller
+    input Jalr,             // Controller
+    input [31:0] ALUResult, // EX_MEM
+    input [31:0] imm32,     // EX_MEM
 
 //    input upg_rst_i,
 //    input upg_clk_i, 
