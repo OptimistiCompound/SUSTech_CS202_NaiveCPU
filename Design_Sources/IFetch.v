@@ -40,8 +40,11 @@ module IFetch(
     // Outputs
     output [31:0] inst,
     output [31:0] pc4_i,
-    output reg init
+    output [31:0] pc_i
     );
+
+
+assign pc_i = PC;
 wire mode = upg_rst_i | (~upg_rst_i & upg_done_i);
 reg [31:0] PC;
 wire [31:0] next_PC =   (rstn==0) ? 0 : 
@@ -51,11 +54,9 @@ wire [31:0] next_PC =   (rstn==0) ? 0 :
 always @(negedge clk or negedge rstn) begin
     if (~rstn) begin
         PC <= 0;
-        init <= 1;
         end
     else begin
         PC <= next_PC;
-        init <= 0;
         end
 end
  
