@@ -41,7 +41,7 @@ module Controller(
     output ioWrite,
     output reg eRead,
     output reg eWrite,
-    output reg [11:0] EcallOp,
+    output [11:0] EcallOp,
     output eBreak
     );
 //-------------------------------------------------------------
@@ -81,24 +81,22 @@ always @(*) begin
             `EOP_PRINT_INT:begin
                 eWrite  = 1'b1;
                 eRead   = 1'b0;
-                EcallOp = `EOP_PRINT_INT;
             end
             `EOP_READ_INT:begin
                 eWrite  = 1'b0;
                 eRead   = 1'b1;
-                EcallOp = `EOP_READ_INT;
             end
             default:begin
                 eWrite  = 1'b0;
                 eRead   = 1'b0;
-                EcallOp = 0;
             end
         endcase
     else begin
         eWrite  = 1'b0;
         eRead   = 1'b0;
-        EcallOp = 0;
     end
 end
+
+assign EcallOp = ecall_code[11:0];
 
 endmodule

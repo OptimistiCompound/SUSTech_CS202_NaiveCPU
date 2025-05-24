@@ -109,8 +109,8 @@ module CPU(
         .clk(clk),
         .rstn(rstn),
         .eBreak(eBreak),
-        .btn1(btn1_debounce),
-        .btn2(btn2_debounce),
+        .eRead(eRead),
+        .btn1(btn1),
         .clk_in(wiz_clk),
         .clk_out(cpu_clk)
     );
@@ -240,9 +240,10 @@ module CPU(
         .cpu_clk(cpu_clk),
         .rstn(rstn),
         .base(base),
-        .btn(btn3),
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl),
+        .eBreak(eBreak),
+        .eRead(eRead),
         .write_data(write_data),
         .reg_LED(reg_LED),
        .digit_en(digit_en),
