@@ -65,12 +65,26 @@ always @(*) begin
         wdata = imm32;
     else if (opcode == `OPCODE_AUIPC)
         wdata = pc4_i + imm32;
-    else if (MemtoReg == 1)
-        wdata = MemData;
-    else 
+    else if (MemtoReg == 1) begin
+            case (funct3)
+            `INST_LB:
+                wdata = {{24{MemData[7]}}, MemData[7:0]};
+            `INST_LH:
+                wdata = {{16{MemData[16]}}, MemData[15:0]};
+            `INST_LW:
+                wdata = MemData;
+            `INST_LBU:
+                wdata = {24'b0, MemData[7:0]};
+            `INST_LHU:
+                wdata = {16'b0, MemData[15:0]};
+            default:
+                wdata = 0;
+            endcase
+        end
+    else
         wdata = ALUResult;
 end
-
+ 
 //-------------------------------------------------------------
 // Submodules
 //-------------------------------------------------------------
