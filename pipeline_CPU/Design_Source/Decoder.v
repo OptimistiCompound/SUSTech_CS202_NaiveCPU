@@ -24,6 +24,7 @@ module Decoder(
     // Inputs
     input clk,
     input rstn,
+    input [4:0] WB_rd_addr,    // WB_ID
     input [31:0] ALUResult, // WB_ID
     input [31:0] MemData,   // WB_ID
     input [31:0] pc4_i,     // IF_ID
@@ -38,17 +39,18 @@ module Decoder(
     output [2:0]  funct3,
     output [6:0]  funct7,
     output [4:0]  rs1_addr,
-    output [4:0]  rs2_addr
+    output [4:0]  rs2_addr,
+    output [4:0]  rd_addr
     );
 //-------------------------------------------------------------
 // Includes
 //-------------------------------------------------------------
-`include "../Header_Files/riscv_defs.v"
+`include "../../Header_Files/riscv_defs.v"
 
 assign opcode = inst[6:0];
 assign rs1_addr = inst[19:15];
 assign rs2_addr = inst[24:20];
-assign rd_v = inst[11:7];
+assign rd_addr = inst[11:7];
 assign funct3 = inst[14:12];
 assign funct7 = inst[31:25];
 
@@ -77,7 +79,7 @@ RegisterFile uRegisterFile(
     .rstn(rstn),
     .raddr1(rs1_addr),
     .raddr2(rs2_addr),
-    .waddr(rd_v),
+    .waddr(WB_rd_addr),
     .wdata(wdata),
     .regWrite(regWrite),
     .rdata1(rdata1),

@@ -33,15 +33,15 @@ module IF_ID(
 //-------------------------------------------------------------
 // Includes
 //-------------------------------------------------------------
-`include "../Header_Files/riscv_defs.v"
+`include "../../Header_Files/riscv_defs.v"
 
 always @(posedge clk, negedge rstn) begin
     if(~rstn || Flush) begin
         ID_pc4_i = 32'd0;
         ID_inst  = {25'b0, `OPCODE_I};
     end else if(Pause) begin
-        // 空操作 nop
-        // 阻止寄存器值改变
+        // ??? nop
+        // ????????
     end else begin
         ID_pc4_i <= IF_pc4_i;
         ID_inst  <= IF_inst;

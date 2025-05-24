@@ -24,6 +24,7 @@ module EX_MEM(
     // Inputs
     input clk, rstn, Flush,
     input        EX_Branch,
+    input        EX_zero,
     input        EX_Jump,
     input        EX_Jalr,
     input        EX_MemRead,
@@ -36,16 +37,15 @@ module EX_MEM(
     input [4:0]  EX_rd_addr,
     input [31:0] EX_ALUResult,
     input [31:0] EX_rs2_v,
+    input [31:0] EX_imm32,
 
-    input        EX_conf_btn_out,
     input [31:0] EX_addr_in,
     input [31:0] EX_m_rdata,
-    input [11:0] EX_switch_data,
-    input [3:0]  EX_key_data,
     input [31:0] EX_r_rdata,
 
     // Outputs
     output reg        MEM_Branch,
+    output reg        MEM_zero,
     output reg        MEM_Jump,
     output reg        MEM_Jalr,
     output reg        MEM_MemRead,
@@ -58,21 +58,20 @@ module EX_MEM(
     output reg [4:0]  MEM_rd_addr,
     output reg [31:0] MEM_ALUResult,
     output reg [31:0] MEM_rs2_v,
+    output reg [31:0] MEM_imm32,
 
-    output reg        MEM_conf_btn_out,
     output reg [31:0] MEM_addr_in,
     output reg [31:0] MEM_m_rdata,
-    output reg [11:0] MEM_switch_data,
-    output reg [3:0]  MEM_key_data,
     output reg [31:0] MEM_r_rdata
     );
 //-------------------------------------------------------------
 // Includes
 //-------------------------------------------------------------
-`include "../Header_Files/riscv_defs.v"
+`include "../../Header_Files/riscv_defs.v"
 always @(posedge clk) begin
     if (~rstn || Flush) begin
         MEM_Branch           = 0;
+        MEM_zero             = 0;
         MEM_Jump             = 0;
         MEM_Jalr             = 0;
         MEM_MemRead          = 0;
@@ -85,16 +84,15 @@ always @(posedge clk) begin
         MEM_rd_addr          = 0;
         MEM_ALUResult        = 0;
         MEM_rs2_v            = 0;
+        MEM_imm32            = 0;
 
-        MEM_conf_btn_out     = 0;
         MEM_addr_in          = 0;
         MEM_m_rdata          = 0;
-        MEM_switch_data      = 0;
-        MEM_key_data         = 0;
         MEM_r_rdata          = 0;
     end
     else begin
         MEM_Branch           = EX_Branch;
+        MEM_zero             = EX_zero;
         MEM_Jump             = EX_Jump;
         MEM_Jalr             = EX_Jalr;
         MEM_MemRead         <= EX_MemRead;
@@ -107,12 +105,10 @@ always @(posedge clk) begin
         MEM_rd_addr         <= EX_rd_addr;
         MEM_ALUResult       <= EX_ALUResult;
         MEM_rs2_v           <= EX_rs2_v;
+        MEM_imm32           <= EX_imm32;
 
-        MEM_conf_btn_out    <= EX_conf_btn_out;
         MEM_addr_in         <= EX_addr_in;
         MEM_m_rdata         <= EX_m_rdata;
-        MEM_switch_data     <= EX_switch_data;
-        MEM_key_data        <= EX_key_data;
         MEM_r_rdata         <= EX_r_rdata;
     end
 end

@@ -37,6 +37,7 @@ module ID_EX(
 
     input [4:0]  ID_rs1_addr,   // ID
     input [4:0]  ID_rs2_addr,   // ID
+    input [4:0]  ID_rd_addr,
     input [31:0] ID_rs1_v,      // ID
     input [31:0] ID_rs2_v,      // ID
     input [31:0] ID_imm32,      // ID
@@ -54,12 +55,13 @@ module ID_EX(
     output reg        EX_MemtoReg,
     output reg        EX_RegWrite,
     output reg        EX_ioRead,
-    output reg        EX_ioWrite    // EX_MEM
+    output reg        EX_ioWrite,    // EX_MEM
 
     output reg [4:0]  EX_rs1_addr,  // EX_MEM
     output reg [4:0]  EX_rs2_addr,
-    output reg [31:0] EX_ReadData1,
-    output reg [31:0] EX_ReadData2,
+    output reg [4:0]  EX_rd_addr,
+    output reg [31:0] EX_rs1_v,
+    output reg [31:0] EX_rs2_v,
     output reg [31:0] EX_imm32,
     output reg [2:0]  EX_funct3,
     output reg [6:0]  EX_funct7     // EX_MEM
@@ -67,7 +69,7 @@ module ID_EX(
 //-------------------------------------------------------------
 // Includes
 //-------------------------------------------------------------
-`include "../Header_Files/riscv_defs.v"
+`include "../../Header_Files/riscv_defs.v"
 always @(posedge clk) begin
     if (~rstn || Pause || Flush) begin
         EX_Branch        = 0;
@@ -83,9 +85,10 @@ always @(posedge clk) begin
         EX_ioWrite       = 0;
         EX_rs1_addr      = 0;
         EX_rs2_addr      = 0;
+        EX_rd_addr       = 0;
 
-        EX_ReadData1     = 0;
-        EX_ReadData2     = 0;
+        EX_rs1_v         = 0;
+        EX_rs2_v         = 0;
         EX_imm32         = 0;
         EX_funct3        = 0;
         EX_funct7        = 0;
@@ -104,9 +107,10 @@ always @(posedge clk) begin
         EX_ioWrite      <= ID_ioWrite;
         EX_rs1_addr     <= ID_rs1_addr;
         EX_rs2_addr     <= ID_rs2_addr;
+        EX_rd_addr      <= ID_rd_addr;
 
-        EX_ReadData1    <= ID_rdata1;
-        EX_ReadData2    <= ID_rdata2;
+        EX_rs1_v        <= ID_rs1_v;
+        EX_rs2_v        <= ID_rs2_v;
         EX_imm32        <= ID_imm32;
         EX_funct3       <= ID_funct3;
         EX_funct7       <= ID_funct7;

@@ -199,7 +199,7 @@ module CPU(
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl),
         .write_data(write_data),
-        .reg_LED(reg_LED)
+        .reg_LED(reg_LED),
        .digit_en(digit_en),
        .sseg(sseg),
        .sseg1(sseg1)

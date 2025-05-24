@@ -26,10 +26,8 @@ module MEM_WB(
     input        MEM_MemtoReg,
     input        MEM_RegWrite,
     input        MEM_ioWrite,
-    input        MEM_SegCtrl,
-    input        MEM_LEDCtrl,
 
-    input [4:0]  MEM_rd_addr
+    input [4:0]  MEM_rd_addr,
     input [31:0] MEM_ALUResult,
     input [31:0] MEM_MemData,
 
@@ -37,24 +35,20 @@ module MEM_WB(
     output reg        WB_MemtoReg,
     output reg        WB_RegWrite,
     output reg        WB_ioWrite,
-    output reg        WB_SegCtrl,
-    output reg        WB_LEDCtrl,
 
-    output reg [4:0]  WB_rd_addr
+    output reg [4:0]  WB_rd_addr,
     output reg [31:0] WB_ALUResult,
-    output reg [31:0] WB_MemData,
+    output reg [31:0] WB_MemData
     );
 //-------------------------------------------------------------
 // Includes
 //-------------------------------------------------------------
-`include "../Header_Files/riscv_defs.v"
+`include "../../Header_Files/riscv_defs.v"
 always @(posedge clk, negedge rstn) begin
     if(~rstn) begin
         WB_MemtoReg     = 0;
         WB_RegWrite     = 0;
         WB_ioWrite      = 0;
-        WB_SegCtrl      = 0;
-        WB_LEDCtrl      = 0;
 
         WB_rd_addr      = 0;
         WB_ALUResult    = 0;
@@ -64,8 +58,6 @@ always @(posedge clk, negedge rstn) begin
         WB_MemtoReg     <= MEM_MemtoReg;
         WB_RegWrite     <= MEM_RegWrite;
         WB_ioWrite      <= MEM_ioWrite;
-        WB_SegCtrl      <= MEM_SegCtrl;
-        WB_LEDCtrl      <= MEM_LEDCtrl;
         
         WB_rd_addr      <= MEM_rd_addr;
         WB_ALUResult    <= MEM_ALUResult;
