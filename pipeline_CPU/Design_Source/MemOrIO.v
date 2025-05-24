@@ -2,24 +2,24 @@
 
 module MemOrIO(
     // Inputs
-    input mRead,                    // ???????
-    input mWrite,                   // ???????
-    input ioRead,                   // ?IO????
-    input ioWrite,                  // ?IO????
+    input mRead,                    // 读内存控制信号
+    input mWrite,                   // 写内存控制信号
+    input ioRead,                   // 读IO控制信号
+    input ioWrite,                  // 写IO控制信号
 
-    input conf_btn_out,             // ???????
-    input [31:0] addr_in,           // ??ALU???
-    input [31:0] m_rdata,           // ?dMem?????
-    input [11:0] switch_data,       // ?Switch?????(12bits)
-    input [3:0] key_data,           // ?Keyboard?????(32bits)
-    input [31:0] r_rdata,           // ?Reg?????
+    input conf_btn_out,             // 来自按键的信号
+    input [31:0] addr_in,           // 来自ALU的地址
+    input [31:0] m_rdata,           // 从dMem读取的数据
+    input [11:0] switch_data,       // 从Switch读取的数据(12bits)
+    input [3:0] key_data,           // 从Keyboard读取的数据(4bits)
+    input [31:0] r_rdata,           // 从Reg读取的数据
 
     // Outputs
     output [31:0] addr_out,
     output [31:0] r_wdata,          // write back data to Reg
     output reg [31:0] write_data,   // data to Mem and IO
-    output LEDCtrl,                 // LED????
-    output SegCtrl                  // Seg????
+    output LEDCtrl,                 // LED控制信号
+    output SegCtrl                  // Seg控制信号
 );
     assign addr_out = addr_in;
 

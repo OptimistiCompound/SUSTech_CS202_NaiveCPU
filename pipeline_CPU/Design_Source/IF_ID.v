@@ -40,8 +40,8 @@ always @(posedge clk, negedge rstn) begin
         ID_pc4_i = 32'd0;
         ID_inst  = {25'b0, `OPCODE_I};
     end else if(Pause) begin
-        // ??? nop
-        // ????????
+        // 空操作 nop
+        // 阻止寄存器值改变
     end else begin
         ID_pc4_i <= IF_pc4_i;
         ID_inst  <= IF_inst;
