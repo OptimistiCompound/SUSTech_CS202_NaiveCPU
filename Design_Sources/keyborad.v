@@ -28,7 +28,7 @@ module keyboard_scan(
         end
     end
 
-    // ¶Ôps2_clkºÍps2_data½øÐÐÂË²¨
+    // ï¿½ï¿½ps2_clkï¿½ï¿½ps2_dataï¿½ï¿½ï¿½ï¿½ï¿½Ë²ï¿½
     always @(posedge DIR or negedge rstn) begin
         if (!rstn) begin
             ps2c_filter <= 0;
@@ -86,7 +86,7 @@ module keyboard_driver (
     input rstn,
     input ps2_clk,
     input ps2_data,
-    output reg [3:0] data_out // ÓÃÓÚ¿ØÖÆ¶ÔÓ¦0 - 9µÄÏÔÊ¾£¬Ã¿Î»¶ÔÓ¦Ò»¸öÊý×Ö¼ü£¬¸ßµçÆ½µãÁÁ£¨¾ßÌåµãÁÁÂß¼­Ðè½áºÏÊµ¼ÊÏÔÊ¾Ó²¼þ£¬ÕâÀïÏÈ°´³£¹æÂß¼­¶¨Òå£©
+    output reg [3:0] data_out // ï¿½ï¿½ï¿½Ú¿ï¿½ï¿½Æ¶ï¿½Ó¦0 - 9ï¿½ï¿½ï¿½ï¿½Ê¾ï¿½ï¿½Ã¿Î»ï¿½ï¿½Ó¦Ò»ï¿½ï¿½ï¿½ï¿½ï¿½Ö¼ï¿½ï¿½ï¿½ï¿½ßµï¿½Æ½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½ï¿½Êµï¿½ï¿½ï¿½ï¿½Ê¾Ó²ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½È°ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ß¼ï¿½ï¿½ï¿½ï¿½å£©
 );
     wire [15:0] xkey;
     wire [21:0] ps_data;
@@ -98,10 +98,10 @@ module keyboard_driver (
     assign now_key = xkey[7:0];
     assign pre_key = xkey[15:8];
     reg [10:0]cnt = 0;
-    // Ê¹ÓÃ clk ½øÈëalways
+    // Ê¹ï¿½ï¿½ clk ï¿½ï¿½ï¿½ï¿½always
     always @(posedge clk or negedge rstn) begin
         if (!rstn) begin
-            data_out <= 0; // ¸´Î»Ê±È«Ãð
+            data_out <= 0; // ï¿½ï¿½Î»Ê±È«ï¿½ï¿½
         end else if (data_in) begin
             case (now_key)
                 8'd69: data_out <= 4'b0000; //69,22,30,38,37,46,54,61,62,70
@@ -116,10 +116,10 @@ module keyboard_driver (
                 8'd70: data_out <= 4'b1001;
                 8'd90: data_out <= 4'b1011;
                 8'd13: data_out <= 4'b1100; // tab
-                default: data_out <=4'b1111; // ÆäËû¼ü
+                default: data_out <=4'b1111; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             endcase
         end else begin
-            data_out <= 4'b1111; // ÎÞÓÐÐ§°´¼ü
+            data_out <= 4'b1111; // ï¿½ï¿½ï¿½ï¿½Ð§ï¿½ï¿½ï¿½ï¿½
         end
     end
 endmodule
