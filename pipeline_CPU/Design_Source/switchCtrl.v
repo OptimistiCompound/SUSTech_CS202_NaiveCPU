@@ -16,5 +16,4 @@ begin
     else
         switch_data <= switch_data;
 end
-
 endmodule
