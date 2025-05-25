@@ -23,7 +23,7 @@
 module MEM_WB(
     // Inputs
     input clk, rstn,
-    input        MEM_pc4_i,
+    input [31:0] MEM_pc4_i,
     input        MEM_MemtoReg,
     input        MEM_RegWrite,
     // input        MEM_ioWrite,
