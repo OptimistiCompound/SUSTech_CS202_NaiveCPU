@@ -488,6 +488,7 @@ wire Flush; // 控制冒险刷新
         .sseg1(sseg1)
     );
 
+//assign conf_btn_out = conf_btn;
     debounce conf_btn_deb(
         .clk(cpu_clk),
         .rstn(rstn),

@@ -135,8 +135,8 @@ always @(*) begin
             `INST_BNE:          zero = (ALUResult != 0);
             `INST_BLT:          zero = ($signed(ALUResult) < 0);
             `INST_BGE:          zero = ($signed(ALUResult) >= 0);
-            `INST_BLTU:         zero = ($unsigned(ALUResult) < 0);
-            `INST_BGEU:         zero = ($unsigned(ALUResult) >= 0);
+            `INST_BLTU:         zero = ($signed(ALUResult) < 0);
+            `INST_BGEU:         zero = ($signed(ALUResult) >= 0);
             default: 
                 zero = (ALUResult == 0);
         endcase
