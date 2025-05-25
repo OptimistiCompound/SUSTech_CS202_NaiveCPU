@@ -77,7 +77,7 @@ module CPU(
     wire [14:0] upg_addr_w;
     wire [31:0] upg_data_w;
 
-    wire [3:0]key_data_sub;
+    wire [4:0]key_data_sub;
     wire [31:0]key_data;
 
     wire SegCtrl;
@@ -140,7 +140,7 @@ module CPU(
         .Jalr(Jalr),
         .ALUResult(ALUResult),
         .upg_rst_i(upg_rst),
-        .upg_clk_i(upg_clk),
+        .upg_clk_i(upg_clk_w),
         .upg_wen_i(upg_wen_w),
         .upg_adr_i(upg_addr_w),
         .upg_dat_i(upg_data_w),
@@ -191,7 +191,7 @@ module CPU(
         .addr(addr_out[15:2]),
         .din(ReadData2),
         .upg_rst_i(upg_rst),
-        .upg_clk_i(upg_clk),
+        .upg_clk_i(upg_clk_w),
         .upg_wen_i(upg_wen_w),
         .upg_addr_i(upg_addr_w[13:0]),
         .upg_data_i(upg_data_w),
@@ -312,7 +312,7 @@ module CPU(
         .key_in(btn3),
         .key_out(btn3_debounce)
     );
-
+    
     // Switch_con switch_con(
     //     .clk(cpu_clk),
     //     .rstn(rstn),
