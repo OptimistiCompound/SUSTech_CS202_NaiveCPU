@@ -24,17 +24,20 @@ module Decoder(
     // Inputs
     input clk,
     input rstn,
-    input [31:0] ALUResult, // WB
-    input [31:0] MemData,   // WB
+    input [31:0] ALUResult,
+    input [31:0] MemData,
     input [31:0] pc4_i,
-    input regWrite,         // WB
-    input MemtoReg,         // WB
+    input regWrite,
+    input MemtoReg,
+    input eRead,
     input [31:0] inst,
 
     // Outputs
     output [31:0] rdata1,
     output [31:0] rdata2,
-    output [31:0] imm32
+    output [31:0] imm32,
+    output [31:0] ecall_code,
+    output [31:0] ecall_a0_data
     );
 //-------------------------------------------------------------
 // Includes
@@ -57,7 +60,9 @@ always @(*) begin
         wdata = imm32;
     else if (opcode == `OPCODE_AUIPC)
         wdata = pc4_i + imm32;
-    else if (MemtoReg == 1)
+    else if (MemtoReg)
+        wdata = MemData;
+    else if (eRead)
         wdata = MemData;
     else 
         wdata = ALUResult;
@@ -75,7 +80,9 @@ RegisterFile uRegisterFile(
     .wdata(wdata),
     .regWrite(regWrite),
     .rdata1(rdata1),
-    .rdata2(rdata2)
+    .rdata2(rdata2),
+    .a7_data(ecall_code),
+    .a0_data(ecall_a0_data)
 );
 
 ImmGen uImmGen(

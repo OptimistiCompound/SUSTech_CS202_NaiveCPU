@@ -19,6 +19,8 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
+// PC_Offset
+`define PC_OFFSET                               32'h003FFFF8
 
 // Opcode
 `define OPCODE_R                                7'b0110011
@@ -30,6 +32,7 @@
 `define OPCODE_AUIPC                            7'b0010111
 `define OPCODE_JAL                              7'b1101111
 `define OPCODE_JALR                             7'b1100111
+`define OPCODE_E                                7'b1110011
 
 // ALUOp
 `define ALUOP_L_S                               2'b00
@@ -93,3 +96,11 @@
 `define INST_BGE                                3'h5
 `define INST_BLTU                               3'h6
 `define INST_BGEU                               3'h7
+
+// instruction funct for Ecall
+`define INST_ECALL                              12'h0
+`define INST_EBREAK                             12'h1
+
+// Operation code for EcallOp
+`define EOP_PRINT_INT                           12'h1
+`define EOP_READ_INT                            12'h5

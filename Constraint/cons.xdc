@@ -2,11 +2,17 @@
 set_property IOSTANDARD LVCMOS33 [get_ports start_pg]
 set_property IOSTANDARD LVCMOS33 [get_ports conf_btn]
 set_property IOSTANDARD LVCMOS33 [get_ports clk]
-set_property IOSTANDARD LVCMOS33 [get_ports rstn]
-set_property PACKAGE_PIN T5 [get_ports start_pg]
+set_property IOSTANDARD LVCMOS33 [get_ports rstn_fpga]
+set_property IOSTANDARD LVCMOS33 [get_ports btn1]
+set_property IOSTANDARD LVCMOS33 [get_ports btn2]
+set_property IOSTANDARD LVCMOS33 [get_ports btn3]
+set_property PACKAGE_PIN R11 [get_ports start_pg]
 set_property PACKAGE_PIN R15 [get_ports conf_btn]
 set_property PACKAGE_PIN P17 [get_ports clk]
-set_property PACKAGE_PIN P15 [get_ports rstn]
+set_property PACKAGE_PIN P15 [get_ports rstn_fpga]
+set_property PACKAGE_PIN U4 [get_ports btn1]
+set_property PACKAGE_PIN T5 [get_ports btn2]
+set_property PACKAGE_PIN R17 [get_ports btn3]
 
 ##------------------���뿪��------------------
 set_property IOSTANDARD LVCMOS33 [get_ports {switch_data[0]}]
@@ -38,7 +44,7 @@ set_property PACKAGE_PIN P5 [get_ports {switch_data[7]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {base}]
 set_property PACKAGE_PIN T3 [get_ports {base}]
 
-##-------------------�߶������------------------
+##-------------------�߶������?------------------
 set_property IOSTANDARD LVCMOS33 [get_ports {digit_en[0]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {digit_en[1]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {digit_en[2]}]
@@ -100,8 +106,8 @@ set_property PACKAGE_PIN L4 [get_ports ps2_data]
 ##------------------uart------------------
 set_property IOSTANDARD LVCMOS33 [get_ports rx]
 set_property IOSTANDARD LVCMOS33 [get_ports tx]
-set_property PACKAGE_PIN L3 [get_ports rx]
-set_property PACKAGE_PIN N2 [get_ports tx]
+set_property PACKAGE_PIN N5 [get_ports rx]
+set_property PACKAGE_PIN T4 [get_ports tx]
 
 ##------------------led------------------
 set_property IOSTANDARD LVCMOS33 [get_ports {reg_LED[0]}]
@@ -136,3 +142,5 @@ set_property PACKAGE_PIN J4 [get_ports {reg_LED[12]}]
 set_property PACKAGE_PIN G3 [get_ports {reg_LED[13]}]
 set_property PACKAGE_PIN G4 [get_ports {reg_LED[14]}]
 set_property PACKAGE_PIN F6 [get_ports {reg_LED[15]}]
+
+set_property SEVERITY {Warning} [get_drc_checks REQP-1712]
