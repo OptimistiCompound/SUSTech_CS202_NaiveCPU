@@ -50,7 +50,9 @@ module CPU(
     wire [31:0] imm32;
     wire zero;
     wire Branch, Jump, Jalr, ALUSrc, MemRead, MemWrite, MemtoReg, RegWrite;
+    wire [3:0] Ftype;
     wire eRead, eWrite, eBreak;
+    wire mode;
     wire [11:0] EcallOp;
     wire [1:0] ALUOp;
     wire [2:0] funct3;
@@ -115,7 +117,8 @@ module CPU(
         .eRead(eRead),
         .btn1(btn1),
         .clk_in(wiz_clk),
-        .clk_out(cpu_clk)
+        .clk_out(cpu_clk),
+        .mode(mode)
     );
 
     uart_bmpg_0 uart (
@@ -158,6 +161,7 @@ module CPU(
         .Branch(Branch),
         .Jump(Jump),
         .Jalr(Jalr),
+        .Ftype(Ftype),
         .ALUOp(ALUOp),
         .ALUSrc(ALUSrc),
         .MemRead(MemRead),
@@ -180,6 +184,7 @@ module CPU(
         .ALUOp(ALUOp),
         .funct3(funct3),
         .funct7(funct7),
+        .Ftype(Ftype),
         .ALUResult(ALUResult),
         .zero(zero)
     );
@@ -228,6 +233,7 @@ module CPU(
         .eWrite(eWrite),
         .EcallOp(EcallOp),
         .conf_btn_out(conf_btn_out), 
+        .key_btn(btn2_debounce),
         .addr_in(ALUResult),    // address from ALU         
         .m_rdata(MemData),
         .switch_data(switch_data),
@@ -245,6 +251,7 @@ module CPU(
         .clk(clk),
         .cpu_clk(cpu_clk),
         .rstn(rstn),
+        .mode(mode),
         .base(base),
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl),
@@ -282,32 +289,32 @@ module CPU(
 //assign conf_btn_out = conf_btn;
 //assign start_pg_debounce = start_pg;
     debounce conf_btn_deb(
-        .clk(cpu_clk),
+        .clk(clk),
         .rstn(rstn),
         .key_in(conf_btn),
         .key_out(conf_btn_out)
     );
     debounce pg_deb(
-        .clk(upg_clk),
+        .clk(clk),
         .rstn(rstn),
         .key_in(start_pg),
         .key_out(start_pg_debounce)
     );
 
     debounce btn1_deb(
-        .clk(cpu_clk),
+        .clk(clk),
         .rstn(rstn),
         .key_in(btn1),
         .key_out(btn1_debounce)
     );
     debounce btn2_deb(
-        .clk(cpu_clk),
+        .clk(clk),
         .rstn(rstn),
         .key_in(btn2),
         .key_out(btn2_debounce)
     );
     debounce btn3_deb(
-        .clk(cpu_clk),
+        .clk(clk),
         .rstn(rstn),
         .key_in(btn3),
         .key_out(btn3_debounce)
