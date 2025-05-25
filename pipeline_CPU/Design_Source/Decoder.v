@@ -28,7 +28,7 @@ module Decoder(
     input [4:0] WB_rd_addr,    // WB_ID
     input [31:0] ALUResult, // WB_ID
     input [31:0] MemData,   // WB_ID
-    input [31:0] pc4_i,     // WB
+    input [31:0] pc_i,      // WB
     input regWrite,         // WB_ID
     input MemtoReg,         // WB_ID
     input [31:0] inst,      // IF_ID
@@ -58,10 +58,14 @@ assign funct7 = inst[31:25];
 //-------------------------------------------------------------
 // Write data selection
 //-------------------------------------------------------------
+
+//-------------------------------------------------------------
+// Write data selection
+//-------------------------------------------------------------
 reg [31:0] wdata;
 always @(*) begin
     if (opcode == `OPCODE_JAL || opcode == `OPCODE_JALR)
-        wdata = pc4_i;
+        wdata = pc_pos + 32'h4;
     else if (MemtoReg == 1) begin
             case (WB_funct3)
             `INST_LB:

@@ -24,6 +24,7 @@ module ID_EX(
     // Inputs
     input clk, rstn, Pause, Flush,
     input [31:0] ID_pc4_i,
+    input [31:0] ID_pc_i,
     input        ID_Branch,     // Controller
     input        ID_Jump,
     input        ID_Jalr,
@@ -48,6 +49,7 @@ module ID_EX(
 
     // Outputs
     output reg [31:0] EX_pc4_i,
+    output reg [31:0] EX_pc_i,
     output reg        EX_Branch,
     output reg        EX_Jump,
     output reg        EX_Jalr,
@@ -76,6 +78,7 @@ module ID_EX(
 `include "../../Header_Files/riscv_defs.v"
 always @(posedge clk) begin
     if (~rstn || Pause || Flush) begin
+        EX_pc_i          = 0;
         EX_pc4_i         = 0;
         EX_Branch        = 0;
         EX_Jump          = 0;
@@ -100,6 +103,7 @@ always @(posedge clk) begin
         EX_funct7        = 0;
     end
     else begin
+        EX_pc_i          = ID_pc_i;
         EX_pc4_i         = ID_pc4_i;
         EX_Branch       <= ID_Branch;
         EX_Jump         <= ID_Jump;

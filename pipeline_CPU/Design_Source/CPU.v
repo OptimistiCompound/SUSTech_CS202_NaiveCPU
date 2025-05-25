@@ -49,6 +49,7 @@ wire Flush; // 控制冒险刷新
     wire [31:0] IF_inst;
 
 // ID 阶段
+    wire [31:0] ID_pc_i;
     wire [31:0] ID_pc4_i;
     wire [31:0] ID_inst;
 
@@ -74,6 +75,7 @@ wire Flush; // 控制冒险刷新
     wire [6:0]  ID_funct7;  
 
 // EX 阶段
+    wire [31:0] EX_pc_i;
     wire [31:0] EX_pc4_i;
     wire        EX_Branch;
     wire        EX_zero;
@@ -103,6 +105,7 @@ wire Flush; // 控制冒险刷新
     wire [6:0]  EX_funct7;
 
 // MEM 阶段
+    wire [31:0] MEM_pc_i;
     wire [31:0] MEM_pc4_i;
     wire        MEM_Branch;
     wire        MEM_zero;
@@ -126,6 +129,7 @@ wire Flush; // 控制冒险刷新
     wire [31:0] MEM_MemData;
 
 // WB 阶段
+    wire [31:0] WB_pc_i;
     wire [31:0] WB_pc4_i;
     wire        WB_MemtoReg;
     wire        WB_RegWrite;
@@ -214,6 +218,7 @@ wire Flush; // 控制冒险刷新
         .upg_dat_i(upg_dat_w),
         .inst(IF_inst),
         .pc4_i(IF_pc4_i),
+        .pc_i(IF_pc_i),
         .FLush(Flush)
     );
 
@@ -222,9 +227,11 @@ wire Flush; // 控制冒险刷新
         // in
         .clk(cpu_clk), .rstn(rstn), .Pause(Pause), .Flush(Flush),
         .IF_pc4_i(IF_pc4_i),
+        .IF_pc_i(IF_pc_i),
         .IF_inst(IF_inst),
         // out
         .ID_pc4_i(ID_pc4_i),
+        .ID_pc_i(ID_pc_i),
         .ID_inst(ID_inst)
     );
 
@@ -235,6 +242,7 @@ wire Flush; // 控制冒险刷新
         .WB_rd_addr(WB_rd_addr),
         .ALUResult(WB_ALUResult),
         .MemData(WB_MemData),
+        .pc_i(WB_pc_i),
         .pc4_i(WB_pc4_i),
         .regWrite(WB_RegWrite),
         .MemtoReg(WB_MemtoReg),
@@ -305,6 +313,7 @@ wire Flush; // 控制冒险刷新
         .rstn(rstn),
         .Pause(Pause),
         .Flush(Flush),
+        .ID_pc_i(ID_pc_i),
         .ID_pc4_i(ID_pc4_i),
         .ID_Branch(ID_Branch),   
         .ID_Jump(ID_Jump),
@@ -328,6 +337,7 @@ wire Flush; // 控制冒险刷新
         .ID_funct3(ID_funct3),     // ID
         .ID_funct7(ID_funct7),     // ID
 
+        .EX_pc_i(EX_pc_i),
         .EX_pc4_i(EX_pc4_i),
         .EX_Branch(EX_Branch),
         .EX_Jump(EX_Jump),
@@ -371,6 +381,7 @@ wire Flush; // 控制冒险刷新
         .clk(cpu_clk),
         .rstn(rstn),
         .Flush(Flush),
+        .EX_pc_i(EX_pc_i),
         .EX_pc4_i(EX_pc4_i),
         .EX_Branch(EX_Branch),
         .EX_zero(EX_zero),
@@ -394,6 +405,7 @@ wire Flush; // 控制冒险刷新
         .EX_r_rdata(EX_r_rdata),
 
         // Outputs
+        .MEM_pc_i(MEM_pc_i),
         .MEM_pc4_i(MEM_pc4_i),
         .MEM_Branch(MEM_Branch),
         .MEM_zero(MEM_zero),
@@ -454,6 +466,7 @@ wire Flush; // 控制冒险刷新
     MEM_WB mem_wb(
     .clk(cpu_clk),
     .rstn(rstn),
+    .MEM_pc_i(MEM_pc_i),
     .MEM_pc4_i(MEM_pc4_i),
     .MEM_MemtoReg(MEM_MemtoReg),
     .MEM_RegWrite(MEM_RegWrite),
@@ -464,6 +477,7 @@ wire Flush; // 控制冒险刷新
     .MEM_ALUResult(MEM_ALUResult),
     .MEM_MemData(MEM_MemData),
 
+    .WB_pc_i(WB_pc_i),
     .WB_pc4_i(WB_pc4_i),
     .WB_MemtoReg(WB_MemtoReg),
     .WB_RegWrite(WB_RegWrite),

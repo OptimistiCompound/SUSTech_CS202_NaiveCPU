@@ -24,10 +24,12 @@ module IF_ID(
     // Inputs
     input clk, rstn, Pause, Flush,
     input [31:0] IF_pc4_i,
+    input [31:0] IF_pc_i,
     input [31:0] IF_inst,
 
     // Outputs
     output reg [31:0] ID_pc4_i,
+    output reg [31:0] ID_pc_i,
     output reg [31:0] ID_inst
     );
 //-------------------------------------------------------------
@@ -38,12 +40,14 @@ module IF_ID(
 always @(posedge clk, negedge rstn) begin
     if(~rstn || Flush) begin
         ID_pc4_i = 32'd0;
+        ID_pc_i  = 32'd0;
         ID_inst  = {25'b0, `OPCODE_I};
     end else if(Pause) begin
         // 空操作 nop
         // 阻止寄存器值改变
     end else begin
         ID_pc4_i <= IF_pc4_i;
+        ID_pc_i  <= IF_pc_i;
         ID_inst  <= IF_inst;
     end
 end

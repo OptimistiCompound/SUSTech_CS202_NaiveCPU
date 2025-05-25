@@ -42,6 +42,7 @@ module IFetch(
     // Outputs
     output [31:0] inst,
     output [31:0] pc4_i,
+    output reg [31:0] pc_i,
     output FLush
     );
 wire mode = upg_rst_i | (~upg_rst_i & upg_done_i);
@@ -64,6 +65,13 @@ always @(negedge clk or negedge rstn) begin
 end
  
 assign pc4_i = PC + 32'h4;
+always @(posedge clk or negedge rstn) begin
+    if (~rstn) begin
+        pc_i <= 0;
+    end else begin
+        pc_i <= PC;
+    end
+end
 
 programrom instmem (
     .clka (mode? clk : upg_clk_i ),

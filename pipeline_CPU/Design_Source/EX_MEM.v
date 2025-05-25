@@ -23,6 +23,7 @@
 module EX_MEM(
     // Inputs
     input clk, rstn, Flush,
+    input [31:0] EX_pc_i,
     input [31:0] EX_pc4_i,
     input        EX_Branch,
     input        EX_zero,
@@ -46,6 +47,7 @@ module EX_MEM(
     input [31:0] EX_r_rdata,
 
     // Outputs
+    output reg [31:0] MEM_pc_i,
     output reg [31:0] MEM_pc4_i,
     output reg        MEM_Branch,
     output reg        MEM_zero,
@@ -74,6 +76,7 @@ module EX_MEM(
 `include "../../Header_Files/riscv_defs.v"
 always @(posedge clk) begin
     if (~rstn || Flush) begin
+        MEM_pc_i             = 0;
         MEM_pc4_i            = 0;
         MEM_Branch           = 0;
         MEM_zero             = 0;
@@ -97,6 +100,7 @@ always @(posedge clk) begin
         MEM_r_rdata          = 0;
     end
     else begin
+        MEM_pc_i            <= EX_pc_i;
         MEM_pc4_i           <= EX_pc4_i;
         MEM_Branch           = EX_Branch;
         MEM_zero             = EX_zero;

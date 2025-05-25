@@ -23,6 +23,7 @@
 module MEM_WB(
     // Inputs
     input clk, rstn,
+    input [31:0] MEM_pc_i,
     input [31:0] MEM_pc4_i,
     input        MEM_MemtoReg,
     input        MEM_RegWrite,
@@ -34,6 +35,7 @@ module MEM_WB(
     input [31:0] MEM_MemData,
 
     // Outputs
+    output reg [31:0] WB_pc_i,
     output reg [31:0] WB_pc4_i,
     output reg        WB_MemtoReg,
     output reg        WB_RegWrite,
@@ -50,6 +52,7 @@ module MEM_WB(
 `include "../../Header_Files/riscv_defs.v"
 always @(posedge clk, negedge rstn) begin
     if(~rstn) begin
+        WB_pc_i         = 0;
         WB_pc4_i        = 0;
         WB_MemtoReg     = 0;
         WB_RegWrite     = 0;
@@ -60,6 +63,7 @@ always @(posedge clk, negedge rstn) begin
         WB_MemData      = 0;
     end
     else begin
+        WB_pc_i         <= MEM_pc_i;
         WB_pc4_i        <= MEM_pc4_i;
         WB_MemtoReg     <= MEM_MemtoReg;
         WB_RegWrite     <= MEM_RegWrite;
