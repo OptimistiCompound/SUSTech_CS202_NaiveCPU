@@ -29,6 +29,7 @@ module Controller(
     output Branch,
     output Jump,
     output Jalr,
+    output Utype,
     output [1:0] ALUOp,
     output ALUSrc,
     output MemRead,
@@ -51,6 +52,10 @@ wire [2:0] funct3 = inst[14:12];
 assign Branch = (opcode == `OPCODE_B);
 assign Jump = (opcode == `OPCODE_JAL);
 assign Jalr = (opcode == `OPCODE_JALR);
+assign Utype = {
+            {opcode == `OPCODE_LUI}, 
+            {opcode == `OPCODE_AUIPC}
+        };
 assign ALUOp = {
             {(opcode != `OPCODE_L) && (opcode != `OPCODE_S) && (opcode != `OPCODE_B)}, 
             {(opcode != `OPCODE_L) && (opcode != `OPCODE_S) && (opcode != `OPCODE_R)}

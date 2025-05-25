@@ -55,7 +55,7 @@ wire Flush; // 控制冒险刷新
     wire        ID_Branch;
     wire        ID_Jump;
     wire        ID_Jalr;
-
+    wire [1:0]  ID_Utype;
     wire [1:0]  ID_ALUOp;
     wire        ID_ALUSrc;
     wire        ID_MemRead;
@@ -79,6 +79,7 @@ wire Flush; // 控制冒险刷新
     wire        EX_zero;
     wire        EX_Jump;
     wire        EX_Jalr;
+    wire [1:0]  EX_Utype;
     wire [1:0]  EX_ALUOp;
     wire        EX_ALUSrc;
     wire        EX_MemRead;
@@ -253,6 +254,7 @@ wire Flush; // 控制冒险刷新
         .Branch(ID_Branch),
         .Jump(ID_Jump),
         .Jalr(ID_Jalr),
+        .Utype(ID_Utype),
         .ALUOp(ID_ALUOp),
         .ALUSrc(ID_ALUSrc),
         .MemRead(ID_MemRead),
@@ -304,6 +306,7 @@ wire Flush; // 控制冒险刷新
         .ID_Branch(ID_Branch),   
         .ID_Jump(ID_Jump),
         .ID_Jalr(ID_Jalr),
+        .ID_Utype(ID_Utype),
         .ID_ALUOp(ID_ALUOp),
         .ID_ALUSrc(ID_ALUSrc),
         .ID_MemRead(ID_MemRead),
@@ -326,6 +329,7 @@ wire Flush; // 控制冒险刷新
         .EX_Branch(EX_Branch),
         .EX_Jump(EX_Jump),
         .EX_Jalr(EX_Jalr),
+        .EX_Utype(EX_Utype),
         .EX_ALUOp(EX_ALUOp),     // EX_MEM
         .EX_ALUSrc(EX_ALUSrc),
         .EX_MemRead(EX_MemRead),
@@ -351,6 +355,8 @@ wire Flush; // 控制冒险刷新
         .imm32(EX_imm32),
         .ALUSrc(EX_ALUSrc),
         .ALUOp(EX_ALUOp),
+        .Utype(EX_Utype),
+        .pc4_i(EX_pc4_i),
         .funct3(EX_funct3),
         .funct7(EX_funct7),
         .ALUResult(EX_ALUResult),

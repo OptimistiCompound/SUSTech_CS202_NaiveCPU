@@ -95,3 +95,7 @@
 `define INST_BGE                                3'h5
 `define INST_BLTU                               3'h6
 `define INST_BGEU                               3'h7
+
+// instruction funct for U-type
+`define INST_LUI                                2'b01
+`define INST_AUIPC                              2'b10

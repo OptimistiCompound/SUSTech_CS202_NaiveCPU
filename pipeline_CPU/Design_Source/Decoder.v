@@ -61,10 +61,6 @@ reg [31:0] wdata;
 always @(*) begin
     if (opcode == `OPCODE_JAL || opcode == `OPCODE_JALR)
         wdata = pc4_i;
-    else if (opcode == `OPCODE_LUI)
-        wdata = imm32;
-    else if (opcode == `OPCODE_AUIPC)
-        wdata = pc4_i + imm32 + `PC_OFFSET;
     else if (MemtoReg == 1) begin
             case (funct3)
             `INST_LB:

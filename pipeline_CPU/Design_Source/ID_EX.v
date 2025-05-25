@@ -27,6 +27,7 @@ module ID_EX(
     input        ID_Branch,     // Controller
     input        ID_Jump,
     input        ID_Jalr,
+    input [1:0]  ID_Utype,
     input [1:0]  ID_ALUOp,
     input        ID_ALUSrc,
     input        ID_MemRead,
@@ -50,6 +51,7 @@ module ID_EX(
     output reg        EX_Branch,
     output reg        EX_Jump,
     output reg        EX_Jalr,
+    output reg [1:0]  EX_Utype,
     output reg [1:0]  EX_ALUOp,     // EX_MEM
     output reg        EX_ALUSrc,
     output reg        EX_MemRead,
@@ -78,6 +80,7 @@ always @(posedge clk) begin
         EX_Branch        = 0;
         EX_Jump          = 0;
         EX_Jalr          = 0;
+        EX_Utype         = 0;
         EX_ALUOp         = 0;
         EX_ALUSrc        = 0;
         EX_MemRead       = 0;
@@ -101,6 +104,7 @@ always @(posedge clk) begin
         EX_Branch       <= ID_Branch;
         EX_Jump         <= ID_Jump;
         EX_Jalr         <= ID_Jalr;
+        EX_Utype        <= ID_Utype;
         EX_ALUOp        <= ID_ALUOp;
         EX_ALUSrc       <= ID_ALUSrc;
         EX_MemRead      <= ID_MemRead;
