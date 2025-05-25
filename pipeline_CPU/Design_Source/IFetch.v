@@ -31,6 +31,7 @@ module IFetch(
     input Jalr,             // EX_MEM
     input [31:0] ALUResult, // EX_MEM
     input [31:0] imm32,     // EX_MEM
+    input [31:0] MEM_pc_i, // EX_MEM
 
    input upg_rst_i,
    input upg_clk_i, 
@@ -42,21 +43,23 @@ module IFetch(
     // Outputs
     output [31:0] inst,
     output [31:0] pc4_i,
-    output reg [31:0] pc_i,
-    output FLush
+    output [31:0] pc_i,
+    output Flush
     );
 wire mode = upg_rst_i | (~upg_rst_i & upg_done_i);
 reg [31:0] PC;
 wire [31:0] next_PC =   (rstn==0)           ? 0 : 
-                        (Branch && zero || Jump)    ? PC + imm32 : 
+                        (Branch && zero || Jump)    ? MEM_pc_i + imm32 : 
                         (Jalr)              ? ALUResult : 
                         PC + 32'h4;
-assign Flush        =   (Branch && zero || Jump || Jalr) ? 1'b1 : 1'b0;
+assign Flush        =   (rstn==0)           ? 1'b0 :
+                        (Branch && zero || Jump || Jalr) ? 1'b1 : 
+                        1'b0;
 
 always @(negedge clk or negedge rstn) begin
     if (~rstn)
         PC <= 0;
-    else if (Pause) begin
+    else if (Pause && !Flush) begin
         // 空操作 nop
         // 阻止寄存器值改变
     end
@@ -65,13 +68,7 @@ always @(negedge clk or negedge rstn) begin
 end
  
 assign pc4_i = PC + 32'h4;
-always @(posedge clk or negedge rstn) begin
-    if (~rstn) begin
-        pc_i <= 0;
-    end else begin
-        pc_i <= PC;
-    end
-end
+assign pc_i  = PC;
 
 programrom instmem (
     .clka (mode? clk : upg_clk_i ),

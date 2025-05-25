@@ -77,7 +77,32 @@ module ID_EX(
 //-------------------------------------------------------------
 `include "../../Header_Files/riscv_defs.v"
 always @(posedge clk) begin
-    if (~rstn || Pause || Flush) begin
+    if (~rstn || Flush) begin
+        EX_pc_i          = 0;
+        EX_pc4_i         = 0;
+        EX_Branch        = 0;
+        EX_Jump          = 0;
+        EX_Jalr          = 0;
+        EX_Utype         = 0;
+        EX_ALUOp         = 0;
+        EX_ALUSrc        = 0;
+        EX_MemRead       = 0;
+        EX_MemWrite      = 0;
+        EX_MemtoReg      = 0;
+        EX_RegWrite      = 0;
+        // EX_ioRead        = 0;
+        // EX_ioWrite       = 0;
+        EX_rs1_addr      = 0;
+        EX_rs2_addr      = 0;
+        EX_rd_addr       = 0;
+
+        EX_rs1_v         = 0;
+        EX_rs2_v         = 0;
+        EX_imm32         = 0;
+        EX_funct3        = 0;
+        EX_funct7        = 0;
+    end
+    else if (Pause) begin
         EX_pc_i          = 0;
         EX_pc4_i         = 0;
         EX_Branch        = 0;

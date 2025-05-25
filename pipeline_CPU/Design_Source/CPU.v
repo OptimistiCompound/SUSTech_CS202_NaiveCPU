@@ -46,6 +46,7 @@ wire Flush; // 控制冒险刷新
 
 // IF 阶段
     wire [31:0] IF_pc4_i;
+    wire [31:0] IF_pc_i;
     wire [31:0] IF_inst;
 
 // ID 阶段
@@ -167,8 +168,8 @@ wire Flush; // 控制冒险刷新
     wire start_pg_debounce;
     wire upg_clk_w;
     wire upg_wen_w;
-    wire [13:0] upg_adr_w;
-    wire [31:0] upg_dat_w;
+    wire [14:0] upg_addr_w;
+    wire [31:0] upg_data_w;
     wire upg_done_w;
     always@(posedge clk)begin 
         if(~rstn_fpga)begin
@@ -195,8 +196,8 @@ wire Flush; // 控制冒险刷新
 
         .upg_clk_o(upg_clk_w),
         .upg_wen_o(upg_wen_w),
-        .upg_adr_o(upg_adr_w),
-        .upg_dat_o(upg_dat_w),
+        .upg_adr_o(upg_addr_w[14:0]),
+        .upg_dat_o(upg_data_w),
         .upg_done_o(upg_done_w),
         .upg_tx_o(tx)
     );
@@ -211,15 +212,16 @@ wire Flush; // 控制冒险刷新
         .Jalr(MEM_Jalr),
         .ALUResult(MEM_ALUResult),   // for Jalr
         .imm32(MEM_imm32),          // for Branch || Jump
+        .MEM_pc_i(MEM_pc_i),        // for Branch || Jump
         .upg_rst_i(upg_rst),
         .upg_clk_i(upg_clk),
         .upg_wen_i(upg_wen_w),
-        .upg_adr_i(upg_adr_w),
-        .upg_dat_i(upg_dat_w),
+        .upg_adr_i(upg_addr_w),
+        .upg_dat_i(upg_data_w),
         .inst(IF_inst),
         .pc4_i(IF_pc4_i),
         .pc_i(IF_pc_i),
-        .FLush(Flush)
+        .Flush(Flush)
     );
 
 
@@ -240,10 +242,8 @@ wire Flush; // 控制冒险刷新
         .rstn(rstn),
         .WB_funct3(WB_funct3),
         .WB_rd_addr(WB_rd_addr),
-        .ALUResult(WB_ALUResult),
         .MemData(WB_MemData),
         .pc_i(WB_pc_i),
-        .pc4_i(WB_pc4_i),
         .regWrite(WB_RegWrite),
         .MemtoReg(WB_MemtoReg),
         .inst(IF_inst),
@@ -304,6 +304,7 @@ wire Flush; // 控制冒险刷新
         .ID_rs1_addr(ID_rs1_addr),
         .ID_rs2_addr(ID_rs2_addr),
         .EX_rd_addr(EX_rd_addr),
+        .ID_rd_addr(ID_rd_addr),
 
         .Pause(Pause)
     );
@@ -437,8 +438,8 @@ wire Flush; // 控制冒险刷新
         .upg_rst_i(upg_rst),
         .upg_clk_i(upg_clk),
         .upg_wen_i(upg_wen_w),
-        .upg_adr_i(upg_adr_w[13:0]),
-        .upg_dat_i(upg_dat_w),
+        .upg_addr_i(upg_addr_w[13:0]),
+        .upg_data_i(upg_data_w),
         .upg_done_i(upg_done_w),
         .dout(MemData)
     );
@@ -448,12 +449,12 @@ wire Flush; // 控制冒险刷新
         .mWrite(MEM_MemWrite),      // write to Mem
         // .ioRead(MEM_ioRead),       // read from IO
         // .ioWrite(MEM_ioWrite),     // write to IO
-        .conf_btn_out(conf_btn_out), 
+        .conf_btn_out(conf_btn),     ///////////////////////////////////////debounce
         .ALUResult(MEM_ALUResult),    // address from ALU         
         .m_rdata(MemData),
         .switch_data(switch_data),
         .key_data(key_data),
-        .r_rdata(MEM_rs2_v),
+        .r_rdata(true_m_wdata),
         .addr_out(addr_out),   
         .r_wdata(MEM_MemData),
         .write_data(write_data),
@@ -495,7 +496,7 @@ wire Flush; // 控制冒险刷新
         .base(base),
         .LEDCtrl(LEDCtrl),
         .SegCtrl(SegCtrl),
-        .write_data(MemData),
+        .write_data(write_data),
         .reg_LED(reg_LED),
         .digit_en(digit_en),
         .sseg(sseg),

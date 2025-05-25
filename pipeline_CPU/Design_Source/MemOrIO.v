@@ -4,8 +4,6 @@ module MemOrIO(
     // Inputs
     input mRead,                    // 读内存控制信号
     input mWrite,                   // 写内存控制信号
-    // input ioRead,                   // 读IO控制信号
-    // input ioWrite,                  // 写IO控制信号
 
     input conf_btn_out,             // 来自按键的信号
     input [31:0] ALUResult,         // 来自ALU的地址
@@ -47,7 +45,7 @@ module MemOrIO(
         else if (ioRead && isKeyAddr)
             r_wdata = {key_data};
         else 
-            r_wdata = 32'h0;
+            r_wdata = ALUResult;
     end
 
     // For Store: write Mem or IO

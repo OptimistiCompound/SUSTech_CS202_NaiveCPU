@@ -26,7 +26,6 @@ module Decoder(
     input rstn,
     input [2:0] WB_funct3,    // WB_ID
     input [4:0] WB_rd_addr,    // WB_ID
-    input [31:0] ALUResult, // WB_ID
     input [31:0] MemData,   // WB_ID
     input [31:0] pc_i,      // WB
     input regWrite,         // WB_ID
@@ -41,7 +40,7 @@ module Decoder(
     output [6:0]  funct7,
     output [4:0]  rs1_addr,
     output [4:0]  rs2_addr,
-    output [4:0]  rd_addr
+    output reg [4:0]  rd_addr
     );
 //-------------------------------------------------------------
 // Includes
@@ -51,9 +50,14 @@ module Decoder(
 wire [6:0] opcode = inst[6:0];
 assign rs1_addr = inst[19:15];
 assign rs2_addr = inst[24:20];
-assign rd_addr = inst[11:7];
 assign funct3 = inst[14:12];
 assign funct7 = inst[31:25];
+
+always @(*) begin
+    rd_addr = 0;
+    if (opcode != `OPCODE_B || opcode != `OPCODE_S)
+        rd_addr = inst[11:7];
+end
 
 //-------------------------------------------------------------
 // Write data selection
@@ -65,7 +69,7 @@ assign funct7 = inst[31:25];
 reg [31:0] wdata;
 always @(*) begin
     if (opcode == `OPCODE_JAL || opcode == `OPCODE_JALR)
-        wdata = pc_pos + 32'h4;
+        wdata = pc_i + 32'h4;
     else if (MemtoReg == 1) begin
             case (WB_funct3)
             `INST_LB:
@@ -83,7 +87,7 @@ always @(*) begin
             endcase
         end
     else
-        wdata = ALUResult;
+        wdata = MemData;
 end
  
 //-------------------------------------------------------------
@@ -98,9 +102,7 @@ RegisterFile uRegisterFile(
     .wdata(wdata),
     .regWrite(regWrite),
     .rdata1(rdata1),
-    .rdata2(rdata2),
-    .a7_data(ecall_code),
-    .a0_data(ecall_a0_data)
+    .rdata2(rdata2)
 );
 
 ImmGen uImmGen(

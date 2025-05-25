@@ -30,12 +30,13 @@ module HazardDetector(
     input [4:0] ID_rs1_addr,
     input [4:0] ID_rs2_addr,
     input [4:0] EX_rd_addr,
+    input [4:0] ID_rd_addr,
 
     // Outputs
     output reg Pause
     );
     always @(*) begin
-        if ( (EX_memRead) && (EX_rd_addr == ID_rs1_addr || EX_rd_addr == ID_rs2_addr) )
+        if ( (EX_memRead) && (ID_rd_addr != 0) && (EX_rd_addr == ID_rs1_addr || EX_rd_addr == ID_rs2_addr) )
             Pause = 1'b1;
         else 
             Pause = 1'b0;

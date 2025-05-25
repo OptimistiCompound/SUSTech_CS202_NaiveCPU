@@ -30,8 +30,14 @@ always @(posedge clk or negedge rstn) begin
     else if(LEDCtrl) begin
         reg_LED <= write_data[15:0];
     end
+end
+
+always @(posedge clk or negedge rstn) begin
+    if(!rstn) begin
+        seg_data <= 32'b0;
+    end
     else if(SegCtrl) begin
-        seg_data<= write_data[31:0];
+        seg_data <= write_data;
     end
 end
 
