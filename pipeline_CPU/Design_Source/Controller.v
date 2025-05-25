@@ -29,7 +29,7 @@ module Controller(
     output Branch,
     output Jump,
     output Jalr,
-    output Utype,
+    output [1:0] Utype,
     output [1:0] ALUOp,
     output ALUSrc,
     output MemRead,

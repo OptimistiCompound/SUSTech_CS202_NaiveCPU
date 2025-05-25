@@ -39,6 +39,7 @@ module EX_MEM(
     input [31:0] EX_ALUResult,
     input [31:0] EX_rs2_v,
     input [31:0] EX_imm32,
+    input [2:0]  EX_funct3,
 
     input [31:0] EX_addr_in,
     input [31:0] EX_m_rdata,
@@ -61,6 +62,7 @@ module EX_MEM(
     output reg [31:0] MEM_ALUResult,
     output reg [31:0] MEM_rs2_v,
     output reg [31:0] MEM_imm32,
+    output reg [2:0]  MEM_funct3,
 
     output reg [31:0] MEM_addr_in,
     output reg [31:0] MEM_m_rdata,
@@ -88,6 +90,7 @@ always @(posedge clk) begin
         MEM_ALUResult        = 0;
         MEM_rs2_v            = 0;
         MEM_imm32            = 0;
+        MEM_funct3           = 0;
 
         MEM_addr_in          = 0;
         MEM_m_rdata          = 0;
@@ -110,6 +113,7 @@ always @(posedge clk) begin
         MEM_ALUResult       <= EX_ALUResult;
         MEM_rs2_v           <= EX_rs2_v;
         MEM_imm32           <= EX_imm32;
+        MEM_funct3           = EX_funct3;
 
         MEM_addr_in         <= EX_addr_in;
         MEM_m_rdata         <= EX_m_rdata;

@@ -24,6 +24,7 @@ module Decoder(
     // Inputs
     input clk,
     input rstn,
+    input [2:0] WB_funct3,    // WB_ID
     input [4:0] WB_rd_addr,    // WB_ID
     input [31:0] ALUResult, // WB_ID
     input [31:0] MemData,   // WB_ID
@@ -62,7 +63,7 @@ always @(*) begin
     if (opcode == `OPCODE_JAL || opcode == `OPCODE_JALR)
         wdata = pc4_i;
     else if (MemtoReg == 1) begin
-            case (funct3)
+            case (WB_funct3)
             `INST_LB:
                 wdata = {{24{MemData[7]}}, MemData[7:0]};
             `INST_LH:

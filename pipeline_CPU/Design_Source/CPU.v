@@ -119,6 +119,7 @@ wire Flush; // 控制冒险刷新
     wire [31:0] MEM_ALUResult;
     wire [31:0] MEM_rs2_v;
     wire [31:0] MEM_imm32;
+    wire [2:0]  MEM_funct3;
     wire [31:0] MEM_addr_in;
     wire [31:0] MEM_m_rdata;
     wire [31:0] MEM_r_rdata;
@@ -128,6 +129,7 @@ wire Flush; // 控制冒险刷新
     wire [31:0] WB_pc4_i;
     wire        WB_MemtoReg;
     wire        WB_RegWrite;
+    wire [2:0]  WB_funct3;
     // wire        WB_ioWrite;
     wire [4:0]  WB_rd_addr;
     wire [31:0] WB_ALUResult;
@@ -229,6 +231,7 @@ wire Flush; // 控制冒险刷新
     Decoder decoder(
         .clk(cpu_clk),
         .rstn(rstn),
+        .WB_funct3(WB_funct3),
         .WB_rd_addr(WB_rd_addr),
         .ALUResult(WB_ALUResult),
         .MemData(WB_MemData),
@@ -288,11 +291,11 @@ wire Flush; // 控制冒险刷新
     );
 
     HazardDetector Hazard(
-        .MEM_memRead(MEM_MemRead),
+        .EX_memRead(EX_MemRead),
         // .MEM_ioRead(MEM_ioRead),
-        .EX_rs1_addr(EX_rs1_addr),
-        .EX_rs2_addr(EX_rs2_addr),
-        .MEM_rd_addr(MEM_rd_addr),
+        .ID_rs1_addr(ID_rs1_addr),
+        .ID_rs2_addr(ID_rs2_addr),
+        .EX_rd_addr(EX_rd_addr),
 
         .Pause(Pause)
     );
@@ -383,6 +386,7 @@ wire Flush; // 控制冒险刷新
         .EX_rd_addr(EX_rd_addr),
         .EX_ALUResult(EX_ALUResult),
         .EX_rs2_v(EX_rs2_v),
+        .EX_funct3(EX_funct3),
         .EX_imm32(EX_imm32),
 
         .EX_addr_in(EX_addr_in),
@@ -405,6 +409,7 @@ wire Flush; // 控制冒险刷新
         .MEM_rd_addr(MEM_rd_addr),
         .MEM_ALUResult(MEM_ALUResult),
         .MEM_rs2_v(MEM_rs2_v),
+        .MEM_funct3(MEM_funct3),
         .MEM_imm32(MEM_imm32),
         .MEM_addr_in(MEM_addr_in),
         .MEM_m_rdata(MEM_m_rdata),
@@ -415,7 +420,7 @@ wire Flush; // 控制冒险刷新
         .clk(cpu_clk),
         .MemRead(MEM_MemRead),
         .MemWrite(MEM_MemWrite),
-        .addr(addr_out),
+        .addr(addr_out[15:2]),
         .din(write_data),
         .upg_rst_i(upg_rst),
         .upg_clk_i(upg_clk),
@@ -452,6 +457,7 @@ wire Flush; // 控制冒险刷新
     .MEM_pc4_i(MEM_pc4_i),
     .MEM_MemtoReg(MEM_MemtoReg),
     .MEM_RegWrite(MEM_RegWrite),
+    .MEM_funct3(MEM_funct3),
     // .MEM_ioWrite(MEM_ioWrite),
 
     .MEM_rd_addr(MEM_rd_addr),
@@ -461,6 +467,7 @@ wire Flush; // 控制冒险刷新
     .WB_pc4_i(WB_pc4_i),
     .WB_MemtoReg(WB_MemtoReg),
     .WB_RegWrite(WB_RegWrite),
+    .WB_funct3(WB_funct3),
     // .WB_ioWrite(WB_ioWrite),
 
     .WB_rd_addr(WB_rd_addr),

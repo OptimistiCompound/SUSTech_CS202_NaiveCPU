@@ -162,9 +162,9 @@ end
 //-------------------------------------------------------------
 always @(*) begin
     if(Utype)
-        ALUResult = Result_1;
-    else 
         ALUResult = Result_2;
+    else 
+        ALUResult = Result_1;
 end
 
 endmodule

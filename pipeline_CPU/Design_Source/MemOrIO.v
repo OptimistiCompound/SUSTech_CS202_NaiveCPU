@@ -21,7 +21,7 @@ module MemOrIO(
     output LEDCtrl,                 // LED控制信号
     output SegCtrl                  // Seg控制信号
 );
-    wire addr_in = ALUResult; // ALU计算的地址
+    wire [31:0] addr_in = ALUResult; // ALU计算的地址
     assign addr_out = addr_in;
     wire ioRead  = (ALUResult[31:8] == 24'hFFFFFC) && mRead;   // IO读
     wire ioWrite = (ALUResult[31:8] == 24'hFFFFFC) && mWrite;  // IO写

@@ -26,6 +26,7 @@ module MEM_WB(
     input [31:0] MEM_pc4_i,
     input        MEM_MemtoReg,
     input        MEM_RegWrite,
+    input [2:0]  MEM_funct3,
     // input        MEM_ioWrite,
 
     input [4:0]  MEM_rd_addr,
@@ -36,6 +37,7 @@ module MEM_WB(
     output reg [31:0] WB_pc4_i,
     output reg        WB_MemtoReg,
     output reg        WB_RegWrite,
+    output reg [2:0]  WB_funct3,
     // output reg        WB_ioWrite,
 
     output reg [4:0]  WB_rd_addr,
@@ -51,6 +53,7 @@ always @(posedge clk, negedge rstn) begin
         WB_pc4_i        = 0;
         WB_MemtoReg     = 0;
         WB_RegWrite     = 0;
+        WB_funct3      = 0;
 
         WB_rd_addr      = 0;
         WB_ALUResult    = 0;
@@ -60,6 +63,7 @@ always @(posedge clk, negedge rstn) begin
         WB_pc4_i        <= MEM_pc4_i;
         WB_MemtoReg     <= MEM_MemtoReg;
         WB_RegWrite     <= MEM_RegWrite;
+        WB_funct3       <= MEM_funct3;
         // WB_ioWrite      <= MEM_ioWrite;
         
         WB_rd_addr      <= MEM_rd_addr;

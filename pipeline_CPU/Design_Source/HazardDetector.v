@@ -26,16 +26,16 @@
 // 所以说stall也只会插入在 ID 和 EX 之间，也只会影响到IF_ID以及ID_EX
 module HazardDetector(
     // Inputs
-    input       MEM_memRead,
-    input [4:0] EX_rs1_addr,
-    input [4:0] EX_rs2_addr,
-    input [4:0] MEM_rd_addr,
+    input       EX_memRead,
+    input [4:0] ID_rs1_addr,
+    input [4:0] ID_rs2_addr,
+    input [4:0] EX_rd_addr,
 
     // Outputs
     output reg Pause
     );
     always @(*) begin
-        if ( (MEM_memRead) && (MEM_rd_addr == EX_rs1_addr || MEM_rd_addr == EX_rs2_addr) )
+        if ( (EX_memRead) && (EX_rd_addr == ID_rs1_addr || EX_rd_addr == ID_rs2_addr) )
             Pause = 1'b1;
         else 
             Pause = 1'b0;
