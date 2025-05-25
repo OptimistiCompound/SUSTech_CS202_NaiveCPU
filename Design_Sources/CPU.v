@@ -53,6 +53,7 @@ module CPU(
     wire [3:0] Ftype;
     wire eRead, eWrite, eBreak;
     wire mode;
+    wire [31:0] reg_data;
     wire [11:0] EcallOp;
     wire [1:0] ALUOp;
     wire [2:0] funct3;
@@ -116,6 +117,8 @@ module CPU(
         .eBreak(eBreak),
         .eRead(eRead),
         .btn1(btn1),
+        .btn2(btn2),
+        .btn3(btn3),
         .clk_in(wiz_clk),
         .clk_out(cpu_clk),
         .mode(mode)
@@ -207,6 +210,9 @@ module CPU(
     Decoder decoder(
         .clk(cpu_clk),
         .rstn(rstn),
+        .mode(mode),
+        .conf_btn(conf_btn),
+        .switch_data(switch_data),
         .ALUResult(ALUResult),
         .MemData(r_wdata),
         .pc4_i(pc4_i),
@@ -219,7 +225,8 @@ module CPU(
         .rdata2(ReadData2),
         .imm32(imm32),
         .ecall_code(ecall_code),
-        .ecall_a0_data(ecall_a0_data)
+        .ecall_a0_data(ecall_a0_data),
+        .reg_data(reg_data)
     );
 
     // need to test and complicate
@@ -257,6 +264,7 @@ module CPU(
         .SegCtrl(SegCtrl),
         .eBreak(eBreak),
         .eRead(eRead),
+        .reg_data(reg_data),
         .write_data(write_data),
         .reg_LED(reg_LED),
        .digit_en(digit_en),

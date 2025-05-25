@@ -24,6 +24,9 @@ module RegisterFile(
     // Inputs
     input clk,
     input rstn,
+    input mode,
+    input conf_btn,
+    input [12:0] switch_data,
     input [4:0] raddr1,
     input [4:0] raddr2,
     input [4:0] waddr,
@@ -34,7 +37,8 @@ module RegisterFile(
     output [31:0] rdata1,
     output [31:0] rdata2,
     output [31:0] a7_data,
-    output [31:0] a0_data
+    output [31:0] a0_data,
+    output [31:0] reg_data
     );
 reg [31:0] registers [31:0];
 
@@ -53,4 +57,16 @@ always @(posedge clk or negedge rstn) begin
     else if (regWrite && waddr != 5'b0)
         registers[waddr] <= wdata;
 end
+
+always @(posedge clk or negedge rstn) begin
+    if (~rstn || ~mode)
+        reg_data = 32'h0;
+    else if (mode) begin
+        if (conf_btn) 
+            reg_data = registers[switch_data[4:0]];
+        else 
+            reg_data <= reg_data;
+    end
+end
+
 endmodule

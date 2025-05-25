@@ -9,6 +9,7 @@ module LED_con(
     input SegCtrl,
     input eBreak,
     input eRead,
+    input [31:0] reg_data,
     input [31:0] pc4_i,
     input [31:0] write_data,
     output reg [15:0] reg_LED,
@@ -47,7 +48,7 @@ always @(posedge clk or negedge rstn) begin
     if(!rstn) begin
         seg_data <= 32'b0;
     end else if(mode) begin
-        seg_data <= pc4_i;
+        seg_data <= reg_data;
     end
     else if(SegCtrl) begin
         seg_data <= write_data;

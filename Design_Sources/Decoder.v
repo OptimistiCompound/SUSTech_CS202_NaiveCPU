@@ -24,6 +24,9 @@ module Decoder(
     // Inputs
     input clk,
     input rstn,
+    input mode,
+    input conf_btn,
+    input [11:0] switch_data,
     input [31:0] ALUResult,
     input [31:0] MemData,
     input [31:0] pc4_i,
@@ -37,6 +40,7 @@ module Decoder(
     output [31:0] rdata1,
     output [31:0] rdata2,
     output [31:0] imm32,
+    output [31:0] reg_data,
     output [31:0] ecall_code,
     output [31:0] ecall_a0_data
     );
@@ -99,6 +103,9 @@ end
 RegisterFile uRegisterFile(
     .clk(clk),
     .rstn(rstn),
+    .mode(mode),
+    .conf_btn(conf_btn),
+    .switch_data(switch_data),
     .raddr1(raddr1),
     .raddr2(raddr2),
     .waddr(rd_v),
@@ -107,7 +114,8 @@ RegisterFile uRegisterFile(
     .rdata1(rdata1),
     .rdata2(rdata2),
     .a7_data(ecall_code),
-    .a0_data(ecall_a0_data)
+    .a0_data(ecall_a0_data),
+    .reg_data(reg_data)
 );
 
 ImmGen uImmGen(
