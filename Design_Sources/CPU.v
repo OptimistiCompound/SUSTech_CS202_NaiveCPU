@@ -57,6 +57,7 @@ module CPU(
     wire [6:0] funct7;
     wire [31:0] MemData;
     wire [31:0] pc4_i;
+    wire [31:0] pc_i;
     wire conf_btn_out;
     wire start_pg_debounce;
     wire btn1_debounce;
@@ -99,6 +100,8 @@ module CPU(
     wire rstn;
     assign rstn = rstn_fpga | !upg_rst;
 
+//assign wiz_clk=clk;
+//assign upg_clk=clk;
     clk_wiz cpuclk(
         .clk_in1(clk),
         .clk_out1(wiz_clk),
@@ -135,6 +138,7 @@ module CPU(
         .Branch(Branch),
         .Jump(Jump),
         .Jalr(Jalr),
+        .ALUResult(ALUResult),
         .upg_rst_i(upg_rst),
         .upg_clk_i(upg_clk_w),
         .upg_wen_i(upg_wen_w),
@@ -142,7 +146,8 @@ module CPU(
         .upg_dat_i(upg_data_w),
         .upg_done_i(upg_done_w),
         .inst(inst),
-        .pc4_i(pc4_i)
+        .pc4_i(pc4_i),
+        .pc_i(pc_i)
     );
 
     Controller controller(
@@ -200,6 +205,7 @@ module CPU(
         .ALUResult(ALUResult),
         .MemData(r_wdata),
         .pc4_i(pc4_i),
+        .pc_i(pc_i),
         .regWrite(RegWrite),
         .MemtoReg(MemtoReg),
         .eRead(eRead),
@@ -274,6 +280,7 @@ module CPU(
     // );
 
 //assign conf_btn_out = conf_btn;
+//assign start_pg_debounce = start_pg;
     debounce conf_btn_deb(
         .clk(cpu_clk),
         .rstn(rstn),
