@@ -93,7 +93,9 @@ RegisterFile uRegisterFile(
     .wdata(wdata),
     .regWrite(regWrite),
     .rdata1(rdata1),
-    .rdata2(rdata2)
+    .rdata2(rdata2),
+    .a7_data(ecall_code),
+    .a0_data(ecall_a0_data)
 );
 
 ImmGen uImmGen(
