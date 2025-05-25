@@ -12,6 +12,7 @@ module MemOrIO(
     input [11:0] EcallOp,                  // ???????
 
     input conf_btn_out,             // ???????
+    input key_btn,                  // 
     input [31:0] addr_in,           // ??ALU???
     input [31:0] m_rdata,           // ?dMem?????
     input [11:0] switch_data,       // ?Switch?????(12bits)
@@ -33,11 +34,12 @@ module MemOrIO(
     wire isSwitchAddr    = (addr_in == `SWITCH_BASE_ADDR);
     wire isKeyAddr       = (addr_in == `KEY_BASE_ADDR);
     wire isBntAddr       = (addr_in == `Btn_ADDR);
+    wire isKeyBntAddr    = (addr_in == `KeyCtr_ADDR);
     // Decide Write address
     wire isLEDAddr       = (addr_in == `LED_BASE_ADDR);
     wire isSegAddr       = (addr_in == `SEG_BASE_ADDR);
     // Decide Mem address
-    wire isMemAddr       = !isBntAddr && !isSwitchAddr && !isKeyAddr;
+    wire isMemAddr       = !isBntAddr && !isSwitchAddr && !isKeyAddr && !isKeyBntAddr;
 
     // For Load: write reg
     always @(*) begin
@@ -49,6 +51,8 @@ module MemOrIO(
             r_wdata = {31'b0, conf_btn_out};
         else if (ioRead && isKeyAddr)
             r_wdata = {key_data};
+        else if (ioRead && isKeyBntAddr)
+            r_wdata = {31'b0, key_btn};
         else if (eRead && EcallOp == `EOP_READ_INT)
             r_wdata = {20'h0, switch_data};
         else 
