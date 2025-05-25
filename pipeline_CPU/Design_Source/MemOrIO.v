@@ -43,23 +43,19 @@ module MemOrIO(
         else if (ioRead && isSwitchAddr)
             r_wdata = {20'h0, switch_data};
         else if (ioRead && isBntAddr)
-            r_wdata = {31'b0, conf_btn_out}
+            r_wdata = {31'b0, conf_btn_out};
         else if (ioRead && isKeyAddr)
-            r_wdata = {28'h0, key_data}
-        else if (eRead && EcallOp == `EOP_READ_INT)
-            r_wdata = {20'h0, switch_data};
+            r_wdata = {key_data};
         else 
             r_wdata = 32'h0;
     end
 
     // For Store: write Mem or IO
-    assign LEDCtrl = (ioWrite && isLEDAddr || Ecall);
+    assign LEDCtrl = (ioWrite && isLEDAddr);
     assign SegCtrl = ioWrite && isSegAddr;
     always @* begin
-        if (mWrite || (ioWrite && !Ecall) )
+        if (mWrite || (ioWrite) )
             write_data = r_rdata;
-        else if (eWrite && EcallOp == `EOP_PRINT_INT)
-            write_data = ecall_a0_data;
         else
             write_data = 32'h0;
     end

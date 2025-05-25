@@ -45,7 +45,6 @@ module IFetch(
     output FLush
     );
 wire mode = upg_rst_i | (~upg_rst_i & upg_done_i);
-
 reg [31:0] PC;
 wire [31:0] next_PC =   (rstn==0)           ? 0 : 
                         (Branch && zero || Jump)    ? PC + imm32 : 
@@ -78,5 +77,6 @@ programrom instmem (
 //.addra(PC[15:2]),
 //.douta(inst)
 //);
+
 
 endmodule

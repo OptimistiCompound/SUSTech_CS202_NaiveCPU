@@ -25,7 +25,7 @@ module Controller(
     input [31:0] inst,
     input [31:0] ALUResult,
     input zero,
-    input ecall_code,
+    input [31:0] ecall_code,
 
     // Outputs
     output Branch,
@@ -42,7 +42,8 @@ module Controller(
     output ioWrite,
     output reg eRead,
     output reg eWrite,
-    output reg [11:0] EcallOp
+    output [11:0] EcallOp,
+    output eBreak
     );
 //-------------------------------------------------------------
 // Includes
@@ -54,6 +55,7 @@ module Controller(
 //-------------------------------------------------------------
 wire [6:0] opcode = inst[6:0];
 wire [2:0] funct3 = inst[14:12];
+wire [11:0] imm12 = inst [31:20];
 assign Branch = (opcode == `OPCODE_B);
 assign Jump = (opcode == `OPCODE_JAL);
 assign Jalr = (opcode == `OPCODE_JALR);
@@ -75,32 +77,31 @@ assign RegWrite = (opcode == `OPCODE_R) || (opcode == `OPCODE_I) || (opcode == `
 
 assign ioRead = (opcode == `OPCODE_L) && ALUResult[31:8] == 24'hFFFFFC;
 assign ioWrite = ( (opcode == `OPCODE_S ) && ALUResult[31:8] == 24'hFFFFFC );
+assign eBreak = ( (opcode == `OPCODE_E) && (imm12 == `INST_EBREAK) );
 
 // Ecall Operation Code
 always @(*) begin
-    if (opcode == `OPCODE_E)
+    if (opcode == `OPCODE_E && imm12 == `INST_ECALL)
         case (ecall_code[11:0])
             `EOP_PRINT_INT:begin
                 eWrite  = 1'b1;
                 eRead   = 1'b0;
-                EcallOp = `EOP_PRINT_INT;
             end
             `EOP_READ_INT:begin
                 eWrite  = 1'b0;
                 eRead   = 1'b1;
-                EcallOp = `EOP_READ_INT;
             end
             default:begin
                 eWrite  = 1'b0;
                 eRead   = 1'b0;
-                EcallOp = 0;
             end
         endcase
     else begin
         eWrite  = 1'b0;
         eRead   = 1'b0;
-        EcallOp = 0;
     end
 end
+
+assign EcallOp = ecall_code[11:0];
 
 endmodule
