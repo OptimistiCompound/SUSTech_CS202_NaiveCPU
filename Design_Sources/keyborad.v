@@ -86,7 +86,7 @@ module keyboard_driver (
     input rstn,
     input ps2_clk,
     input ps2_data,
-    output reg [3:0] data_out // 用于控制对应0 - 9的显示，每位对应一个数字键，高电平点亮（具体点亮逻辑需结合实际显示硬件，这里先按常规逻辑定义）
+    output reg [4:0] data_out // 用于控制对应0 - 9的显示，每位对应一个数字键，高电平点亮（具体点亮逻辑需结合实际显示硬件，这里先按常规逻辑定义）
 );
     wire [15:0] xkey;
     wire [21:0] ps_data;
@@ -104,22 +104,30 @@ module keyboard_driver (
             data_out <= 0; // 复位时全灭
         end else if (data_in) begin
             case (now_key)
-                8'd69: data_out <= 4'b0000; //69,22,30,38,37,46,54,61,62,70
-                8'd22: data_out <= 4'b0001; 
-                8'd30: data_out <= 4'b0010; 
-                8'd38: data_out <= 4'b0011; 
-                8'd37: data_out <= 4'b0100; 
-                8'd46: data_out <= 4'b0101; 
-                8'd54: data_out <= 4'b0110; 
-                8'd61: data_out <= 4'b0111; 
-                8'd62: data_out <= 4'b1000;
-                8'd70: data_out <= 4'b1001;
-                8'd90: data_out <= 4'b1011;
-                8'd13: data_out <= 4'b1100; // tab
-                default: data_out <=4'b1111; // 其他键
+                8'd69: data_out <= 5'b00000; 
+                8'd22: data_out <= 5'b00001; 
+                8'd30: data_out <= 5'b00010; 
+                8'd38: data_out <= 5'b00011; 
+                8'd37: data_out <= 5'b00100; 
+                8'd46: data_out <= 5'b00101; 
+                8'd54: data_out <= 5'b00110; 
+                8'd61: data_out <= 5'b00111; 
+                8'd62: data_out <= 5'b01000;
+                8'd70: data_out <= 5'b01001;
+                8'h1c: data_out <= 5'b01010;
+                8'h32: data_out <= 5'b01011;
+                8'h21: data_out <= 5'b01100;
+                8'h23: data_out <= 5'b01101;
+                8'h24: data_out <= 5'b01110;
+                8'h2b: data_out <= 5'b01111;
+
+                8'h5a: data_out <= 5'b10000;
+                8'h66: data_out <= 5'b10001;
+                8'd13: data_out <= 5'b10010;
+                default: data_out <=5'b11111;
             endcase
         end else begin
-            data_out <= 4'b1111; // 无有效按键
+            data_out <= data_out; // 无有效按键
         end
     end
 endmodule
