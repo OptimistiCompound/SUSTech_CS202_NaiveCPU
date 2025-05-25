@@ -33,6 +33,7 @@
 `define OPCODE_JAL                              7'b1101111
 `define OPCODE_JALR                             7'b1100111
 `define OPCODE_E                                7'b1110011
+`define OPCODE_FADD                             7'b1010011
 
 // ALUOp
 `define ALUOP_L_S                               2'b00
@@ -53,6 +54,7 @@
 `define ALU_LESS_THAN_UNSIGNED                  4'b1010
 `define ALU_LESS_THAN_SIGNED                    4'b1011
 `define ALU_SUB_UNSIGNED                        4'b1100
+`define ALU_FADD                                4'b1101
 
 // instruction funct for R-type
 `define INST_ADD                                12'h0_00
@@ -65,6 +67,7 @@
 `define INST_SRA                                12'h5_20
 `define INST_SLT                                12'h2_00
 `define INST_SLTU                               12'h3_00
+`define INST_FADD                               4'b0001
  
 // instruction funct for I-type
 `define INST_ADDI                               3'h0
