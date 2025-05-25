@@ -22,7 +22,7 @@
 
 module CPU(
     input clk,
-    input rstn,
+    input rstn_fpga,
     input conf_btn,
     input [11:0] switch_data,
     input ps2_clk,
@@ -62,8 +62,8 @@ wire Flush; // 控制冒险刷新
     wire        ID_MemWrite;
     wire        ID_MemtoReg;
     wire        ID_RegWrite;
-    wire        ID_ioRead;
-    wire        ID_ioWrite; 
+    // wire        ID_ioRead;
+    // wire        ID_ioWrite; 
     wire [4:0]  ID_rs1_addr;
     wire [4:0]  ID_rs2_addr;
     wire [4:0]  ID_rd_addr;
@@ -74,6 +74,7 @@ wire Flush; // 控制冒险刷新
     wire [6:0]  ID_funct7;  
 
 // EX 阶段
+    wire [31:0] EX_pc4_i;
     wire        EX_Branch;
     wire        EX_zero;
     wire        EX_Jump;
@@ -84,8 +85,8 @@ wire Flush; // 控制冒险刷新
     wire        EX_MemWrite;
     wire        EX_MemtoReg;
     wire        EX_RegWrite;
-    wire        EX_ioRead;
-    wire        EX_ioWrite;
+    // wire        EX_ioRead;
+    // wire        EX_ioWrite;
 
     wire [4:0]  EX_rs1_addr;
     wire [4:0]  EX_rs2_addr;
@@ -101,6 +102,7 @@ wire Flush; // 控制冒险刷新
     wire [6:0]  EX_funct7;
 
 // MEM 阶段
+    wire [31:0] MEM_pc4_i;
     wire        MEM_Branch;
     wire        MEM_zero;
     wire        MEM_Jump;
@@ -109,8 +111,8 @@ wire Flush; // 控制冒险刷新
     wire        MEM_MemWrite;
     wire        MEM_MemtoReg;
     wire        MEM_RegWrite;
-    wire        MEM_ioRead;
-    wire        MEM_ioWrite;
+    // wire        MEM_ioRead;
+    // wire        MEM_ioWrite;
     wire [4:0]  MEM_rs2_addr;
     wire [4:0]  MEM_rd_addr;
     wire [31:0] MEM_ALUResult;
@@ -122,9 +124,10 @@ wire Flush; // 控制冒险刷新
     wire [31:0] MEM_MemData;
 
 // WB 阶段
+    wire [31:0] WB_pc4_i;
     wire        WB_MemtoReg;
     wire        WB_RegWrite;
-    wire        WB_ioWrite;
+    // wire        WB_ioWrite;
     wire [4:0]  WB_rd_addr;
     wire [31:0] WB_ALUResult;
     wire [31:0] WB_MemData;
@@ -153,39 +156,59 @@ wire Flush; // 控制冒险刷新
 //-------------------------------------------------------------
 // Instantiation of modules
 //-------------------------------------------------------------
+    reg upg_rst;
+    wire start_pg_debounce;
+    wire upg_clk_w;
+    wire upg_wen_w;
+    wire [13:0] upg_adr_w;
+    wire [31:0] upg_dat_w;
+    wire upg_done_w;
+    always@(posedge clk)begin 
+        if(~rstn_fpga)begin
+            upg_rst <= 1'b1;
+        end
+        else if(start_pg_debounce)begin
+            upg_rst <= 0;
+        end
+    end
+    
+    wire rstn;
+    assign rstn = rstn_fpga | !upg_rst;
 
-    cpuclk cpuclk(
+    clk_wiz cpuclk(
         .clk_in1(clk),
         .clk_out1(cpu_clk),
         .clk_out2(upg_clk)
     );
 
-//    uart_bmpg_0 uart (
-//        .upg_clk_i(upg_clk),
-//        .upg_rst_i(upg_rst),
-//        .upg_rx_i(rx),
+    uart_bmpg_0 uart (
+        .upg_clk_i(upg_clk),
+        .upg_rst_i(upg_rst),
+        .upg_rx_i(rx),
 
-//        .upg_clk_o(upg_clk_w),
-//        .upg_wen_o(upg_wen_w),
-//        .upg_adr_o(upg_adr_w),
-//        .upg_dat_o(upg_dat_w),
-//        .upg_done_o(upg_done_w),
-//        .upg_tx_o(tx)
-//    );
+        .upg_clk_o(upg_clk_w),
+        .upg_wen_o(upg_wen_w),
+        .upg_adr_o(upg_adr_w),
+        .upg_dat_o(upg_dat_w),
+        .upg_done_o(upg_done_w),
+        .upg_tx_o(tx)
+    );
 
     IFetch ifetch(
         .clk(cpu_clk),
         .rstn(rstn),
+        .Pause(Pause),
         .Branch(MEM_Branch),
+        .zero(MEM_zero),
         .Jump(MEM_Jump),
         .Jalr(MEM_Jalr),
         .ALUResult(MEM_ALUResult),   // for Jalr
         .imm32(MEM_imm32),          // for Branch || Jump
-//        .upg_rst_i(upg_rst),
-//        .upg_clk_i(upg_clk),
-//        .upg_wen_i(upg_wen_w),
-//        .upg_adr_i(upg_adr_w),
-//        .upg_dat_i(upg_dat_w),
+        .upg_rst_i(upg_rst),
+        .upg_clk_i(upg_clk),
+        .upg_wen_i(upg_wen_w),
+        .upg_adr_i(upg_adr_w),
+        .upg_dat_i(upg_dat_w),
         .inst(IF_inst),
         .pc4_i(IF_pc4_i),
         .FLush(Flush)
@@ -208,7 +231,7 @@ wire Flush; // 控制冒险刷新
         .WB_rd_addr(WB_rd_addr),
         .ALUResult(WB_ALUResult),
         .MemData(WB_MemData),
-        .pc4_i(IF_pc4_i),
+        .pc4_i(WB_pc4_i),
         .regWrite(WB_RegWrite),
         .MemtoReg(WB_MemtoReg),
         .inst(IF_inst),
@@ -224,9 +247,8 @@ wire Flush; // 控制冒险刷新
     );
 
     Controller controller(
-        .inst(ID_inst),
-        .ALUResult(MEM_ALUResult),
-        .zero(MEM_zero),
+        .inst(IF_inst),
+        // .ALUResult(EX_ALUResult),
 
         .Branch(ID_Branch),
         .Jump(ID_Jump),
@@ -236,31 +258,41 @@ wire Flush; // 控制冒险刷新
         .MemRead(ID_MemRead),
         .MemWrite(ID_MemWrite),
         .MemtoReg(ID_MemtoReg),
-        .RegWrite(ID_RegWrite),
-        .ioRead(ID_ioRead),
-        .ioWrite(ID_ioWrite)
+        .RegWrite(ID_RegWrite)
+        // .ioRead(ID_ioRead),
+        // .ioWrite(ID_ioWrite)
     );
 
     ForwardingController forward_ctrl(
-    // Inputs
-    .MEM_RegWrite(MEM_RegWrite),
-    .WB_RegWrite(WB_RegWrite),
-    .EX_rs1_addr(EX_rs1_addr),
-    .EX_rs2_addr(EX_rs2_addr),
-    .MEM_rs2_addr(MEM_rs2_addr),
-    .MEM_rd_addr(MEM_rd_addr),
-    .WB_rd_addr(WB_rd_addr),
+        // Inputs
+        .MEM_RegWrite(MEM_RegWrite),
+        .WB_RegWrite(WB_RegWrite),
+        .EX_rs1_addr(EX_rs1_addr),
+        .EX_rs2_addr(EX_rs2_addr),
+        .MEM_rs2_addr(MEM_rs2_addr),
+        .MEM_rd_addr(MEM_rd_addr),
+        .WB_rd_addr(WB_rd_addr),
 
-    .EX_rs1_v(EX_rs1_v),
-    .EX_rs2_v(EX_rs2_v),
-    .MEM_ALUResult(MEM_ALUResult),
-    .MEM_rs2_v(MEM_rs2_v),
-    .WB_mdata(WB_MemData),
+        .EX_rs1_v(EX_rs1_v),
+        .EX_rs2_v(EX_rs2_v),
+        .MEM_ALUResult(MEM_ALUResult),
+        .MEM_rs2_v(MEM_rs2_v),
+        .WB_mdata(WB_MemData),
 
-    // Outputs
-    .true_ReadData1(true_ReadData1), // mux result to ALU
-    .true_ReadData2(true_ReadData2), // mux result to ALU
-    .true_m_wdata(true_m_wdata)   // mux result to dMem
+        // Outputs
+        .true_ReadData1(true_ReadData1), // mux result to ALU
+        .true_ReadData2(true_ReadData2), // mux result to ALU
+        .true_m_wdata(true_m_wdata)   // mux result to dMem
+    );
+
+    HazardDetector Hazard(
+        .MEM_memRead(MEM_MemRead),
+        // .MEM_ioRead(MEM_ioRead),
+        .EX_rs1_addr(EX_rs1_addr),
+        .EX_rs2_addr(EX_rs2_addr),
+        .MEM_rd_addr(MEM_rd_addr),
+
+        .Pause(Pause)
     );
 
     ID_EX id_ex(
@@ -268,6 +300,7 @@ wire Flush; // 控制冒险刷新
         .rstn(rstn),
         .Pause(Pause),
         .Flush(Flush),
+        .ID_pc4_i(ID_pc4_i),
         .ID_Branch(ID_Branch),   
         .ID_Jump(ID_Jump),
         .ID_Jalr(ID_Jalr),
@@ -277,17 +310,19 @@ wire Flush; // 控制冒险刷新
         .ID_MemWrite(ID_MemWrite),
         .ID_MemtoReg(ID_MemtoReg),
         .ID_RegWrite(ID_RegWrite),
-        .ID_ioRead(ID_ioRead),
-        .ID_ioWrite(ID_ioWrite),
+        // .ID_ioRead(ID_ioRead),
+        // .ID_ioWrite(ID_ioWrite),
 
         .ID_rs1_addr(ID_rs1_addr),   // ID
         .ID_rs2_addr(ID_rs2_addr),
         .ID_rs1_v(ID_rs1_v),      // ID
         .ID_rs2_v(ID_rs2_v),      // ID
+        .ID_rd_addr(ID_rd_addr),
         .ID_imm32(ID_imm32),      // ID
         .ID_funct3(ID_funct3),     // ID
         .ID_funct7(ID_funct7),     // ID
 
+        .EX_pc4_i(EX_pc4_i),
         .EX_Branch(EX_Branch),
         .EX_Jump(EX_Jump),
         .EX_Jalr(EX_Jalr),
@@ -297,13 +332,14 @@ wire Flush; // 控制冒险刷新
         .EX_MemWrite(EX_MemWrite),
         .EX_MemtoReg(EX_MemtoReg),
         .EX_RegWrite(EX_RegWrite),
-        .EX_ioRead(EX_ioRead),
-        .EX_ioWrite(EX_ioWrite),    // EX_MEM
+        // .EX_ioRead(EX_ioRead),
+        // .EX_ioWrite(EX_ioWrite),    // EX_MEM
 
         .EX_rs1_addr(EX_rs1_addr),  // EX_MEM
         .EX_rs2_addr(EX_rs2_addr),
         .EX_rs1_v(EX_rs1_v),
         .EX_rs2_v(EX_rs2_v),
+        .EX_rd_addr(EX_rd_addr),
         .EX_imm32(EX_imm32),
         .EX_funct3(EX_funct3),
         .EX_funct7(EX_funct7)     // EX_MEM
@@ -326,38 +362,44 @@ wire Flush; // 控制冒险刷新
         .clk(cpu_clk),
         .rstn(rstn),
         .Flush(Flush),
+        .EX_pc4_i(EX_pc4_i),
         .EX_Branch(EX_Branch),
+        .EX_zero(EX_zero),
         .EX_Jump(EX_Jump),
         .EX_Jalr(EX_Jalr),
         .EX_MemRead(EX_MemRead),
         .EX_MemWrite(EX_MemWrite),
         .EX_MemtoReg(EX_MemtoReg),
         .EX_RegWrite(EX_RegWrite),
-        .EX_ioRead(EX_ioRead),
-        .EX_ioWrite(EX_ioWrite),
+        // .EX_ioRead(EX_ioRead),
+        // .EX_ioWrite(EX_ioWrite),
         .EX_rs2_addr(EX_rs2_addr),
         .EX_rd_addr(EX_rd_addr),
         .EX_ALUResult(EX_ALUResult),
         .EX_rs2_v(EX_rs2_v),
+        .EX_imm32(EX_imm32),
 
         .EX_addr_in(EX_addr_in),
         .EX_m_rdata(EX_m_rdata),
         .EX_r_rdata(EX_r_rdata),
 
         // Outputs
+        .MEM_pc4_i(MEM_pc4_i),
         .MEM_Branch(MEM_Branch),
+        .MEM_zero(MEM_zero),
         .MEM_Jump(MEM_Jump),
         .MEM_Jalr(MEM_Jalr),
         .MEM_MemRead(MEM_MemRead),
         .MEM_MemWrite(MEM_MemWrite),
         .MEM_MemtoReg(MEM_MemtoReg),
         .MEM_RegWrite(MEM_RegWrite),
-        .MEM_ioRead(MEM_ioRead),
-        .MEM_ioWrite(MEM_ioWrite),
+        // .MEM_ioRead(MEM_ioRead),
+        // .MEM_ioWrite(MEM_ioWrite),
         .MEM_rs2_addr(MEM_rs2_addr),
         .MEM_rd_addr(MEM_rd_addr),
         .MEM_ALUResult(MEM_ALUResult),
         .MEM_rs2_v(MEM_rs2_v),
+        .MEM_imm32(MEM_imm32),
         .MEM_addr_in(MEM_addr_in),
         .MEM_m_rdata(MEM_m_rdata),
         .MEM_r_rdata(MEM_r_rdata)
@@ -369,22 +411,22 @@ wire Flush; // 控制冒险刷新
         .MemWrite(MEM_MemWrite),
         .addr(addr_out),
         .din(write_data),
-//        .upg_rst_i(upg_rst),
-//        .upg_clk_i(upg_clk),
-//        .upg_wen_i(upg_wen_w),
-//        .upg_addr_i(upg_adr_w[13:0]),
-//        .upg_data_i(upg_dat_w),
-//        .upg_done_i(upg_done_w),
+        .upg_rst_i(upg_rst),
+        .upg_clk_i(upg_clk),
+        .upg_wen_i(upg_wen_w),
+        .upg_adr_i(upg_adr_w[13:0]),
+        .upg_dat_i(upg_dat_w),
+        .upg_done_i(upg_done_w),
         .dout(MemData)
     );
 
     MemOrIO memorio(
         .mRead(MEM_MemRead),        // read from Mem
         .mWrite(MEM_MemWrite),      // write to Mem
-        .ioRead(MEM_ioRead),       // read from IO
-        .ioWrite(MEM_ioWrite),     // write to IO
+        // .ioRead(MEM_ioRead),       // read from IO
+        // .ioWrite(MEM_ioWrite),     // write to IO
         .conf_btn_out(conf_btn_out), 
-        .addr_in(MEM_ALUResult),    // address from ALU         
+        .ALUResult(MEM_ALUResult),    // address from ALU         
         .m_rdata(MemData),
         .switch_data(switch_data),
         .key_data(key_data),
@@ -401,17 +443,19 @@ wire Flush; // 控制冒险刷新
     MEM_WB mem_wb(
     .clk(cpu_clk),
     .rstn(rstn),
+    .MEM_pc4_i(MEM_pc4_i),
     .MEM_MemtoReg(MEM_MemtoReg),
     .MEM_RegWrite(MEM_RegWrite),
-    .MEM_ioWrite(MEM_ioWrite),
+    // .MEM_ioWrite(MEM_ioWrite),
 
     .MEM_rd_addr(MEM_rd_addr),
     .MEM_ALUResult(MEM_ALUResult),
     .MEM_MemData(MEM_MemData),
 
+    .WB_pc4_i(WB_pc4_i),
     .WB_MemtoReg(WB_MemtoReg),
     .WB_RegWrite(WB_RegWrite),
-    .WB_ioWrite(WB_ioWrite),
+    // .WB_ioWrite(WB_ioWrite),
 
     .WB_rd_addr(WB_rd_addr),
     .WB_ALUResult(WB_ALUResult),
@@ -438,19 +482,26 @@ wire Flush; // 控制冒险刷新
         .key_out(conf_btn_out)
     );
 
-    keyboard_driver keyboard(
+    debounce start_pg_deb(
         .clk(cpu_clk),
         .rstn(rstn),
-        .ps2_clk(ps2_clk),
-        .ps2_data(ps2_data),
-        .data_out(key_data_sub)
+        .key_in(start_pg),
+        .key_out(start_pg_debounce)
     );
 
-    Keyboard_cache key_cache(
-        .rstn(rstn),
-        .key_data(key_data_sub),
-        .data_out(key_data)
-    );
+    // keyboard_driver keyboard(
+    //     .clk(cpu_clk),
+    //     .rstn(rstn),
+    //     .ps2_clk(ps2_clk),
+    //     .ps2_data(ps2_data),
+    //     .data_out(key_data_sub)
+    // );
+
+    // Keyboard_cache key_cache(
+    //     .rstn(rstn),
+    //     .key_data(key_data_sub),
+    //     .data_out(key_data)
+    // );
 
 //-------------------------------------------------------------
 // direct connections

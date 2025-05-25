@@ -27,7 +27,7 @@ module Decoder(
     input [4:0] WB_rd_addr,    // WB_ID
     input [31:0] ALUResult, // WB_ID
     input [31:0] MemData,   // WB_ID
-    input [31:0] pc4_i,     // IF_ID
+    input [31:0] pc4_i,     // WB
     input regWrite,         // WB_ID
     input MemtoReg,         // WB_ID
     input [31:0] inst,      // IF_ID
@@ -47,7 +47,7 @@ module Decoder(
 //-------------------------------------------------------------
 `include "../../Header_Files/riscv_defs.v"
 
-assign opcode = inst[6:0];
+wire [6:0] opcode = inst[6:0];
 assign rs1_addr = inst[19:15];
 assign rs2_addr = inst[24:20];
 assign rd_addr = inst[11:7];
@@ -64,7 +64,7 @@ always @(*) begin
     else if (opcode == `OPCODE_LUI)
         wdata = imm32;
     else if (opcode == `OPCODE_AUIPC)
-        wdata = pc4_i + imm32;
+        wdata = pc4_i + imm32 + `PC_OFFSET;
     else if (MemtoReg == 1) begin
             case (funct3)
             `INST_LB:

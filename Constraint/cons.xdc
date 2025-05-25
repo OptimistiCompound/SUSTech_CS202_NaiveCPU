@@ -2,11 +2,11 @@
 set_property IOSTANDARD LVCMOS33 [get_ports start_pg]
 set_property IOSTANDARD LVCMOS33 [get_ports conf_btn]
 set_property IOSTANDARD LVCMOS33 [get_ports clk]
-set_property IOSTANDARD LVCMOS33 [get_ports rstn]
+set_property IOSTANDARD LVCMOS33 [get_ports rstn_fpga]
 set_property PACKAGE_PIN T5 [get_ports start_pg]
 set_property PACKAGE_PIN R15 [get_ports conf_btn]
 set_property PACKAGE_PIN P17 [get_ports clk]
-set_property PACKAGE_PIN P15 [get_ports rstn]
+set_property PACKAGE_PIN P15 [get_ports rstn_fpga]
 
 ##------------------���뿪��------------------
 set_property IOSTANDARD LVCMOS33 [get_ports {switch_data[0]}]
@@ -38,7 +38,7 @@ set_property PACKAGE_PIN P5 [get_ports {switch_data[7]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {base}]
 set_property PACKAGE_PIN T3 [get_ports {base}]
 
-##-------------------�߶������------------------
+##-------------------�߶������?------------------
 set_property IOSTANDARD LVCMOS33 [get_ports {digit_en[0]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {digit_en[1]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {digit_en[2]}]

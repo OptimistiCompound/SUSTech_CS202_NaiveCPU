@@ -24,9 +24,11 @@ module IFetch(
     // Inputs
     input clk,
     input rstn,
-    input Branch,           // Controller
-    input Jump,             // Controller
-    input Jalr,             // Controller
+    input Pause,
+    input Branch,           // EX_MEM
+    input zero,             // EX_MEM
+    input Jump,             // EX_MEM
+    input Jalr,             // EX_MEM
     input [31:0] ALUResult, // EX_MEM
     input [31:0] imm32,     // EX_MEM
 
@@ -46,16 +48,18 @@ wire mode = upg_rst_i | (~upg_rst_i & upg_done_i);
 
 reg [31:0] PC;
 wire [31:0] next_PC =   (rstn==0)           ? 0 : 
-                        (Branch || Jump)    ? PC + imm32 : 
+                        (Branch && zero || Jump)    ? PC + imm32 : 
                         (Jalr)              ? ALUResult : 
                         PC + 32'h4;
-assign Flush        =   (Branch || Jump)    ? 1'b1 :
-                        (Jalr)              ? 1'b1 :
-                        1'b0;
+assign Flush        =   (Branch && zero || Jump || Jalr) ? 1'b1 : 1'b0;
 
 always @(negedge clk or negedge rstn) begin
     if (~rstn)
         PC <= 0;
+    else if (Pause) begin
+        // 空操作 nop
+        // 阻止寄存器值改变
+    end
     else
         PC <= next_PC;
 end

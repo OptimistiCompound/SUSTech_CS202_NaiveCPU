@@ -23,6 +23,7 @@
 module ID_EX(
     // Inputs
     input clk, rstn, Pause, Flush,
+    input [31:0] ID_pc4_i,
     input        ID_Branch,     // Controller
     input        ID_Jump,
     input        ID_Jalr,
@@ -32,8 +33,8 @@ module ID_EX(
     input        ID_MemWrite,
     input        ID_MemtoReg,
     input        ID_RegWrite,
-    input        ID_ioRead,
-    input        ID_ioWrite,
+    // input        ID_ioRead,
+    // input        ID_ioWrite,
 
     input [4:0]  ID_rs1_addr,   // ID
     input [4:0]  ID_rs2_addr,   // ID
@@ -45,6 +46,7 @@ module ID_EX(
     input [6:0]  ID_funct7,     // ID
 
     // Outputs
+    output reg [31:0] EX_pc4_i,
     output reg        EX_Branch,
     output reg        EX_Jump,
     output reg        EX_Jalr,
@@ -54,8 +56,8 @@ module ID_EX(
     output reg        EX_MemWrite,
     output reg        EX_MemtoReg,
     output reg        EX_RegWrite,
-    output reg        EX_ioRead,
-    output reg        EX_ioWrite,    // EX_MEM
+    // output reg        EX_ioRead,
+    // output reg        EX_ioWrite,    // EX_MEM
 
     output reg [4:0]  EX_rs1_addr,  // EX_MEM
     output reg [4:0]  EX_rs2_addr,
@@ -72,6 +74,7 @@ module ID_EX(
 `include "../../Header_Files/riscv_defs.v"
 always @(posedge clk) begin
     if (~rstn || Pause || Flush) begin
+        EX_pc4_i         = 0;
         EX_Branch        = 0;
         EX_Jump          = 0;
         EX_Jalr          = 0;
@@ -81,8 +84,8 @@ always @(posedge clk) begin
         EX_MemWrite      = 0;
         EX_MemtoReg      = 0;
         EX_RegWrite      = 0;
-        EX_ioRead        = 0;
-        EX_ioWrite       = 0;
+        // EX_ioRead        = 0;
+        // EX_ioWrite       = 0;
         EX_rs1_addr      = 0;
         EX_rs2_addr      = 0;
         EX_rd_addr       = 0;
@@ -94,17 +97,18 @@ always @(posedge clk) begin
         EX_funct7        = 0;
     end
     else begin
+        EX_pc4_i         = ID_pc4_i;
         EX_Branch       <= ID_Branch;
-        EX_Jump         <= ID_Branch;
-        EX_Jalr         <= ID_Branch;
+        EX_Jump         <= ID_Jump;
+        EX_Jalr         <= ID_Jalr;
         EX_ALUOp        <= ID_ALUOp;
         EX_ALUSrc       <= ID_ALUSrc;
         EX_MemRead      <= ID_MemRead;
         EX_MemWrite     <= ID_MemWrite;
         EX_MemtoReg     <= ID_MemtoReg;
         EX_RegWrite     <= ID_RegWrite;
-        EX_ioRead       <= ID_ioRead;
-        EX_ioWrite      <= ID_ioWrite;
+        // EX_ioRead       <= ID_ioRead;
+        // EX_ioWrite      <= ID_ioWrite;
         EX_rs1_addr     <= ID_rs1_addr;
         EX_rs2_addr     <= ID_rs2_addr;
         EX_rd_addr      <= ID_rd_addr;

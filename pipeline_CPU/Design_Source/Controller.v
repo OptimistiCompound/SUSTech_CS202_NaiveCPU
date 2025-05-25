@@ -24,7 +24,6 @@ module Controller(
     // Inputs
     input [31:0] inst,
     input [31:0] ALUResult,
-    input zero,
 
     // Outputs
     output Branch,
@@ -42,14 +41,14 @@ module Controller(
 //-------------------------------------------------------------
 // Includes
 //-------------------------------------------------------------
-`include "../Header_Files/riscv_defs.v"
+`include "../../Header_Files/riscv_defs.v"
 
 //-------------------------------------------------------------
 // Control signals
 //-------------------------------------------------------------
 wire [6:0] opcode = inst[6:0];
 wire [2:0] funct3 = inst[14:12];
-assign Branch = (opcode == `OPCODE_B) && (zero == 1);
+assign Branch = (opcode == `OPCODE_B);
 assign Jump = (opcode == `OPCODE_JAL);
 assign Jalr = (opcode == `OPCODE_JALR);
 assign ALUOp = {

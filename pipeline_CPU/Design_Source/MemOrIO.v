@@ -4,11 +4,11 @@ module MemOrIO(
     // Inputs
     input mRead,                    // 读内存控制信号
     input mWrite,                   // 写内存控制信号
-    input ioRead,                   // 读IO控制信号
-    input ioWrite,                  // 写IO控制信号
+    // input ioRead,                   // 读IO控制信号
+    // input ioWrite,                  // 写IO控制信号
 
     input conf_btn_out,             // 来自按键的信号
-    input [31:0] addr_in,           // 来自ALU的地址
+    input [31:0] ALUResult,         // 来自ALU的地址
     input [31:0] m_rdata,           // 从dMem读取的数据
     input [11:0] switch_data,       // 从Switch读取的数据(12bits)
     input [31:0] key_data,           // 从Keyboard读取的数据(4bits)
@@ -21,8 +21,10 @@ module MemOrIO(
     output LEDCtrl,                 // LED控制信号
     output SegCtrl                  // Seg控制信号
 );
+    wire addr_in = ALUResult; // ALU计算的地址
     assign addr_out = addr_in;
- 
+    wire ioRead  = (ALUResult[31:8] == 24'hFFFFFC) && mRead;   // IO读
+    wire ioWrite = (ALUResult[31:8] == 24'hFFFFFC) && mWrite;  // IO写
     // Decide Read address
     wire isSwitchAddr    = (addr_in == `SWITCH_BASE_ADDR);
     wire isKeyAddr       = (addr_in == `KEY_BASE_ADDR);
