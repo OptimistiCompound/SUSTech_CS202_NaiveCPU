@@ -70,7 +70,7 @@ assign MemRead = opcode == `OPCODE_L;
 assign MemWrite = (opcode == `OPCODE_S);
 assign MemtoReg = (opcode == `OPCODE_L);
 assign RegWrite = (opcode == `OPCODE_R) || (opcode == `OPCODE_I) || (opcode == `OPCODE_L) || (opcode == `OPCODE_LUI) ||
-            (opcode == `OPCODE_AUIPC) || (opcode == `OPCODE_JAL) || (opcode == `OPCODE_JALR);
+            (opcode == `OPCODE_AUIPC) || (opcode == `OPCODE_JAL) || (opcode == `OPCODE_JALR) ||  (opcode == `OPCODE_FADD);
 
 assign ioRead = (opcode == `OPCODE_L) && ALUResult[31:8] == 24'hFFFFFC;
 assign ioWrite = ( (opcode == `OPCODE_S ) && ALUResult[31:8] == 24'hFFFFFC );
