@@ -46,7 +46,7 @@ module ALU(
 reg [3:0] ALUControl;
 wire [31:0] operand1 = ReadData1;
 wire [31:0] operand2 = (ALUSrc==1) ? imm32 : ReadData2;
-wire [31:0] fadd_result;
+wire [31:0] fadd_result, product_result;
 wire [11:0] com_funct = {1'b0, funct3, 1'b0, funct7};
 always @(*) begin
     case(ALUOp)
@@ -80,7 +80,9 @@ always @(*) begin
                 ALUControl = `ALU_LESS_THAN_SIGNED;
             else if (com_funct == `INST_SLTU)
                 ALUControl = `ALU_LESS_THAN_UNSIGNED;
-            else 
+            else if (com_funct == `INST_PRODUCT)
+                ALUControl = `ALU_PRODUCT; 
+            else
                 ALUControl = `ALU_NONE;
         end 
         2'b11:begin // I-type
@@ -125,6 +127,7 @@ always @(*) begin
         `ALU_LESS_THAN_SIGNED:  ALUResult = {31'b0, $signed(operand1) < $signed(operand2)};
         `ALU_SUB_UNSIGNED:      ALUResult = $unsigned(operand1) - $unsigned(operand2);
         `ALU_FADD:              ALUResult = fadd_result;
+        `ALU_PRODUCT:           ALUResult = product_result;
         default: 
             ALUResult = 0;
     endcase
@@ -154,6 +157,12 @@ Float_Addition fadd(
     .operand1(operand1),
     .operand2(operand2),
     .addition_result(fadd_result)
+);
+
+MUL mul(
+    .operand1(operand1[15:0]),
+    .operand2(operand2[15:0]),
+    .product_result(product_result)
 );
 
 endmodule
@@ -216,4 +225,19 @@ always @(*) begin
     
 end
 
+endmodule
+
+module MUL(
+    input [15:0]operand1,
+    input [15:0]operand2,
+    output reg [31:0]product_result
+);
+
+    wire sign = operand1[15] ^ operand2[15];
+    wire [16:0] abs_op1 = operand1[15] ? {1'b0, ~operand1} + 1'b1 : {1'b0, operand1};
+    wire [16:0] abs_op2 = operand2[15] ? {1'b0, ~operand2} + 1'b1 : {1'b0, operand2};
+    wire [31:0] unsigned_product = abs_op1 * abs_op2;
+    always @(*) begin
+        product_result = sign ? (~unsigned_product + 1) : unsigned_product;
+    end
 endmodule

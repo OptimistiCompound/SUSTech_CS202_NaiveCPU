@@ -123,7 +123,7 @@ module CPU(
 
     uart_bmpg_0 uart (
         .upg_clk_i(upg_clk),
-        .upg_rst_i(start_pg),
+        .upg_rst_i(upg_rst),
         .upg_rx_i(rx),
 
         .upg_clk_o(upg_clk_w),
@@ -145,7 +145,7 @@ module CPU(
         .upg_rst_i(upg_rst),
         .upg_clk_i(upg_clk),
         .upg_wen_i(upg_wen_w),
-        .upg_adr_i(upg_addr_w[14:1]),
+        .upg_adr_i(upg_addr_w[14:0]),
         .upg_dat_i(upg_data_w),
         .upg_done_i(upg_done_w),
         .inst(inst),
@@ -198,7 +198,7 @@ module CPU(
         .upg_rst_i(upg_rst),
         .upg_clk_i(upg_clk),
         .upg_wen_i(upg_wen_w),
-        .upg_addr_i(upg_addr_w[14:1]),
+        .upg_addr_i(upg_addr_w[14:0]),
         .upg_data_i(upg_data_w),
         .upg_done_i(upg_done_w),
         .dout(MemData)
@@ -259,9 +259,9 @@ module CPU(
         .eRead(eRead),
         .write_data(write_data),
         .reg_LED(reg_LED),
-       .digit_en(digit_en),
-       .sseg(sseg),
-       .sseg1(sseg1)
+        .digit_en(digit_en),
+        .sseg(sseg),
+        .sseg1(sseg1)
     );
     // reg [3:0]cnt_btn;
     // always@(posedge cpu_clk) begin
@@ -276,15 +276,15 @@ module CPU(
     //  assign out[7:4] =cnt_iow;
     //  assign out[15:8] =write_data[7:0];
     //  assign out[31:16] =pc4_i[23:8];
-    // seg seg(
-    // .clk(cpu_clk),
-    // .rstn(rstn),
-    // .data(out),
-    // .base(base),
-    // .digit_en(digit_en),
-    //         .sseg(sseg),
-    //         .sseg1(sseg1)
-    // );
+//    seg seg(
+//    .clk(cpu_clk),
+//    .rstn(rstn),
+//    .data(key_data),
+//    .base(base),
+//    .digit_en(digit_en),
+//    .sseg(sseg),
+//    .sseg1(sseg1)
+//    );
 
 // assign conf_btn_out = conf_btn;
 // assign start_pg_debounce = start_pg;

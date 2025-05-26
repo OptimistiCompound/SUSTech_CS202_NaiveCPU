@@ -55,6 +55,7 @@
 `define ALU_LESS_THAN_SIGNED                    4'b1011
 `define ALU_SUB_UNSIGNED                        4'b1100
 `define ALU_FADD                                4'b1101
+`define ALU_PRODUCT                             4'b1110
 
 // instruction funct for R-type
 `define INST_ADD                                12'h0_00
@@ -68,6 +69,7 @@
 `define INST_SLT                                12'h2_00
 `define INST_SLTU                               12'h3_00
 `define INST_FADD                               4'b0001
+`define INST_PRODUCT                            12'h0_01
  
 // instruction funct for I-type
 `define INST_ADDI                               3'h0
