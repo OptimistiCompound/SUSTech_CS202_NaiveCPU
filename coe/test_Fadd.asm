@@ -395,68 +395,10 @@ loop2_t1011:
 	bne a6,x0,loop2_t1011
 
 	lw s0, 128(x0)
-	andi t0, s0, 0xFF     
-	srli t1, t0, 7         
-    	srli a0, t0, 4         
-    	andi a0, a0, 0x07    
-    	andi a1, t0, 0x0F     
-    	slli a1, a1, 4       
-    	addi a1, a1, 256         
-
-    	li t2, 3         
-   	sub a2, a0, t2   
-    	bgez a2, shift_num1
-    	neg a2, a2            
-    	srl a1, a1, a2      
-    	jal num1_done
-shift_num1:
-    	sll a1, a1, a2       
-num1_done:
-    	mv s2, a1             
-    	mv s3, t1        
-
 	lw s1, 132(x0)
-    	andi t0, s1, 0xFF       
-    	srli t1, t0, 7           
-    	srli a0, t0, 4      
-    	andi a0, a0, 0x07      
-    	andi a1, t0, 0x0F        
-    	slli a1, a1, 4         
-    	addi a1, a1, 256     
-
-    	li t2, 3              
-    	sub a2, a0, t2       
-    	bgez a2, shift_num2
-    	neg a2, a2             
-    	srl a1, a1, a2      
-    	j num2_done
-shift_num2:
-    	sll a1, a1, a2      
-num2_done:
-    	mv s4, a1        
-    	mv s5, t1    
-
-    	beq s3, s5, same_sign
-diff_sign:
-    	bgeu s2, s4, sub_abs
-    	sub t1, s4, s2           # |num2| > |num1|
-    	mv s3, s5              
-    	j add_done
-sub_abs:
-    	sub t1, s2, s4           # |num1| >= |num2|
-    	j add_done
-same_sign:
-    	add t1, s2, s4        
-add_done:
-    	srli t1, t1, 8     
-
-    	beqz s3, store_result2
-    	li a7,0x8000
-	sw a7,96(a5)
-
-store_result2:
-    sw t1, 108(a5)
-    jal loop1
+	fadd.s ft6,fs0,fs1
+    	sw t1, 108(a5)
+    	jal loop1
 
 test1100_1: 
 

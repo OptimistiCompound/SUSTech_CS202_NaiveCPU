@@ -9,13 +9,24 @@ main:
 	
 loop1: 
 	lw a6, 112(a5)
+	lw t6, 116(a5)
+	beqz t6,loop_key_1
+	jal input_key
+loop_key_1:
 	beq a6,x0,loop1
 	
 loop2: 
 	lw a6, 112(a5) 
 	bne a6,x0,loop2
 	
+	bnez s8,load_key
 	lw a7, 100(a5)
+	jal load_key2
+load_key:
+	mv a7,s8
+	li s8,0
+load_key2:
+	
 	sw a7,96(a5) ## test content
 	
 	srli a7,a7,8
@@ -611,4 +622,23 @@ test_1111_end:
 	slli a4,a4,5
 	sw a4,96(a5)
 	jal loop1
+	
+input_key:
+	li a6,0xF
+	sw a6,96(a5)
+ini_input_key:
+	lw t6,116(a5)
+	bnez t6,ini_input_key
+	
+loop_input_key:
+	lw t6,116(a5)
+	lw t0,104(a5)
+	sw t0,108(a5)
+	beqz t6,loop_input_key
+	
+	lw s8,104(a5)
+input_key_end:
+	lw t6,116(a5)
+	bnez t6,input_key_end
+	jr ra
 	
