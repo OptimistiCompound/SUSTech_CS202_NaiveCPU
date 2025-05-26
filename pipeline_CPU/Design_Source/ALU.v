@@ -19,7 +19,7 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-
+ 
 module ALU(
     // Inputs
     input [31:0] ReadData1,         // data from rs1
@@ -27,6 +27,8 @@ module ALU(
     input [31:0] imm32,             // immediate
     input ALUSrc,                   // MUX control, operand2 = (ALU == 1) ? rs2 : imm
     input [1:0] ALUOp,              // 2bits control
+    input [1:0] Utype,
+    input [31:0] pc4_i,
     input [2:0] funct3,             // from instruction
     input [6:0] funct7,             // from instruction
 
@@ -37,7 +39,7 @@ module ALU(
 //-------------------------------------------------------------
 // Includes
 //-------------------------------------------------------------
-`include "../Header_Files/riscv_defs.v"
+`include "../../Header_Files/riscv_defs.v"
 
 //-------------------------------------------------------------
 // Decode ALUOp and funct to ALUControl
@@ -106,22 +108,32 @@ always @(*) begin
     endcase
 end
 
+reg [31:0] Result_1;
+reg [31:0] Result_2;
+always @(*) begin
+    case (Utype)
+        `INST_LUI:      Result_2 = imm32;
+        `INST_AUIPC:    Result_2 = pc4_i + imm32 + `PC_OFFSET;
+        default:        Result_2 = 0;
+    endcase
+end
+
 always @(*) begin
     case (ALUControl)
-        `ALU_NONE:              ALUResult = 0;
-        `ALU_SHIFTL:            ALUResult = operand1 << operand2[4:0];
-        `ALU_SHIFTR:            ALUResult = operand1 >> operand2[4:0];
-        `ALU_SHIFTR_ARITH:      ALUResult = $signed(operand1) >>> operand2[4:0];
-        `ALU_ADD:               ALUResult = $signed(operand1) + $signed(operand2);
-        `ALU_SUB:               ALUResult = $signed(operand1) - $signed(operand2);
-        `ALU_AND:               ALUResult = operand1 & operand2;
-        `ALU_OR:                ALUResult = operand1 | operand2;
-        `ALU_XOR:               ALUResult = operand1 ^ operand2;
-        `ALU_LESS_THAN_UNSIGNED:ALUResult = {31'b0, $unsigned(operand1) < $unsigned(operand2)};
-        `ALU_LESS_THAN_SIGNED:  ALUResult = {31'b0, $signed(operand1) < $signed(operand2)};
-        `ALU_SUB_UNSIGNED:      ALUResult = $unsigned(operand1) - $unsigned(operand2);
+        `ALU_NONE:              Result_1 = 0;
+        `ALU_SHIFTL:            Result_1 = operand1 << operand2[4:0];
+        `ALU_SHIFTR:            Result_1 = operand1 >> operand2[4:0];
+        `ALU_SHIFTR_ARITH:      Result_1 = $signed(operand1) >>> operand2[4:0];
+        `ALU_ADD:               Result_1 = $signed(operand1) + $signed(operand2);
+        `ALU_SUB:               Result_1 = $signed(operand1) - $signed(operand2);
+        `ALU_AND:               Result_1 = operand1 & operand2;
+        `ALU_OR:                Result_1 = operand1 | operand2;
+        `ALU_XOR:               Result_1 = operand1 ^ operand2;
+        `ALU_LESS_THAN_UNSIGNED:Result_1 = {31'b0, $unsigned(operand1) < $unsigned(operand2)};
+        `ALU_LESS_THAN_SIGNED:  Result_1 = {31'b0, $signed(operand1) < $signed(operand2)};
+        `ALU_SUB_UNSIGNED:      Result_1 = $unsigned(operand1) - $unsigned(operand2);
         default: 
-            ALUResult = 0;
+            Result_1 = 0;
     endcase
 end
 
@@ -131,18 +143,28 @@ end
 always @(*) begin
     if (ALUOp == 2'b01) begin
         case (funct3)
-            `INST_BEQ:          zero = (ALUResult == 0);
-            `INST_BNE:          zero = (ALUResult != 0);
-            `INST_BLT:          zero = ($signed(ALUResult) < 0);
-            `INST_BGE:          zero = ($signed(ALUResult) >= 0);
-            `INST_BLTU:         zero = ($unsigned(ALUResult) < 0);
-            `INST_BGEU:         zero = ($unsigned(ALUResult) >= 0);
+            `INST_BEQ:          zero = (Result_1 == 0);
+            `INST_BNE:          zero = (Result_1 != 0);
+            `INST_BLT:          zero = ($signed(Result_1) < 0);
+            `INST_BGE:          zero = ($signed(Result_1) >= 0);
+            `INST_BLTU:         zero = ($unsigned(operand1) < $unsigned(operand2));
+            `INST_BGEU:         zero = ($unsigned(operand1) >= $unsigned(operand2));
             default: 
-                zero = (ALUResult == 0);
+                zero = (Result_1 == 0);
         endcase
     end
     else 
-        zero = (ALUResult == 0);
+        zero = (Result_1 == 0);
+end
+
+//-------------------------------------------------------------
+// MUX
+//-------------------------------------------------------------
+always @(*) begin
+    if(Utype)
+        ALUResult = Result_2;
+    else 
+        ALUResult = Result_1;
 end
 
 endmodule

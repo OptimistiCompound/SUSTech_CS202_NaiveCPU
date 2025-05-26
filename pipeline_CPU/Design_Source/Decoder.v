@@ -24,30 +24,44 @@ module Decoder(
     // Inputs
     input clk,
     input rstn,
-    input [31:0] ALUResult,
-    input [31:0] MemData,
-    input [31:0] pc4_i,
-    input regWrite,
-    input MemtoReg,
-    input eRead,
-    input [31:0] inst,
+    input [2:0] WB_funct3,    // WB_ID
+    input [4:0] WB_rd_addr,    // WB_ID
+    input [31:0] MemData,   // WB_ID
+    input [31:0] pc_i,      // WB
+    input regWrite,         // WB_ID
+    input MemtoReg,         // WB_ID
+    input [31:0] inst,      // IF_ID
 
     // Outputs
     output [31:0] rdata1,
     output [31:0] rdata2,
     output [31:0] imm32,
-    output [31:0] ecall_code,
-    output [31:0] ecall_a0_data
+    output [2:0]  funct3,
+    output [6:0]  funct7,
+    output [4:0]  rs1_addr,
+    output [4:0]  rs2_addr,
+    output reg [4:0]  rd_addr
     );
 //-------------------------------------------------------------
 // Includes
 //-------------------------------------------------------------
-`include "../Header_Files/riscv_defs.v"
+`include "../../Header_Files/riscv_defs.v"
 
-assign opcode = inst[6:0];
-wire [4:0] raddr1 = inst[19:15];
-wire [4:0] raddr2 = inst[24:20];
-wire [4:0] rd_v = inst[11:7];
+wire [6:0] opcode = inst[6:0];
+assign rs1_addr = inst[19:15];
+assign rs2_addr = inst[24:20];
+assign funct3 = inst[14:12];
+assign funct7 = inst[31:25];
+
+always @(*) begin
+    rd_addr = 0;
+    if (opcode != `OPCODE_B || opcode != `OPCODE_S)
+        rd_addr = inst[11:7];
+end
+
+//-------------------------------------------------------------
+// Write data selection
+//-------------------------------------------------------------
 
 //-------------------------------------------------------------
 // Write data selection
@@ -55,34 +69,40 @@ wire [4:0] rd_v = inst[11:7];
 reg [31:0] wdata;
 always @(*) begin
     if (opcode == `OPCODE_JAL || opcode == `OPCODE_JALR)
-        wdata = pc4_i;
-    else if (opcode == `OPCODE_LUI)
-        wdata = imm32;
-    else if (opcode == `OPCODE_AUIPC)
-        wdata = pc4_i + imm32;
-    else if (MemtoReg)
+        wdata = pc_i + 32'h4;
+    else if (MemtoReg == 1) begin
+            case (WB_funct3)
+            `INST_LB:
+                wdata = {{24{MemData[7]}}, MemData[7:0]};
+            `INST_LH:
+                wdata = {{16{MemData[16]}}, MemData[15:0]};
+            `INST_LW:
+                wdata = MemData;
+            `INST_LBU:
+                wdata = {24'b0, MemData[7:0]};
+            `INST_LHU:
+                wdata = {16'b0, MemData[15:0]};
+            default:
+                wdata = 0;
+            endcase
+        end
+    else
         wdata = MemData;
-    else if (eRead)
-        wdata = MemData;
-    else 
-        wdata = ALUResult;
 end
-
+ 
 //-------------------------------------------------------------
 // Submodules
 //-------------------------------------------------------------
 RegisterFile uRegisterFile(
     .clk(clk),
     .rstn(rstn),
-    .raddr1(raddr1),
-    .raddr2(raddr2),
-    .waddr(rd_v),
+    .raddr1(rs1_addr),
+    .raddr2(rs2_addr),
+    .waddr(WB_rd_addr),
     .wdata(wdata),
     .regWrite(regWrite),
     .rdata1(rdata1),
-    .rdata2(rdata2),
-    .a7_data(ecall_code),
-    .a0_data(ecall_a0_data)
+    .rdata2(rdata2)
 );
 
 ImmGen uImmGen(

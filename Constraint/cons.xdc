@@ -44,7 +44,7 @@ set_property PACKAGE_PIN P5 [get_ports {switch_data[7]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {base}]
 set_property PACKAGE_PIN T3 [get_ports {base}]
 
-##-------------------�߶������?------------------
+##-------------------�߶������?------------------
 set_property IOSTANDARD LVCMOS33 [get_ports {digit_en[0]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {digit_en[1]}]
 set_property IOSTANDARD LVCMOS33 [get_ports {digit_en[2]}]
