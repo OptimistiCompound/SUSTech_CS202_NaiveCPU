@@ -102,13 +102,13 @@ module CPU(
     wire rstn;
     assign rstn = rstn_fpga | !upg_rst;
 
-//assign wiz_clk=clk;
-//assign upg_clk=clk;
-    clk_wiz cpuclk(
-        .clk_in1(clk),
-        .clk_out1(wiz_clk),
-        .clk_out2(upg_clk)
-    );
+// assign wiz_clk=clk;
+// assign upg_clk=clk;
+   clk_wiz cpuclk(
+       .clk_in1(clk),
+       .clk_out1(wiz_clk),
+       .clk_out2(upg_clk)
+   );
 
     Debug_Controller debug_ctrl(
         .clk(clk),
@@ -143,9 +143,9 @@ module CPU(
         .Jalr(Jalr),
         .ALUResult(ALUResult),
         .upg_rst_i(upg_rst),
-        .upg_clk_i(upg_clk_w),
+        .upg_clk_i(upg_clk),
         .upg_wen_i(upg_wen_w),
-        .upg_adr_i(upg_addr_w),
+        .upg_adr_i(upg_addr_w[14:1]),
         .upg_dat_i(upg_data_w),
         .upg_done_i(upg_done_w),
         .inst(inst),
@@ -196,9 +196,9 @@ module CPU(
         .addr(addr_out[15:2]),
         .din(ReadData2),
         .upg_rst_i(upg_rst),
-        .upg_clk_i(upg_clk_w),
+        .upg_clk_i(upg_clk),
         .upg_wen_i(upg_wen_w),
-        .upg_addr_i(upg_addr_w[13:0]),
+        .upg_addr_i(upg_addr_w[14:1]),
         .upg_data_i(upg_data_w),
         .upg_done_i(upg_done_w),
         .dout(MemData)
@@ -286,20 +286,21 @@ module CPU(
     //         .sseg1(sseg1)
     // );
 
-//assign conf_btn_out = conf_btn;
-//assign start_pg_debounce = start_pg;
-    debounce conf_btn_deb(
-        .clk(clk),
-        .rstn(rstn),
-        .key_in(conf_btn),
-        .key_out(conf_btn_out)
-    );
-    debounce pg_deb(
-        .clk(clk),
-        .rstn(rstn),
-        .key_in(start_pg),
-        .key_out(start_pg_debounce)
-    );
+// assign conf_btn_out = conf_btn;
+// assign start_pg_debounce = start_pg;
+// assign btn2_debounce = btn2;
+   debounce conf_btn_deb(
+       .clk(clk),
+       .rstn(rstn),
+       .key_in(conf_btn),
+       .key_out(conf_btn_out)
+   );
+   debounce pg_deb(
+       .clk(clk),
+       .rstn(rstn),
+       .key_in(start_pg),
+       .key_out(start_pg_debounce)
+   );
 
     debounce btn1_deb(
         .clk(clk),
@@ -307,19 +308,19 @@ module CPU(
         .key_in(btn1),
         .key_out(btn1_debounce)
     );
-    debounce btn2_deb(
-        .clk(clk),
-        .rstn(rstn),
-        .key_in(btn2),
-        .key_out(btn2_debounce)
-    );
+   debounce btn2_deb(
+       .clk(clk),
+       .rstn(rstn),
+       .key_in(btn2),
+       .key_out(btn2_debounce)
+   );
     debounce btn3_deb(
         .clk(clk),
         .rstn(rstn),
         .key_in(btn3),
         .key_out(btn3_debounce)
     );
-    
+
     // Switch_con switch_con(
     //     .clk(cpu_clk),
     //     .rstn(rstn),
@@ -337,6 +338,7 @@ module CPU(
     );
 
     Keyboard_cache key_cache(
+        .clk(cpu_clk),
         .rstn(rstn),
         .key_data(key_data_sub),
         .data_out(key_data)
