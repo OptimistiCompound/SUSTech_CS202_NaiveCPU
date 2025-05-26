@@ -18,7 +18,7 @@ module DMem(
     
     RAM udram(
         .clka (mode ? clkn : upg_clk_i),
-        .wea (mode ? MemWrite : (upg_wen_i& upg_addr_i[14])),
+        .wea (mode ? MemWrite : (upg_wen_i & upg_addr_i[14])),
         .addra (mode ? addr : upg_addr_i[13:0]),
         .dina (mode ? din : upg_data_i),
         .douta (dout)

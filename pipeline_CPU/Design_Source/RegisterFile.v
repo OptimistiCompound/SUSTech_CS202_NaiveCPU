@@ -32,16 +32,12 @@ module RegisterFile(
 
     // Outputs
     output [31:0] rdata1,
-    output [31:0] rdata2,
-    output [31:0] a7_data,
-    output [31:0] a0_data
+    output [31:0] rdata2
     );
 reg [31:0] registers [31:0];
 
 assign rdata1 = registers[raddr1];
 assign rdata2 = registers[raddr2];
-assign a7_data = registers[5'd17];
-assign a0_data = registers[5'd10];
 integer i;
 always @(posedge clk or negedge rstn) begin
     registers[0] = 0;
