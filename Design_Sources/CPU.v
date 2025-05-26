@@ -126,7 +126,7 @@ module CPU(
 
     uart_bmpg_0 uart (
         .upg_clk_i(upg_clk),
-        .upg_rst_i(start_pg),
+        .upg_rst_i(upg_rst),
         .upg_rx_i(rx),
 
         .upg_clk_o(upg_clk_w),
@@ -201,7 +201,7 @@ module CPU(
         .upg_rst_i(upg_rst),
         .upg_clk_i(upg_clk_w),
         .upg_wen_i(upg_wen_w),
-        .upg_addr_i(upg_addr_w[13:0]),
+        .upg_addr_i(upg_addr_w[14:0]),
         .upg_data_i(upg_data_w),
         .upg_done_i(upg_done_w),
         .dout(MemData)

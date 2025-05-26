@@ -64,7 +64,7 @@ assign pc4_i = PC + 32'h4;
 
 programrom instmem (
     .clka (mode? clk : upg_clk_i ),
-    .wea (mode? 1'b0 : upg_wen_i ),
+    .wea (mode? 1'b0 : (upg_wen_i & ~upg_adr_i[14]) ),
     .addra (mode? PC[15:2] : upg_adr_i ),
     .dina (mode? 32'h00000000 : upg_dat_i ),
     .douta (inst)

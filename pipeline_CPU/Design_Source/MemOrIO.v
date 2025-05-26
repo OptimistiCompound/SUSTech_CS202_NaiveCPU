@@ -54,10 +54,10 @@ module MemOrIO(
     end
 
     // For Store: write Mem or IO
-    assign LEDCtrl = (ioWrite && isLEDAddr || Ecall);
+    assign LEDCtrl = (ioWrite && isLEDAddr) || (eWrite && EcallOp == `EOP_PRINT_INT);
     assign SegCtrl = ioWrite && isSegAddr;
     always @* begin
-        if (mWrite || (ioWrite && !Ecall) )
+        if (mWrite || (ioWrite && !eWrite) )
             write_data = r_rdata;
         else if (eWrite && EcallOp == `EOP_PRINT_INT)
             write_data = ecall_a0_data;
