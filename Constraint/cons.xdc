@@ -11,7 +11,7 @@ set_property PACKAGE_PIN R15 [get_ports conf_btn]
 set_property PACKAGE_PIN P17 [get_ports clk]
 set_property PACKAGE_PIN P15 [get_ports rstn_fpga]
 set_property PACKAGE_PIN U4 [get_ports btn1]
-set_property PACKAGE_PIN T5 [get_ports btn2]
+set_property PACKAGE_PIN V1 [get_ports btn2]
 set_property PACKAGE_PIN R17 [get_ports btn3]
 
 ##------------------���뿪��------------------

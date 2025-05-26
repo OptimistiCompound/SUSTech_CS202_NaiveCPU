@@ -38,7 +38,7 @@ module RegisterFile(
     output [31:0] rdata2,
     output [31:0] a7_data,
     output [31:0] a0_data,
-    output [31:0] reg_data
+    output reg [31:0] reg_data
     );
 reg [31:0] registers [31:0];
 

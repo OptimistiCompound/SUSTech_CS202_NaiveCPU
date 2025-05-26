@@ -75,7 +75,7 @@ module CPU(
 // Instantiation of modules
 //-------------------------------------------------------------
 
-    cpuclk cpuclk(
+    clk_wiz cpuclk(
         .clk_in1(clk),
         .clk_out1(cpu_clk),
         .clk_out2(upg_clk)
