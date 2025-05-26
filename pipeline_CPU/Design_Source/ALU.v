@@ -147,8 +147,8 @@ always @(*) begin
             `INST_BNE:          zero = (Result_1 != 0);
             `INST_BLT:          zero = ($signed(Result_1) < 0);
             `INST_BGE:          zero = ($signed(Result_1) >= 0);
-            `INST_BLTU:         zero = ($signed(Result_1) < 0);
-            `INST_BGEU:         zero = ($signed(Result_1) >= 0);
+            `INST_BLTU:         zero = ($unsigned(operand1) < $unsigned(operand2));
+            `INST_BGEU:         zero = ($unsigned(operand1) >= $unsigned(operand2));
             default: 
                 zero = (Result_1 == 0);
         endcase

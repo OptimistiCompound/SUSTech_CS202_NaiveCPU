@@ -36,7 +36,7 @@ module IFetch(
    input upg_rst_i,
    input upg_clk_i, 
    input upg_wen_i,
-   input[13:0] upg_adr_i, 
+   input[14:0] upg_adr_i, 
    input[31:0] upg_dat_i, 
    input upg_done_i,
 
@@ -60,8 +60,8 @@ always @(negedge clk or negedge rstn) begin
     if (~rstn)
         PC <= 0;
     else if (Pause && !Flush) begin
-        // 空操作 nop
-        // 阻止寄存器值改变
+        // ??? nop
+        // ????????
     end
     else
         PC <= next_PC;
@@ -72,8 +72,8 @@ assign pc_i  = PC;
 
 programrom instmem (
     .clka (mode? clk : upg_clk_i ),
-    .wea (mode? 1'b0 : upg_wen_i ),
-    .addra (mode? PC[15:2] : upg_adr_i ),
+    .wea (mode? 1'b0 : (upg_wen_i & ~upg_adr_i[14])) ,
+    .addra (mode? PC[15:2] : upg_adr_i[13:0] ),
     .dina (mode? 32'h00000000 : upg_dat_i ),
     .douta (inst)
     );
