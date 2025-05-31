@@ -5,7 +5,7 @@ module keyboard_scan(
     input ps2_data,
     output wire [15:0] xkey,
     output wire [21:0] data,
-    output reg [3:0]data_in
+    output reg data_in
 );
 
     reg ps2cf;

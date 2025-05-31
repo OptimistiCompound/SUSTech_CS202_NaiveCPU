@@ -59,15 +59,19 @@ https://github.com/OptimistiCompound/SUSTech_CS202_NaiveCPU
 |T5|input|start_pg|接收uart数据|
 |R15|input|conf_btn|数据输入确认按键|
 |P17|input|clk|时钟引脚|
-|P15|input|rstn|复位按键|
+|P15|input|rstn_fpga|系统复位按键|
+|U4|input|btn1|debug模式暂时解绑按键|
+|V1|input|btn2|debug模式永久解绑按键|
+|R17|input|btn3|debug模式主动进入按键|
 |K5|input|ps2_clk|PS2 接口时钟引脚|
 |L4|input|ps2_data|PS2 接口数据引脚|
-|L3|input|rx|UART 接收引脚|
-|N2|output|tx|UART 发送引脚|
+|T3|input|base|数码管显示进制(0 for hex, 1 for dex)|
+|N5|input|rx|UART 接收引脚|
+|T4|output|tx|UART 发送引脚|
 |V5|input|switch_d[8]|测试场景编号输入 0 位|
 |V2|input|switch_d[9]|测试场景编号输入 1 位|
 |U2|input|switch_d[10]|测试场景编号输入 2 位|
-|U3|input|switch_d[10]|测试场景编号输入 3 位|
+|U3|input|switch_d[11]|测试场景编号输入 3 位|
 |R1|input|switch_d[0]|测试数据输入 0 位|
 |N4|input|switch_d[1]|测试数据输入 1 位|
 |M4|input|switch_d[2]|测试数据输入 2 位|
@@ -208,43 +212,44 @@ MemOrIO
 
 
 TODO：wang的模块
-LED，SEG，SWITCH，KEYBOARD，debounce
+KEYBOARD，debounce,dmem,immgen.,keyboard_c
 
 keyboard_scan
 |Port| Description|
 |------ | ---------|
-|||
-|||
-|||
-|||
+|`input clk`|系统时钟|
+|`input rstn`|复位信号|
+|`input ps2_clk`|键盘时钟|
+|`input ps2_data`|键盘数据|
+|`output [15:0] xkey`|连续键值|
+|`output [21:0] data`|连续输入信号|
+|`output data_in`|数据输入标识|
 
 keyboard_driver
 |Port| Description|
 |------ | ---------|
-|||
-|||
-|||
-|||
+|`input clk`|系统时钟|
+|`input rstn`|复位信号|
+|`input ps2_clk`|键盘时钟|
+|`input ps2_data`|键盘数据|
+|`output [3:0] data_out`|转化的键值|
 
-TODO：wu的模块
+Keyboard_cache
+|Port| Description|
+|------ | ---------|
+|`input clk`|系统时钟|
+|`input clk`|系统时钟|
+|`input clk`|系统时钟|
+|`input clk`|系统时钟|
 
-Switch_con （但是被优化了，这部分不需要时序逻辑，暂时注释了，switch_data 直接从拨码开关信号连向 MemOrIO）
 
-| Port                            | Description                           |
-| ------------------------------- | ------------------------------------- |
-| `input clk`                     | 时钟信号                              |
-| `input rstn`                    | 复位信号                              |
-| `input io_read`                 | 读IO控制信号                          |
-| `input [15:0]switch_d`          | 读取自拨码开关的信息                  |
-| `output reg [15:0] switch_data` | 写回拨码开关数据，在MemOrIO中进行选择 |
-
-cpuclk
+clk_wiz
 
 | Port     | Description                     |
 | -------- | ------------------------------- |
-| clk_in1  | EGO1 的时钟信号，频率为 100MHz  |
-| clk_out1 | 单周期时钟信号，频率为 23MHz    |
-| clk_out2 | Uart 接口时钟信号，频率为 10MHz |
+| `input clk_in1`  | EGO1 的时钟信号，频率为 100MHz  |
+| `output clk_out1` | 单周期时钟信号，频率为 23MHz    |
+| `output clk_out2`| Uart 接口时钟信号，频率为 10MHz |
 
 LED_con
 
@@ -268,7 +273,7 @@ seg
 | `input clk`                 | 时钟信号 |
 | `input rstn`                | 复位信号|
 | `input [31:0]data`          | 输入的即将显示的值 |
-| `input base`                | 进制控制，为1表示十进制，为0表示 |
+| `input base`                | 进制控制(0 for hex, 1 for dex)|
 | `output reg [7:0] digit_en` | 数码管位选信号 |
 | `output reg [7:0] sseg`     | 低位数码管段选信号|
 | `output reg [7:0] sseg1`    | 高位数码管段选信号|
