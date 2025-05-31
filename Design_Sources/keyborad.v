@@ -56,7 +56,7 @@ module keyboard_scan(
         if (!rstn) begin
             count <= 0;
         end else begin
-            if (count >= 10 && ps2df == 1'b1) begin
+            if (count >= 4'h10 && ps2df == 1'b1) begin
                 count <= 0;
                 data_in <= 1'b1;
             end else begin
