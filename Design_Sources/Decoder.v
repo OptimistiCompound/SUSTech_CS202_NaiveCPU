@@ -27,37 +27,52 @@ module Decoder(
     input [31:0] ALUResult,
     input [31:0] MemData,
     input [31:0] pc4_i,
+    input [31:0] pc_i,
     input regWrite,
     input MemtoReg,
+    input eRead,
     input [31:0] inst,
 
     // Outputs
     output [31:0] rdata1,
     output [31:0] rdata2,
-    output [31:0] imm32
+    output [31:0] imm32,
+    output [31:0] ecall_code,
+    output [31:0] ecall_a0_data
     );
 //-------------------------------------------------------------
 // Includes
 //-------------------------------------------------------------
 `include "../Header_Files/riscv_defs.v"
 
-assign opcode = inst[6:0];
+
+wire [6:0] opcode = inst[6:0];
 wire [4:0] raddr1 = inst[19:15];
 wire [4:0] raddr2 = inst[24:20];
 wire [4:0] rd_v = inst[11:7];
 wire [2:0] funct3 = inst[14:12];
+reg [31:0] pc_pos;
 
 //-------------------------------------------------------------
 // Write data selection
 //-------------------------------------------------------------
 reg [31:0] wdata;
+
+always @(posedge clk or negedge rstn) begin
+    if (~rstn) begin
+        pc_pos <= 0;
+    end else begin
+        pc_pos <= pc_i;
+    end
+end
+
 always @(*) begin
     if (opcode == `OPCODE_JAL || opcode == `OPCODE_JALR)
-        wdata = pc4_i;
+        wdata = pc_pos + 32'h4;
     else if (opcode == `OPCODE_LUI)
         wdata = imm32;
     else if (opcode == `OPCODE_AUIPC)
-        wdata = pc4_i + imm32;
+        wdata = pc4_i + imm32 + `PC_OFFSET;
     else if (MemtoReg == 1) begin
             case (funct3)
             `INST_LB:
@@ -90,7 +105,9 @@ RegisterFile uRegisterFile(
     .wdata(wdata),
     .regWrite(regWrite),
     .rdata1(rdata1),
-    .rdata2(rdata2)
+    .rdata2(rdata2),
+    .a7_data(ecall_code),
+    .a0_data(ecall_a0_data)
 );
 
 ImmGen uImmGen(
