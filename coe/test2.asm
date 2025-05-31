@@ -3,7 +3,7 @@ all_one: .word 0x000000ff
 bbeg:	.word 0xfffffC00
 
 .text
-main:  
+main: 
  	la t0,bbeg
  	lw a5,0(t0)
 	
@@ -19,23 +19,8 @@ loop2:
 	sw a7,96(a5) ## test content
 	
 	srli a7,a7,8
-	addi s2,x0,0
-	beq s2, a7, test000_1
-	addi s2,s2,1
-	beq s2, a7, test001_1
-	addi s2,s2,1
-	beq s2, a7, test010_1
-	addi s2,s2,1
-	beq s2, a7, test011_1
-	addi s2,s2,1
-	beq s2, a7, test100_1
-	addi s2,s2,1
-	beq s2, a7, test101_1
-	addi s2,s2,1
-	beq s2, a7, test110_1
-	addi s2,s2,1
-	beq s2, a7, test111_1
-	addi s2,s2,1
+	andi a7, a7, 0x07
+	li s2, 0
 	beq s2, a7, test1000_1
 	addi s2,s2,1
 	beq s2, a7, test1001_1
@@ -52,157 +37,6 @@ loop2:
 	addi s2,s2,1
 	beq s2, a7, test1111_1
 	
-
-test000_1:
-	
-loop1_t000_1:
-	lw a6,112(a5)
-	beq a6,x0,loop1_t000_1
-	
-loop2_t000_1: 
-	lw a6, 112(a5) 
-	bne a6,x0,loop2_t000_1
-	
-	lb t0,100(a5)
-	sw t0,96(a5)
-	
-loop3_t000_1:
-	lw a6,112(a5)
-	beq a6,x0,loop3_t000_1
-	
-loop4_t000_1: 
-	lw a6, 112(a5) 
-	bne a6,x0,loop4_t000_1	
-	
-	lb t0,100(a5)
-	sw t0,96(a5)
-	jal loop1
-	
-test001_1:
-
-loop1_t001_1:
-	lw a6,112(a5)
-	beq a6,x0,loop1_t001_1
-	
-loop2_t001_1: 
-	lw a6, 112(a5) 
-	bne a6,x0,loop2_t001_1
-
-	lb s10,100(a5)
-	sw s10,108(a5)
-	sw s10,120(x0)
-	jal loop1
-
-test010_1:
-
-loop1_t010_1:
-	lw a6,112(a5)
-	beq a6,x0,loop1_t010_1
-	
-loop2_t010_1: 
-	lw a6, 112(a5) 
-	bne a6,x0,loop2_t010_1
-
-	lbu s11,100(a5)
-	sw s11,108(a5)
-	sw s11,124(x0)
-	jal loop1
-	
-	# test 3 beq
-test011_1:
-
-loop1_t011_1:
-	lw a6,112(a5)
-	beq a6,x0,loop1_t011_1
-loop2_t011_1:
-	lw a6,112(a5)
-	bne a6,x0,loop2_t011_1
-	
-	lw s10,120(x0)
-	lw s11,124(x0)
-	beq s10,s11,label1_t011_1
-	sw x0,96(a5)
-	jal label2_t011_1
-label1_t011_1:
-	addi t1,x0,0x00ff
-	sw t1,96(a5)
-label2_t011_1:
-	jal loop1
-	
-	# test 4 blt
-test100_1:
-
-loop1_t100_1:
-	lw a6,112(a5)
-	beq a6,x0,loop1_t100_1
-	
-loop2_t100_1:
-	lw a6,112(a5)
-	bne a6,x0,loop2_t100_1
-	
-	lw s10,120(x0)
-	lw s11,124(x0)
-	blt s10,s11,lable1_t100_1
-	sw x0,96(a5)
-	jal label2_t100_1
-lable1_t100_1:
-	addi t1,x0,0x00ff
-	sw t1,96(a5)
-label2_t100_1:
-	jal loop1
-	# test 5: bltu
-test101_1:
-
-loop1_t101_1:
-	lw a6,112(a5)
-	beq a6,x0,loop1_t101_1
-	
-loop2_t101_1:
-	lw a6,112(a5)
-	bne a6,x0,loop2_t101_1
-	
-	lw s10,120(x0)
-	lw s11,124(x0)
-	bltu s10,s11,lable1_t101_1
-	sw x0,96(a5)
-	jal label2_t101_1
-lable1_t101_1:
-	addi t1,x0,0x00ff
-	sw t1,96(a5)
-label2_t101_1:
-	jal loop1
-	
-	# test 6: slt
-test110_1:
-
-loop1_t110_1:
-	lw a6,112(a5)
-	beq a6,x0,loop1_t110_1
-loop2_t110_1:
-	lw a6,112(a5)
-	bne a6,x0,loop2_t110_1
-	
-	lw s10,120(x0)
-	lw s11,124(x0)
-	slt t0,s10,s11
-	sw t0,96(a5)
-	jal loop1
-	
-	# test 7: sltu
-test111_1:
-
-loop1_t111_1:
-	lw a6,112(a5)
-	beq a6,x0,loop1_t111_1
-loop2_t111_1:
-	lw a6,112(a5)
-	bne a6,x0,loop2_t111_1
-	
-	lw s10,120(x0)
-	lw s11,124(x0)
-	sltu t0,s10,s11
-	sw t0,96(a5)
-	jal loop1
 	
 test1000_1:
 
@@ -611,4 +445,3 @@ test_1111_end:
 	slli a4,a4,5
 	sw a4,96(a5)
 	jal loop1
-	

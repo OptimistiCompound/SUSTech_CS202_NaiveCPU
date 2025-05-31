@@ -12,6 +12,7 @@
 #define OPCODE_AUIPC                            0b0010111
 #define OPCODE_JAL                              0b1101111
 #define OPCODE_JALR                             0b1100111
+#define OPCODE_E                                0b1110011
 
 // ALUOp
 #define ALUOP_L_S                               0b00
