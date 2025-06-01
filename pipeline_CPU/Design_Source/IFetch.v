@@ -60,8 +60,8 @@ always @(negedge clk or negedge rstn) begin
     if (~rstn)
         PC <= 0;
     else if (Pause && !Flush) begin
-        // ??? nop
-        // ????????
+        // 空指令 nop
+        // 保持指令不变暂停一个周期
     end
     else
         PC <= next_PC;

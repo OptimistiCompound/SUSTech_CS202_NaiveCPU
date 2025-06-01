@@ -3,7 +3,19 @@
 源码托管于 GitHub，访问链接：
 https://github.com/OptimistiCompound/SUSTech_CS202_NaiveCPU
 
-## CPU特性
+
+
+## I. 开发者说明
+
+| 开发者     | 贡献比 | 负责工作                          |
+| --------- | ----- | -------------------------------- |
+| 钟庸       | 33.3% | 单周期CPU子模块的硬件实现，流水线CPU的硬件实现，硬件仿真测试 |
+| 吴鎏亿     | 33.3% | 测试场景汇编代码编写，仿真测试及上班测试 |
+| 王朝贺     | 33.3% | IO及外设模块的编写，硬件仿真测试 |
+
+
+
+## II. CPU特性 & 设计说明
 
 ### 1. ISA
 
@@ -46,13 +58,15 @@ https://github.com/OptimistiCompound/SUSTech_CS202_NaiveCPU
 | jalr      | I   | 1100111 | 0x0    | -      | rd = PC+4; PC = rs1 + imm            |
 | lui       | U   | 0110111 | -      | -      | rd = imm << 12                       |
 | auipc     | U   | 0010111 | -      | -      | rd = PC + (imm << 12)                |
-| ecall     | I   | 1110011 | 0x0    | -      | 触发环境调用                               |
-| ebreak    | I   | 1110011 | 0x0    | -      | 触发调试断点                               |
+| mul       | R   | 0110011 | 0x0    | 0x01   | rd = (rs1 * rs2)[31:0]               |
+| fadd.s    | -   | -       | -      | -      | rd = rs1 + rs2                       |
 
-- 参考ISA：RISC-V
+- 参考ISA：RV32I, RV32F, RV32M
 - 寻址空间：哈佛架构
 
-### 2. CPU接口定义
+
+
+### 2. 引脚说明
 
 |引脚|规格|名称|功能|
 | ---- | ---- | ---- | ---- |
@@ -123,7 +137,8 @@ https://github.com/OptimistiCompound/SUSTech_CS202_NaiveCPU
 
 
 
-## 各模块端口定义
+### 3. 各模块接口定义
+
 
 Controller
 
@@ -288,7 +303,9 @@ seg
 | `output reg [7:0] sseg`     | 低位数码管段选信号|
 | `output reg [7:0] sseg1`    | 高位数码管段选信号|
 
-### 3. 对外设IO的支持
+
+
+### 5. 对外设IO的支持
 使用MMIO进行io，外设基地址如下，在汇编中采用轮询的方式进行访问。
 
 |外设名称|基地址|
@@ -300,118 +317,193 @@ seg
 |`Btn`|32'hFFFFFC70|
 |`KeyCtr`|32'hFFFFFC74|
 
-## Bonus
-### 键盘
-keyboard_scan负责接受键盘输入的信号，实例化于keyboard_driver模块并且传递信号给该模块
 
-|Port| Description|
-|------ | ---------|
-|`input clk`|系统时钟|
-|`input rstn`|复位信号|
-|`input ps2_clk`|键盘时钟|
-|`input ps2_data`|键盘数据|
-|`output [15:0] xkey`|连续键值|
-|`output [21:0] data`|连续输入信号|
-|`output data_in`|数据输入标识|
 
-keyboard_driver负责将接收到的信号转换成五位的设定值并且输出，实例化于顶层模块并传递信号给Keyboard_cache模块
+## IV. 方案分析说明
 
-|Port| Description|
-|------ | ---------|
-|`input clk`|系统时钟|
-|`input rstn`|复位信号|
-|`input ps2_clk`|键盘时钟|
-|`input ps2_data`|键盘数据|
-|`output [4:0] data_out`|转化的键值|
 
-Keyboard_cache键值缓存，负责将接受的值拼接起来，包括删除确认按键，实例化于顶层模块，将处理后的值作为键盘的input
-|Port| Description|
-|------ | ---------|
-|`input clk`|系统时钟|
-|`input rstn`|复位信号|
-|`input [4:0] key_data`|输入的键值|
-|`output [31:0] data_out`|经过拼接后的键盘输入|
 
-#### 主要代码说明
-`keyboard_scan`对 PS/2 时钟 (ps2_clk) 和数据 (ps2_data) 进行 8 级移位寄存器滤波，键被按下时的编码叫做通码(makecode)，弹起时的编码叫做断码(breakcode)，大部分键的通码和断码都是 8 位 1 字节，所以进行8 级移位寄存器滤波
-当连续 8 个时钟周期检测到相同电平 (全 1 或全 0) 时，更新同步后的信号 ps2cf 和 ps2df
-当时钟Clock的下降沿时，侦测到数据Data也拉低，代表一个数据包传送出来，之后的10个时钟下降沿，分别收到从最低位LSB到MSB的八位数据，1位的奇偶校验（1表示八位数据中1的位数为偶数，0是奇数），最后1位高电平表示数据包结束。
-![alt text](image.png)
-```
-always @(posedge DIR or negedge rstn) begin
-    if (!rstn) begin
-        ps2c_filter <= 0;
-        ps2d_filter <= 0;
-        ps2cf <= 1;
-        ps2df <= 1;
-    end else begin
-        ps2c_filter[7] <= ps2_clk;
-        ps2c_filter[6:0] <= ps2c_filter[7:1];
-        ps2d_filter[7] <= ps2_data;
-        ps2d_filter[6:0] <= ps2d_filter[7:1];
-        if (ps2c_filter == 8'b11111111)
-            ps2cf <= 1;
-        else if (ps2c_filter == 8'b00000000)
-            ps2cf <= 0;
-        if (ps2d_filter == 8'b11111111)
-            ps2df <= 1;
-        else if (ps2d_filter == 8'b00000000)
-            ps2df <= 0;
-    end
+
+
+
+
+
+
+## V. 系统上板使用说明
+
+
+
+## VI. 自测试说明
+
+
+
+## VII. 启发和帮助
+
+
+
+流水线参考：
+
+https://github.com/Azalea8/riscv_cpu
+
+https://github.com/ultraembedded/riscv
+
+## VIII. 问题及总结
+
+
+
+# Bonus
+
+
+## 1. 其他外设：键盘
+
+>其他说明见https://github.com/OptimistiCompound/SUSTech_CS202_NaiveCPU/Doc/Keyboard.md
+
+TODO:
+
+
+## 2. UART接口
+
+TODO:
+
+
+## 3. 流水线CPU
+
+能够正确处理`Structure hazard`, `Data hazard`, `Control hazard`，实现了`MEM-EX`, `EX-EX`, `MEM-MEM`三种`forwarding`，实现了`stall`的控制停顿，实现了`flush`清空中间寄存器。
+
+
+### 接口定义
+
+> [!NOTE]
+> 流水线CPU与单周期CPU大部分子模块是重合的，即使一些子模块增加了端口，其基本功能的实现是相同或相似的。中间寄存器的端口不言自明，遂不赘述。此处仅仅介绍与Data hazard处理相关的模块
+
+ForwardingController
+
+| Port                        | Description                      |
+|-----------------------------|-----------------------------------|
+| input MEM_RegWrite          | MEM阶段寄存器写使能信号（1表示需要写回寄存器） |
+| input WB_RegWrite           | WB阶段寄存器写使能信号（1表示需要写回寄存器） |
+| input [4:0] EX_rs1_addr     | EX阶段的源寄存器1地址             |
+| input [4:0] EX_rs2_addr     | EX阶段的源寄存器2地址             |
+| input [4:0] MEM_rs2_addr    | MEM阶段的源寄存器2地址（用于存储指令数据前递） |
+| input [4:0] MEM_rd_addr     | MEM阶段的目标寄存器地址           |
+| input [4:0] WB_rd_addr      | WB阶段的目标寄存器地址           |
+| input [31:0] EX_rs1_v       | EX阶段从寄存器文件读取的rs1原始值  |
+| input [31:0] EX_rs2_v       | EX阶段从寄存器文件读取的rs2原始值  |
+| input [31:0] MEM_ALUResult  | MEM阶段的ALU计算结果（用于数据前递） |
+| input [31:0] MEM_rs2_v      | MEM阶段的rs2寄存器值（用于存储数据前递） |
+| input [31:0] WB_mdata       | WB阶段要写回寄存器文件的数据      |
+| output reg [31:0] true_ReadData1 | 前递选择后的最终rs1值（送往ALU） |
+| output reg [31:0] true_ReadData2 | 前递选择后的最终rs2值（送往ALU） |
+| output reg [31:0] true_m_wdata | 前递选择后的存储数据（送往数据存储器） |
+
+HazardDetector
+
+| Port                        | Description                      |
+| --------------------------- | -------------------------------- |
+| input EX_memRead            | EX 阶段是否为 load 指令（1 表示 load） |
+| input [4:0] ID_rs1_addr     | ID 阶段的源寄存器 1 地址         |
+| input [4:0] ID_rs2_addr     | ID 阶段的源寄存器 2 地址         |
+| input [4:0] EX_rd_addr      | EX 阶段的目标寄存器地址          |
+| input [4:0] ID_rd_addr      | ID 阶段的目标寄存器地址          |
+| output reg Pause            | 流水线暂停信号（1 表示需要暂停） |
+
+
+## 流水线CPU特性
+
+### **Data Hazard处理**
+
+我们实现了三种forwarding以及一个stall控制，能够正确处理所有data hazard的情况。forwarding由`ForwardingController`控制，stall由`HazardDetector`输出的`Pause`信号控制
+
+
+>三种forwarding: `MEM-EX`, `EX-EX`, `MEM-MEM`
+>
+>stall的检测：load之后的下一条指令的rs1或者rs2是load指令的rd，必须stall一个周期
+
+#### 实现细节：
+
+我们通过不同中间寄存器存储的`rd`,`rs1`,`rs2`寄存器的关系，以及`RegWrite`信号来判断是否以及如何forwarding。
+
+`EX-EX` 在上一条指令的ALU结果是下一条指令的源寄存器的时候发生，即
+
+> EX/MEM.rd = ID/EX.rs1 or ID/EX.rs2
+>
+> true_ReadData1 = MEM_ALUResult;
+> 
+> true_ReadData2 = MEM_ALUResult;
+
+`EX-MEM` 在上一条指令的访存结果是隔一条指令的源寄存器，即
+
+> MEM/WB.rd = ID/EX.rs1 or /EX.rs2
+>
+> true_ReadData1 = WB_mdata;
+>
+> true_ReadData2 = WB_mdata;
+
+`MEM-MEM` 即`lw-sw forwarding`，上一条指令从MEM中读取的数据需要在下一条指令写回内存：
+
+> MEM/WB.rd = EX/MEM.rs2，这里只有rs2是因为sw将rs2写回MEM
+
+> [!WARNING]
+> 当`EX-EX`和`EX-MEM`的条件同时满足的时候选择`EX-EX`，因为此时EX中的运算结果更新，所以EX/EX的赋值语句一定要在MEM/EX之后，即可覆盖MEM/EX的结果
+
+
+``` verilog
+always @(*) begin
+    true_ReadData1 = EX_rs1_v;
+    true_ReadData2 = EX_rs2_v;
+    true_m_wdata   = MEM_rs2_v;
+
+    if (WB_RegWrite  && WB_rd_addr  != 0 && (WB_rd_addr  == EX_rs1_addr) ) // MEM/EX forwarding to rs1
+        true_ReadData1 = WB_mdata;
+    if (WB_RegWrite  && WB_rd_addr  != 0 && (WB_rd_addr  == EX_rs2_addr) ) // MEM/EX forwarding to rs2
+        true_ReadData2 = WB_mdata;
+    if (MEM_RegWrite && MEM_rd_addr != 0 && (MEM_rd_addr == EX_rs1_addr) ) // EX/EX forwarding to rs1
+        true_ReadData1 = MEM_ALUResult;
+    if (MEM_RegWrite && MEM_rd_addr != 0 && (MEM_rd_addr == EX_rs2_addr) ) // EX/EX forwarding to rs2
+        true_ReadData2 = MEM_ALUResult;
+    if (WB_RegWrite  && WB_rd_addr  != 0 && (WB_rd_addr  == MEM_rs2_addr) )// MEM/MEM forwading to rs2
+        true_m_wdata = WB_mdata;
 end
-
-always @(negedge ps2cf or negedge rstn) begin
-    if (!rstn) begin
-        count <= 0;
-    end else begin
-        if (count >= 4'h10 && ps2df == 1'b1) begin
-            count <= 0;
-            data_in <= 1'b1;
-        end else begin
-            data_in <= 1'b0;
-            count <= count + 1;
-        end
-    end
-end
-```
-`xkey`作为连续两个键值有效值的拼接，只有八位的有效值，第一位是1位起始低电位，第十位是1位奇偶校验，第十一位是1位结尾高电位
-`data`作为连续两个键盘信号的拼接
-```
-assign xkey = {shift2[8:1], shift1[8:1]};
-assign data = {shift2, shift1};
-```
-`Keyboard_cache`
-缓存将上一个状态的键值存入寄存器，当单间键值对应`enter`的时候就根据`key_data_valid`的值对输出数据进行更改
-```
-always @(posedge clk or negedge rstn) begin
-    if (!rstn) begin
-        data_out <= 32'h0; // 同步复位
-    end
-    else begin
-        if (key_data == 5'b10000)begin
-            case(key_data_valid)
-                5'b10001: data_out <= {4'h0, data_out[31:4]}; 
-                5'b10010: data_out <= 32'b0;
-                5'b10000: begin end
-                default: 
-                    if (key_data_valid != 5'b11111) begin // 过滤无效键值
-                        data_out <= {data_out[27:0], key_data_valid[3:0]}; // 左移4位并添加新数据
-                    end
-            endcase
-        end
-    end
-end
-always @(posedge clk or negedge rstn) begin
-    if (!rstn) begin
-        key_data_valid <= 5'b11111; // 同步复位
-    end
-    else begin
-        key_data_valid <= key_data; 
-    end
-end
 ```
 
-#### 使用说明
-键值对应键盘上的`0-f`每次键值的输入由`enter`键确认输入，每次按下`enter`只能输入一位十六进制数字，删除单位数字`backspace`和清空缓存区`tab`都是需要`enter`确认的，最大接受八位十六进制数，发生溢出时高位会被舍弃，低位更新为最新的数字
 
-https://blog.csdn.net/qimoDIY/article/details/99920981
+Stall出现在上一条指令load的rd寄存器是下一条指令的rs1或者rs2寄存器，此时必须停顿一个周期，然后使用`MEM-EX`保证ALU拿到正确的源寄存器值。
+
+``` verilog
+    always @(*) begin
+        if ( (EX_memRead) && (ID_rd_addr != 0) && (EX_rd_addr == ID_rs1_addr || EX_rd_addr == ID_rs2_addr) )
+            Pause = 1'b1;
+        else 
+            Pause = 1'b0;
+    end
+```
+
+
+#### **Control Hazard处理**
+
+我们的CPU没有分支预测功能，而是采取直接“冲刷”的策略，通过`IFetch`模块中的`Flush`信号控制。当发生控制冒险的时候，简单地将`IF_ID`、`ID_EX`和`EX_MEM`中的寄存器置0，将之前正在执行的指令清空。
+
+#### 实现细节：
+
+在`IFetch`中给出`Flush`信号，当`Flush`为高电平时生效。此时，`IF-ID`，`ID-EX`，`EX-MEM`里的中间寄存器全部置0,相当于将原先取到的2条指令清除，然后`IFetch`根据PC跳转拿到实际执行的指令。
+
+``` verilog
+wire [31:0] next_PC =   (rstn==0)           ? 0 : 
+                        (Branch && zero || Jump)    ? MEM_pc_i + imm32 : 
+                        (Jalr)              ? ALUResult : 
+                        PC + 32'h4;
+assign Flush        =   (rstn==0)           ? 1'b0 :
+                        (Branch && zero || Jump || Jalr) ? 1'b1 : 
+                        1'b0;
+
+always @(negedge clk or negedge rstn) begin
+    if (~rstn)
+        PC <= 0;
+    else if (Pause && !Flush) begin
+        // 空指令 nop
+        // 保持指令不变暂停一个周期
+    end
+    else
+        PC <= next_PC;
+end
+```
