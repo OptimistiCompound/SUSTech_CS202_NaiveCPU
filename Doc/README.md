@@ -409,6 +409,10 @@ num1_done:
 
 
 
+
+
+![image](https://github.com/OptimistiCompound/SUSTech_CS202_NaiveCPU/blob/main/Doc/user_guide.jpg)
+
 ## VI. 自测试说明
 
 以表格的方式罗列出测试方法（仿真、上板）、测试类型（单元、集成）、测试用例（除本文及OJ 以外的用例）描述、测试结果（通过、不 通过）；以及最终的测试结论。
