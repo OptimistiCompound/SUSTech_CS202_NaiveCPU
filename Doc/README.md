@@ -415,7 +415,7 @@ num1_done:
 - 数码管信息，显示内存地址中 `32'hFFFFFC6C` 对应的数据
 - LED灯信息，显示内存地址中 `32'hFFFFFC60`  对应的数据
 
-![image](https://github.com/OptimistiCompound/SUSTech_CS202_NaiveCPU/blob/main/Doc/user_guide.jpg)
+>可以使用 Uart 导入对应的软件 coe 文件进行测试
 
 
 
@@ -435,13 +435,23 @@ num1_done:
 |   上板   |   集成   |     测试单周期CPU      |  不通过  |                   没经过仿真，无法显示信息                   |
 |   仿真   |   集成   |     测试单周期CPU      |   通过   |          发现主模块中有 wire 连接错误，或者名字错误          |
 |   上板   |   集成   |     测试单周期CPU      |   通过   |             能过基础的测试场景，其中也经过 Debug             |
-|   仿真   |   集成   |     测试 Pipeline      |  不通过  |                                                              |
-|   仿真   |   集成   |     测试 Pipeline      |   通过   |                                                              |
-|   上板   |   集成   |     测试 Pipeline      |  不通过  |                                                              |
-
-
+|   仿真   |   集成   |     测试 Pipeline      |  不通过  |   使用汇编集成的coeIFMem测试，没有正确处理 Hazard 和 stall   |
+|   仿真   |   集成   |     测试 Pipeline      |   通过   |       初步能处理 Hazard 和 stall，通过仿真中的场景测试       |
+|   上板   |   集成   |     测试 Pipeline      |  不通过  |         测试场景1都能实现，但是测试场景2不能正常显示         |
 
 ## VII. 启发和帮助
+
+（遇到的问题和解决方法见 **VIII. 问题及总结**）
+
+**Uart 模块**
+
+参考了 lab12 课件，基本照着做即可实现。（但是由于一个使能信号，导致浪费了很长的时间）
+
+**单周期CPU**
+
+参考 lab 9-11 课件，使用了 `MemOrIO` 模块，将输入信号和输出信号设置对应的虚拟内存，使用匹配的 asm 汇编指令文件进行对应的场景设计。
+
+**Pipeline**
 
 
 
@@ -458,13 +468,14 @@ https://github.com/ultraembedded/riscv
 在准备阶段，我们由于没有完全理解单周期CPU的功能，一直没有理解如何让 CPU 能够实现测试场景的内容。后来经过学习和了解，我们发现了可以使用汇编进行io的轮询，测试场景大部分是汇编代码实现，在汇编中经过读写内存进行io，结果显示的正确就可以说明这部分CPU正确执行了汇编代码。
 
 **第二阶段**  
-实现 `pipeline` 一开始主要是在单周期CPU的基础上添加了四个大的寄存器和对于`hazard`和`forwarding`的处理，但仿真的时候发现子模块结构需要改变，比如原本`Controller`处理ioRead和ioWrite控制信号，但是在pipeline中转移到`MemOrIO`模块中,这其实是因为作为mem阶段，接收的控制信号是上上条指令的与
+实现 `pipeline` 一开始主要是在单周期CPU的基础上添加了四个大的寄存器和对于`hazard`和`forwarding`的处理，但仿真的时候发现子模块结构需要改变，比如原本`Controller`处理ioRead和ioWrite控制信号，但是在pipeline中转移到`MemOrIO`模块中，因为需要保证`Forwarding_controller` 和 `Hazard_Detector` 控制信号接口的正确性。再比如，在WB阶段，遇到`jal`指令，需要`PC + imm32`，此时的PC寄存器的值不是当前`IFetch`给出的寄存器值，因此PC寄存器的值需要不断地在中间寄存器传输。
 
 **上板问题**
 
-- 我们在使用 vivado 的过程中，经常会出现从 vivado 中导入 git 仓库中对应文件夹的代码时，往往没有和 Vscode中实时更新的保持一致，导致测试失败。
-- 在仿真过程中
-- 键盘在子模块上板效果已经很完善了，但是不知道为什么无法用于测试场景
+- 我们在使用 vivado 的过程中，经常会出现从 vivado 中导入 git 仓库中对应文件夹的代码时，往往没有和 Vscode中实时更新的保持一致，导致测试失败。也就是在 Vivado 明明和对应的文件建立了联系，但是有时 updata 不及时（ViVado 软件的问题）。后来我们使用每次都检查没有即时更新，不然重启 Vivado 或者直接复制。
+- 键盘在子模块上板效果已经很完善了，但是不知道为什么无法用于测试场景（在专门测试的项目中，能够准确读取键盘输入的值并显示；但是在CPU项目中，无法正常输入和显示）
+
+以上问题我们基本都是通过仿真测试找到了bug，但是效率非常低，有时需要同时观察十几个寄存器和信号的值，甚至可能几个小时才能定位到问题。
 
 
 # Bonus
@@ -586,11 +597,13 @@ end
 
 *Reference*: https://blog.csdn.net/qimoDIY/article/details/99920981
 
-
 ## 2. UART接口
+
+实现方法参考：lab12课件
 
 使用提供的IP核，接入uart改动的部分：CPU顶层模块，IFetch,Dmem.   
 **uar连线(顶层模块)**
+
 |Port| Description|
 |------ | ---------|
 |`wire upg_clk`|10MHz时钟信号|
