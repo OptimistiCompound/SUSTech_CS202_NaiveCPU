@@ -455,15 +455,16 @@ https://github.com/ultraembedded/riscv
 
 **第一阶段的问题**
 
-在准备阶段，我们由于没有完全理解单周期CPU的功能，一直没有理解如何让 CPU 能够实现测试场景的内容。后来经过学习和了解，我们才发现需要
+在准备阶段，我们由于没有完全理解单周期CPU的功能，一直没有理解如何让 CPU 能够实现测试场景的内容。后来经过学习和了解，我们发现了可以使用汇编进行io的轮询，测试场景大部分是汇编代码实现，在汇编中经过读写内存进行io，结果显示的正确就可以说明这部分CPU正确执行了汇编代码。
 
-
+**第二阶段**  
+实现 `pipeline` 一开始主要是在单周期CPU的基础上添加了四个大的寄存器和对于`hazard`和`forwarding`的处理，但仿真的时候发现子模块结构需要改变，比如原本`Controller`处理ioRead和ioWrite控制信号，但是在pipeline中转移到`MemOrIO`模块中,这其实是因为作为mem阶段，接收的控制信号是上上条指令的与
 
 **上板问题**
 
 - 我们在使用 vivado 的过程中，经常会出现从 vivado 中导入 git 仓库中对应文件夹的代码时，往往没有和 Vscode中实时更新的保持一致，导致测试失败。
 - 在仿真过程中
-
+- 键盘在子模块上板效果已经很完善了，但是不知道为什么无法用于测试场景
 
 
 # Bonus
@@ -471,16 +472,143 @@ https://github.com/ultraembedded/riscv
 
 ## 1. 其他外设：键盘
 
->其他说明见https://github.com/OptimistiCompound/SUSTech_CS202_NaiveCPU/Doc/Keyboard.md
+keyboard_scan负责接受键盘输入的信号，实例化于keyboard_driver模块并且传递信号给该模块
 
-TODO:
+|Port| Description|
+|------ | ---------|
+|`input clk`|系统时钟|
+|`input rstn`|复位信号|
+|`input ps2_clk`|键盘时钟|
+|`input ps2_data`|键盘数据|
+|`output [15:0] xkey`|连续键值|
+|`output [21:0] data`|连续输入信号|
+|`output data_in`|数据输入标识|
+
+keyboard_driver负责将接收到的信号转换成五位的设定值并且输出，实例化于顶层模块并传递信号给Keyboard_cache模块
+
+|Port| Description|
+|------ | ---------|
+|`input clk`|系统时钟|
+|`input rstn`|复位信号|
+|`input ps2_clk`|键盘时钟|
+|`input ps2_data`|键盘数据|
+|`output [4:0] data_out`|转化的键值|
+
+Keyboard_cache键值缓存，负责将接受的值拼接起来，包括删除确认按键，实例化于顶层模块，将处理后的值作为键盘的input
+|Port| Description|
+|------ | ---------|
+|`input clk`|系统时钟|
+|`input rstn`|复位信号|
+|`input [4:0] key_data`|输入的键值|
+|`output [31:0] data_out`|经过拼接后的键盘输入|
+
+#### 主要代码说明
+`keyboard_scan`对 PS/2 时钟 (ps2_clk) 和数据 (ps2_data) 进行 8 级移位寄存器滤波，键被按下时的编码叫做通码(makecode)，弹起时的编码叫做断码(breakcode)，大部分键的通码和断码都是 8 位 1 字节，所以进行8 级移位寄存器滤波
+当连续 8 个时钟周期检测到相同电平 (全 1 或全 0) 时，更新同步后的信号 ps2cf 和 ps2df
+当时钟Clock的下降沿时，侦测到数据Data也拉低，代表一个数据包传送出来，之后的10个时钟下降沿，分别收到从最低位LSB到MSB的八位数据，1位的奇偶校验（1表示八位数据中1的位数为偶数，0是奇数），最后1位高电平表示数据包结束。
+![alt text](image.png)
+```
+always @(posedge DIR or negedge rstn) begin
+    if (!rstn) begin
+        ps2c_filter <= 0;
+        ps2d_filter <= 0;
+        ps2cf <= 1;
+        ps2df <= 1;
+    end else begin
+        ps2c_filter[7] <= ps2_clk;
+        ps2c_filter[6:0] <= ps2c_filter[7:1];
+        ps2d_filter[7] <= ps2_data;
+        ps2d_filter[6:0] <= ps2d_filter[7:1];
+        if (ps2c_filter == 8'b11111111)
+            ps2cf <= 1;
+        else if (ps2c_filter == 8'b00000000)
+            ps2cf <= 0;
+        if (ps2d_filter == 8'b11111111)
+            ps2df <= 1;
+        else if (ps2d_filter == 8'b00000000)
+            ps2df <= 0;
+    end
+end
+
+always @(negedge ps2cf or negedge rstn) begin
+    if (!rstn) begin
+        count <= 0;
+    end else begin
+        if (count >= 4'h10 && ps2df == 1'b1) begin
+            count <= 0;
+            data_in <= 1'b1;
+        end else begin
+            data_in <= 1'b0;
+            count <= count + 1;
+        end
+    end
+end
+```
+`xkey`作为连续两个键值有效值的拼接，只有八位的有效值，第一位是1位起始低电位，第十位是1位奇偶校验，第十一位是1位结尾高电位
+`data`作为连续两个键盘信号的拼接
+```
+assign xkey = {shift2[8:1], shift1[8:1]};
+assign data = {shift2, shift1};
+```
+`Keyboard_cache`
+缓存将上一个状态的键值存入寄存器，当单间键值对应`enter`的时候就根据`key_data_valid`的值对输出数据进行更改
+```
+always @(posedge clk or negedge rstn) begin
+    if (!rstn) begin
+        data_out <= 32'h0; // 同步复位
+    end
+    else begin
+        if (key_data == 5'b10000)begin
+            case(key_data_valid)
+                5'b10001: data_out <= {4'h0, data_out[31:4]}; 
+                5'b10010: data_out <= 32'b0;
+                5'b10000: begin end
+                default: 
+                    if (key_data_valid != 5'b11111) begin // 过滤无效键值
+                        data_out <= {data_out[27:0], key_data_valid[3:0]}; // 左移4位并添加新数据
+                    end
+            endcase
+        end
+    end
+end
+always @(posedge clk or negedge rstn) begin
+    if (!rstn) begin
+        key_data_valid <= 5'b11111; // 同步复位
+    end
+    else begin
+        key_data_valid <= key_data; 
+    end
+end
+```
+
+#### 使用说明
+键值对应键盘上的`0-f`每次键值的输入由`enter`键确认输入，每次按下`enter`只能输入一位十六进制数字，删除单位数字`backspace`和清空缓存区`tab`都是需要`enter`确认的，最大接受八位十六进制数，发生溢出时高位会被舍弃，低位更新为最新的数字
+
+*Reference*: https://blog.csdn.net/qimoDIY/article/details/99920981
 
 
 ## 2. UART接口
 
-TODO:
-
-
+使用提供的IP核，接入uart改动的部分：CPU顶层模块，IFetch,Dmem.   
+**uar连线(顶层模块)**
+|Port| Description|
+|------ | ---------|
+|`wire upg_clk`|10MHz时钟信号|
+|`reg upg_rst`|综合系统复位与uart复位的复位信号|
+|`input rx`|传入数据|
+|`wire upg_clk_w`|输出到子模块的时钟|
+|`wire upg_wen_w`|输出到子模块的写使能信号|
+|`wire [14:0] upg_addr_w`|地址输出|
+|`wire [31:0] upg_data_w`|数据处处|
+|`wire upg_done_w`|写完毕标识|
+|`output tx`|输出数据|
+**子模块说明**
+两个子模块中添加模式控制
+```
+wire mode = upg_rst_i | (~upg_rst_i & upg_done_i);
+```
+IFetch将ROM更改成RAM，在模式为0时接收uart输入，模式为1时关闭写使能，uart本身的写使能经过处理控制实际的内存，IFetch中为(upg_wen_i & ~ upg_adr_i[14])，Dmem中是
+(~upg_wen_i & ~ upg_adr_i[14])
 ## 3. 流水线CPU
 
 能够正确处理`Structure hazard`, `Data hazard`, `Control hazard`，实现了`MEM-EX`, `EX-EX`, `MEM-MEM`三种`forwarding`，实现了`stall`的控制停顿，实现了`flush`清空中间寄存器。
