@@ -46,9 +46,7 @@ end
 always @(posedge clk or negedge rstn) begin
     if(!rstn) begin
         seg_data <= 32'b0;
-    end else if(mode) begin
-        seg_data <= pc4_i;
-    end
+    end 
     else if(SegCtrl) begin
         seg_data <= write_data;
     end 

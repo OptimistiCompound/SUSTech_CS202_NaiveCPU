@@ -247,22 +247,22 @@ module CPU(
         .SegCtrl(SegCtrl)
     );
  
-    LED_con led(
-        .clk(clk),
-        .cpu_clk(cpu_clk),
-        .rstn(rstn),
-        .mode(mode),
-        .base(base),
-        .LEDCtrl(LEDCtrl),
-        .SegCtrl(1'b1),
-        .eBreak(eBreak),
-        .eRead(eRead),
-        .write_data(key_data),
-        .reg_LED(reg_LED),
-        .digit_en(digit_en),
-        .sseg(sseg),
-        .sseg1(sseg1)
-    );
+//    LED_con led(
+//        .clk(clk),
+//        .cpu_clk(cpu_clk),
+//        .rstn(rstn),
+//        .mode(mode),
+//        .base(base),
+//        .LEDCtrl(LEDCtrl),
+//        .SegCtrl(1'b1),
+//        .eBreak(eBreak),
+//        .eRead(eRead),
+//        .write_data(key_data),
+//        .reg_LED(reg_LED)
+//        .digit_en(digit_en),
+//        .sseg(sseg),
+//        .sseg1(sseg1)
+//    );
     // reg [3:0]cnt_btn;
     // always@(posedge cpu_clk) begin
     //  if (conf_btn_out)cnt_btn<=cnt_btn+1;
@@ -276,15 +276,15 @@ module CPU(
     //  assign out[7:4] =cnt_iow;
     //  assign out[15:8] =write_data[7:0];
     //  assign out[31:16] =pc4_i[23:8];
-//    seg seg(
-//    .clk(cpu_clk),
-//    .rstn(rstn),
-//    .data(key_data),
-//    .base(base),
-//    .digit_en(digit_en),
-//    .sseg(sseg),
-//    .sseg1(sseg1)
-//    );
+    seg seg(
+    .clk(cpu_clk),
+    .rstn(rstn),
+    .data(key_data),
+    .base(base),
+    .digit_en(digit_en),
+    .sseg(sseg),
+    .sseg1(sseg1)
+    );
 
 // assign conf_btn_out = conf_btn;
 // assign start_pg_debounce = start_pg;

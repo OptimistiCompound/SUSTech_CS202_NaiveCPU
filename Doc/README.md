@@ -418,9 +418,6 @@ num1_done:
 >可以使用 Uart 导入对应的软件 coe 文件进行测试
 
 
-
-![image](https://github.com/OptimistiCompound/SUSTech_CS202_NaiveCPU/blob/main/Doc/user_guide.jpg)
-
 ## VI. 自测试说明
 
 >以表格的方式罗列出测试方法（仿真、上板）、测试类型（单元、集成）、测试用例描述、测试结果（通过、不通过）；以及最终的测试结论。
@@ -453,7 +450,9 @@ num1_done:
 
 **Pipeline**
 
+我们参考了Azalea8/riscv_cpu中中间寄存器的组织方式。`ForwardingController`以及`HazardDetecor`亦通过Azalea8/riscv_cpu的README.md得到启发。
 
+ultraembedded/riscv是一个标准的risc-v CPU，使用了掩码的方式进行译码，设计思路扁直观，给ALU的实现提供了灵感。
 
 流水线参考：
 
